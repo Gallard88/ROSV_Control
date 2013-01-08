@@ -29,7 +29,7 @@ public:
 	TcpServer(int max_clients);
 
 	void BuildSelectList(void);
-	void CheckNewConnetions(void);
+	int CheckNewConnetions(void);
 
 	int Connect(int port);
 	void Run(struct timeval *timeout);

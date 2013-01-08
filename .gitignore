@@ -2,6 +2,7 @@
 *.slo
 *.lo
 *.o
+ROSV_Control
 
 # Compiled Dynamic libraries
 *.so

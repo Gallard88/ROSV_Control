@@ -64,7 +64,6 @@ int main (int argc, char *argv[])
 
 	// Starting the control module
 //	prop_con = new PropulsionControl(prop_file);
-	cout << "Poll new" << endl;
 	Listner.CheckNewConnetions();
 
 	cout << "Starting Main Program" << endl;
@@ -74,8 +73,10 @@ int main (int argc, char *argv[])
 		struct timeval timeout = system_time;
 		string cmd, arg;
 
+		// read data from connected clients.
 		Listner.Run(&timeout);
-//		if ( Listner.ReadLine(&cmd, &arg) > 0)
+		while ( Listner.ReadLine(&cmd, &arg) > 0)
+			cout << "Cmd: " << cmd << endl;
 //			cout << "Cmd: " << arg << " Arg: " << arg << endl;
 
 		if ( Run_Control == true)
