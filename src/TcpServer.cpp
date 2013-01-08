@@ -57,7 +57,6 @@ int TcpServer::CheckNewConnetions(void)
 //		cout << "FD set" << endl;
 		clilen = sizeof(cli_addr);
 		new_sock.fd = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
-		cout << "accept"<< endl;
 
 		if (new_sock.fd < 0 )
 		{
@@ -115,7 +114,6 @@ void TcpServer::Run(struct timeval *timeout)
 				it->buffer += msg;
 			}
 		}
-		cout << "Loop" << endl;
 	}
 }
 
@@ -125,24 +123,23 @@ int TcpServer::ReadLine(string *cmd, string *arg)
 	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
 	{
 		string *line = &it->buffer;
-		cout << "Line " << *line << endl;
+		if ( line->size() == 0 )
+			continue;
 
-		int found = line->find_first_of("\r");
-		if ( found == string::npos)
-			cout << "Npos" << endl;
+		size_t found = line->find_first_of("\r\n");
 		if ( found != string::npos)
 		{
 			*cmd = line->substr(0, found);
-			line->erase(0, found);
-			cout << "Cmd found: " << *cmd << endl;
+			line->erase(0, found+1);
 
 			size_t x = cmd->find_first_of("=:");
 			if ( x != string::npos )
 			{
 				*arg = cmd->substr((size_t) x+1, cmd->size());
 				cmd->erase((size_t)x, cmd->size());
-				cout << "Arg Built: " << *arg << endl;
+				// need to parse white space at beginning of arg.
 			}
+				// need to parse white space at end of cmd.
 			return 1;
 		}
 	}
@@ -151,58 +148,3 @@ int TcpServer::ReadLine(string *cmd, string *arg)
 
 /* ======================== */
 /* ======================== */
-
-#if 0
-/* A simple server in the internet domain using TCP
-   The port number is passed as an argument */
-
-
-void error(const char *msg)
-{
-    perror(msg);
-    exit(1);
-}
-
-int main(int argc, char *argv[])
-{
-     int sockfd, newsockfd, portno;
-     socklen_t clilen;
-     char buffer[256];
-     struct sockaddr_in serv_addr, cli_addr;
-     int n;
-     if (argc < 2) {
-         fprintf(stderr,"ERROR, no port provided\n");
-         exit(1);
-     }
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0)
-        error("ERROR opening socket");
-     bzero((char *) &serv_addr, sizeof(serv_addr));
-     portno = atoi(argv[1]);
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(portno);
-     if (bind(sockfd, (struct sockaddr *) &serv_addr,
-              sizeof(serv_addr)) < 0)
-              error("ERROR on binding");
-     listen(sockfd,5);
-
-     clilen = sizeof(cli_addr);
-     newsockfd = accept(sockfd,
-                 (struct sockaddr *) &cli_addr,
-                 &clilen);
-     if (newsockfd < 0)
-          error("ERROR on accept");
-
-		 bzero(buffer,256);
-
-     n = read(newsockfd,buffer,255);
-     if (n < 0) error("ERROR reading from socket");
-     printf("Here is the message: %s\n",buffer);
-     n = write(newsockfd,"I got your message",18);
-     if (n < 0) error("ERROR writing to socket");
-     close(newsockfd);
-     close(sockfd);
-     return 0;
-}
-#endif

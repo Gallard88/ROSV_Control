@@ -76,8 +76,7 @@ int main (int argc, char *argv[])
 		// read data from connected clients.
 		Listner.Run(&timeout);
 		while ( Listner.ReadLine(&cmd, &arg) > 0)
-			cout << "Cmd: " << cmd << endl;
-//			cout << "Cmd: " << arg << " Arg: " << arg << endl;
+			cout << "Cmd: " << cmd << " Arg: " << arg << endl;
 
 		if ( Run_Control == true)
 		{
