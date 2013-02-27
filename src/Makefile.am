@@ -9,10 +9,10 @@ ROSV_Controldir = ../
 ROSV_Control_PROGRAMS = ROSV_Control
 
 ROSV_Control_SOURCES = \
+	DataLogger.cpp \
+	DataLogger.h \
 	parson.c \
 	parson.h \
-	SysReport.cpp \
-	SysReport.h \
 	TcpServer.cpp \
 	TcpServer.h \
 	main.cpp

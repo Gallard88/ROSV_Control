@@ -45,7 +45,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = parson.$(OBJEXT) SysReport.$(OBJEXT) \
+am_ROSV_Control_OBJECTS = DataLogger.$(OBJEXT) parson.$(OBJEXT) \
 	TcpServer.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
@@ -168,10 +168,10 @@ AM_CFLAGS = --pedantic -Wall
 # the previous manual Makefile
 ROSV_Controldir = ../
 ROSV_Control_SOURCES = \
+	DataLogger.cpp \
+	DataLogger.h \
 	parson.c \
 	parson.h \
-	SysReport.cpp \
-	SysReport.h \
 	TcpServer.cpp \
 	TcpServer.h \
 	main.cpp
@@ -189,9 +189,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/Makefile
+	  $(AUTOMAKE) --gnu src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -257,7 +257,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/SysReport.Po
+include ./$(DEPDIR)/DataLogger.Po
 include ./$(DEPDIR)/TcpServer.Po
 include ./$(DEPDIR)/main.Po
 include ./$(DEPDIR)/parson.Po
