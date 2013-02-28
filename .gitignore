@@ -3,6 +3,7 @@
 *.slo
 *.lo
 *.o
+*.csv
 ROSV_Control
 
 # Compiled Dynamic libraries
