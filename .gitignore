@@ -17,7 +17,7 @@ ROSV_Control
 # Auto make data
 *autom4te.cache*
 Makefile
-Makefile.in
+#Makefile.in
 
 # Backup data
 *.BAK
