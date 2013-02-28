@@ -24,23 +24,78 @@
 //*******************************************************************************************
 using namespace std;
 
+#include <stdio.h>
+#include <string.h>
+#include <string>
+
 #include "LightManager.h"
 
 //*******************************************************************************************
 LightManager::LightManager(const JSON_Object *settings, PWM_Con *pwm)
 {
-  Led_Ch[LIGHTMAN_LEFT] = (int) json_object_get_number(settings, "Light_Left");
-  Led_Ch[LIGHTMAN_RIGHT] = (int) json_object_get_number(settings, "Light_Right");
+  struct LightCh *new_ch;
+  JSON_Array *array;
+  int i;
 
   Pwm = pwm;
+
+  array = json_object_get_array(settings, "Light");
+  if (array == NULL )
+  {
+    printf( "LM Error\n");
+    return;
+  }
+
+  Num_Chanels = json_array_get_count(array);
+  if ( Num_Chanels <= 0 )
+  {
+    printf("Count error\n");
+    return ;
+  }
+  Chanels = new struct LightCh[Num_Chanels];
+
+  for ( i = 0; i < Num_Chanels; i ++ )
+  {
+    new_ch = &Chanels[i];
+    string search;
+    const char *ptr = json_array_get_string(array, i);
+    if ( ptr == NULL )
+      continue;
+    std::string name(ptr);
+    search = name + ".ch";
+    new_ch->ch = (int)json_object_dotget_number(settings, search.c_str());
+
+    search = name + ".max";
+    new_ch->max = json_object_dotget_number(settings, search.c_str());
+    search = name + ".min";
+    new_ch->min = json_object_dotget_number(settings, search.c_str());
+
+    search = name+ ".name";
+    strncpy(new_ch->name, json_object_dotget_string(settings, search.c_str()) , LM_NAME_SZE);
+  }
 }
 
 //*******************************************************************************************
-void LightManager::SetBrightness(int ch, float level)
+void LightManager::SetBrightness(const char *ch, const float level)
 {
-  if ( ch >= 2 )
-    return ;
-  Pwm->SetLevel(Led_Ch[ch], level);
+  float power;
+  struct LightCh *ptr;
+  int i;
+
+  for ( i = 0; i < Num_Chanels; i ++ )
+  {
+    ptr = &Chanels[i];
+    if ( strcmp(ptr->name, ch) == 0)
+    {
+      if ( level > ptr->max)
+        power = ptr->max;
+      else if ( level < ptr->min )
+        power = ptr->min;
+      else
+        power = level;
+      Pwm->SetLevel(ptr->ch, power);
+    }
+  }
 }
 
 //*******************************************************************************************

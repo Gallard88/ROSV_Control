@@ -29,19 +29,28 @@
 #include "PWM_Con.h"
 
 //*******************************************************************************************
+struct LightCh
+{
+#define LM_NAME_SZE	64
+  char name[LM_NAME_SZE];
+  int ch;
+  float max;
+  float min;
+};
+
+//*******************************************************************************************
 
 class  LightManager
 {
 public:
-	LightManager(const JSON_Object *settings, PWM_Con *pwm);
+  LightManager(const JSON_Object *settings, PWM_Con *pwm);
 
-	void SetBrightness(int ch, float level);
-#define LIGHTMAN_LEFT		0
-#define LIGHTMAN_RIGHT		1
+  void SetBrightness(const char *ch, const float level);
 
 private:
-	PWM_Con *Pwm;
-	int Led_Ch[2];
+  PWM_Con *Pwm;
+  LightCh *Chanels;
+  int Num_Chanels;
 };
 
 //*******************************************************************************************
