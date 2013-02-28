@@ -12,9 +12,10 @@ using namespace std;
 
 #include "TcpServer.h"
 #include "CmdStream.h"
+#include "DataLogger.h"	// for test purposes only
 
 /* ======================== */
-const string prop_file = "./motor.txt";
+const string prop_file = "./ROSV_Motor.json";
 #define SYSTEM_DELAY	100
 const struct timeval system_time = {10,SYSTEM_DELAY};
 
@@ -43,7 +44,9 @@ void alarm_wakeup (int i)
 
 	 Run_Control = true;
 
-}/* ======================== */
+}
+
+/* ======================== */
 int main (int argc, char *argv[])
 {
 	// load paramaters
