@@ -1,6 +1,6 @@
 {
-  "motors" : ["FR", "RR"],
-  "lights" : ["Left", "Right"],
+  "Motors" : ["FR", "RR"],
+  "Lights" : ["Left", "Right"],
 
   "Left" : {
     "max" : 1.0,

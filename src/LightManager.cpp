@@ -39,21 +39,23 @@ LightManager::LightManager(const JSON_Object *settings, PWM_Con *pwm)
 
   Pwm = pwm;
 
-  array = json_object_get_array(settings, "Light");
+  array = json_object_get_array(settings, "Lights");
   if (array == NULL )
   {
-    printf( "LM Error\n");
+    printf( "LM Error, \"Lights\" array not found\n");
     return;
   }
 
   Num_Chanels = json_array_get_count(array);
   if ( Num_Chanels <= 0 )
   {
-    printf("Count error\n");
+    printf("Empty Array\n");
     return ;
   }
+//  printf("%d Light chanels\n", Num_Chanels);
   Chanels = new struct LightCh[Num_Chanels];
 
+//  printf ( "Parsing Settings\n");
   for ( i = 0; i < Num_Chanels; i ++ )
   {
     new_ch = &Chanels[i];
@@ -61,18 +63,26 @@ LightManager::LightManager(const JSON_Object *settings, PWM_Con *pwm)
     const char *ptr = json_array_get_string(array, i);
     if ( ptr == NULL )
       continue;
+    strncpy(new_ch->name, ptr, LM_NAME_SZE);
+
     std::string name(ptr);
     search = name + ".ch";
     new_ch->ch = (int)json_object_dotget_number(settings, search.c_str());
+//    printf("%s %d\n", search.c_str(), new_ch->ch);
 
     search = name + ".max";
     new_ch->max = json_object_dotget_number(settings, search.c_str());
+//    printf("%s, %f\n", search.c_str(), new_ch->max);
+
     search = name + ".min";
     new_ch->min = json_object_dotget_number(settings, search.c_str());
+//    printf("%s, %f\n",search.c_str(), new_ch->min);
 
-    search = name+ ".name";
-    strncpy(new_ch->name, json_object_dotget_string(settings, search.c_str()) , LM_NAME_SZE);
+//    printf("%s, %s\n", search.c_str(), new_ch->name);
+
+//    printf("Next Ch\n");
   }
+//  printf("Light Manager setup\n");
 }
 
 //*******************************************************************************************
@@ -93,6 +103,7 @@ void LightManager::SetBrightness(const char *ch, const float level)
         power = ptr->min;
       else
         power = level;
+//      printf ("Ch %s = %f\n", ch, power);
       Pwm->SetLevel(ptr->ch, power);
     }
   }
