@@ -32,7 +32,7 @@ using namespace std;
 PowerMonitor::PowerMonitor(PWM_Con *pwm)
 {
 	Pwm = pwm;
-	Log = new DataLogger("ROSV_Power",DL_ADD_DATE | DL_ADD_TIME | DL_ADD_TIME);
+	Log = new DataLogger("./ROSV_Power.csv",DL_ADD_DATE | DL_ADD_TIME | DL_ADD_TIME);
 	Log->Add_Title("Temp");
 	Log->Add_Title("Voltage");
 	Log->Add_Title("Current");

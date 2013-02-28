@@ -12,7 +12,8 @@ using namespace std;
 
 #include "TcpServer.h"
 #include "CmdStream.h"
-#include "DataLogger.h"	// for test purposes only
+#include "PWM_Con.h"
+#include "PowerMonitor.h"
 
 /* ======================== */
 const string prop_file = "./ROSV_Motor.json";
@@ -26,6 +27,8 @@ volatile bool Run_Control;
 
 /* ======================== */
 TcpServer Listner(1);
+PWM_Con Pwm;
+PowerMonitor *PowerMon;
 
 /* ======================== */
 void alarm_wakeup (int i)
@@ -42,7 +45,7 @@ void alarm_wakeup (int i)
 
    setitimer(ITIMER_REAL, &tout_val,0);
 
-	 Run_Control = true;
+   Run_Control = true;
 
 }
 
@@ -50,7 +53,11 @@ void alarm_wakeup (int i)
 int main (int argc, char *argv[])
 {
 	// load paramaters
+
 	// open logging module
+	PowerMon = new PowerMonitor(&Pwm);
+
+
 
 	// open TCP server
 	if ( Listner.Connect(8090) < 0)
@@ -84,7 +91,7 @@ int main (int argc, char *argv[])
 		if ( Run_Control == true)
 		{
 			Run_Control = false;
-//			prop_con->Run();
+			PowerMon->Run();
 		}
 	}
 
