@@ -45,8 +45,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = DataLogger.$(OBJEXT) parson.$(OBJEXT) \
-	TcpServer.$(OBJEXT) main.$(OBJEXT)
+am_ROSV_Control_OBJECTS = DataLogger.$(OBJEXT) PWM_Con.$(OBJEXT) \
+	parson.$(OBJEXT) TcpServer.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
@@ -170,6 +170,8 @@ ROSV_Controldir = ../
 ROSV_Control_SOURCES = \
 	DataLogger.cpp \
 	DataLogger.h \
+	PWM_Con.cpp \
+	PWM_Con.h \
 	parson.c \
 	parson.h \
 	TcpServer.cpp \
@@ -258,6 +260,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/DataLogger.Po
+include ./$(DEPDIR)/PWM_Con.Po
 include ./$(DEPDIR)/TcpServer.Po
 include ./$(DEPDIR)/main.Po
 include ./$(DEPDIR)/parson.Po
