@@ -14,9 +14,10 @@ using namespace std;
 #include "CmdStream.h"
 #include "PWM_Con.h"
 #include "PowerMonitor.h"
+#include "LightManager.h"
 
 /* ======================== */
-const string prop_file = "./ROSV_Motor.json";
+const char prop_file[] = "./ROSV_Motors.json";
 #define SYSTEM_DELAY	100
 const struct timeval system_time = {10,SYSTEM_DELAY};
 
@@ -29,6 +30,7 @@ volatile bool Run_Control;
 TcpServer Listner(1);
 PWM_Con Pwm;
 PowerMonitor *PowerMon;
+LightManager *Lighting;
 
 /* ======================== */
 void alarm_wakeup (int i)
@@ -52,10 +54,29 @@ void alarm_wakeup (int i)
 /* ======================== */
 int main (int argc, char *argv[])
 {
+	JSON_Object *settings;
+	JSON_Value *val;
+	int rv;
+
 	// load paramaters
+	val = json_parse_file(prop_file);
+	rv = json_value_get_type(val);
+	if ( rv != JSONObject )
+	{
+		printf("System didn't work %d\n", rv);
+		return -1;
+	}
+	settings = json_value_get_object(val);
+	if ( settings == NULL )
+	{
+		printf("Settings == NULL\n");
+		return -1;
+	}
+
 
 	// open logging module
 	PowerMon = new PowerMonitor(&Pwm);
+	Lighting = new LightManager(settings, &Pwm);
 
 
 
@@ -74,7 +95,7 @@ int main (int argc, char *argv[])
 
 	// Starting the control module
 //	prop_con = new PropulsionControl(prop_file);
-	Listner.CheckNewConnetions();
+//	Listner.CheckNewConnetions();
 
 	cout << "Starting Main Program" << endl;
 
@@ -84,9 +105,9 @@ int main (int argc, char *argv[])
 		string cmd, arg;
 
 		// read data from connected clients.
-		Listner.Run(&timeout);
-		while ( Listner.ReadLine(&cmd, &arg) > 0)
-			cout << "Cmd: " << cmd << " Arg: " << arg << endl;
+//		Listner.Run(&timeout);
+//		while ( Listner.ReadLine(&cmd, &arg) > 0)
+//			cout << "Cmd: " << cmd << " Arg: " << arg << endl;
 
 		if ( Run_Control == true)
 		{

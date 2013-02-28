@@ -33,14 +33,14 @@
 class  LightManager
 {
 public:
-	LightManager(const JSON_Object *settings);
+	LightManager(const JSON_Object *settings, PWM_Con *pwm);
 
 	void SetBrightness(int ch, float level);
 #define LIGHTMAN_LEFT		0
 #define LIGHTMAN_RIGHT		1
 
 private:
-	PWM_Con *pwm;
+	PWM_Con *Pwm;
 	int Led_Ch[2];
 };
 

@@ -27,20 +27,20 @@ using namespace std;
 #include "LightManager.h"
 
 //*******************************************************************************************
-LightManager::LightManager(const JSON_Object *settings)
+LightManager::LightManager(const JSON_Object *settings, PWM_Con *pwm)
 {
-	Led_Ch[LIGHTMAN_LEFT] = (int) json_object_get_number(settings, "Light_Left");
-	Led_Ch[LIGHTMAN_RIGHT] = (int) json_object_get_number(settings, "Light_Right");
+  Led_Ch[LIGHTMAN_LEFT] = (int) json_object_get_number(settings, "Light_Left");
+  Led_Ch[LIGHTMAN_RIGHT] = (int) json_object_get_number(settings, "Light_Right");
 
-	pwm = new PWM_Con();
+  Pwm = pwm;
 }
 
 //*******************************************************************************************
 void LightManager::SetBrightness(int ch, float level)
 {
-	if ( ch >= 2 )
-		return ;
-	pwm->SetLevel(Led_Ch[ch], level);
+  if ( ch >= 2 )
+    return ;
+  Pwm->SetLevel(Led_Ch[ch], level);
 }
 
 //*******************************************************************************************
