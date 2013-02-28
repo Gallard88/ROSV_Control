@@ -11,6 +11,8 @@ ROSV_Control_PROGRAMS = ROSV_Control
 ROSV_Control_SOURCES = \
 	DataLogger.cpp \
 	DataLogger.h \
+	LightManager.cpp \
+	LightManager.h \
 	PWM_Con.cpp \
 	PWM_Con.h \
 	parson.c \
