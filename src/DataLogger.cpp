@@ -33,6 +33,8 @@ DataLogger::DataLogger(const string filename, int opt)
 {
   options = opt;
   name = filename;
+  writer.open(name.c_str());
+  writer.close();
 }
 
 //*******************************************************************************************
