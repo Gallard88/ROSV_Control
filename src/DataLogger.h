@@ -33,11 +33,10 @@
 class  DataLogger
 {
 public:
-	DataLogger(const string filename, int options);
+	DataLogger(const string filename, int opt);
 #define DL_ADD_DATE			1
 #define DL_ADD_TIME			2
 #define DL_LEAVE_FILE_OPEN	4
-#define DL_ADD_TIME			8
 	~DataLogger();
 
 	void Add_Title(const string field);

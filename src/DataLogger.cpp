@@ -24,11 +24,15 @@
 //*******************************************************************************************
 #include <time.h>
 
+using namespace std;
+
 #include "DataLogger.h"
 
 //*******************************************************************************************
-DataLogger::DataLogger(const string filename, int options)
+DataLogger::DataLogger(const string filename, int opt)
 {
+  options = opt;
+  name = filename;
 }
 
 //*******************************************************************************************
@@ -64,9 +68,9 @@ void DataLogger::ChecktoAddTimeTitle(void)
 void DataLogger::Add_Title(const string field)
 {
 	if (! writer.is_open())
-		writer.open (name, ios_base::app);
+		writer.open (name.c_str(), ios_base::app);
 	ChecktoAddTimeTitle();
-	writer << field;
+	writer << field.c_str();
 	writer << ",";
 	writer.flush();
 
@@ -79,7 +83,7 @@ void DataLogger::Add_Title(const string field)
 void DataLogger::Add_Var(const string field)
 {
 	if (! writer.is_open())
-		writer.open (name, ios_base::app);
+		writer.open (name.c_str(), ios_base::app);
 	ChecktoAddTime();
 
 	writer << "\"";
@@ -95,7 +99,7 @@ void DataLogger::Add_Var(const string field)
 void DataLogger::Add_Var(const int field)
 {
 	if (! writer.is_open())
-		writer.open (name, ios_base::app);
+		writer.open (name.c_str(), ios_base::app);
 	ChecktoAddTime();
 
 	writer << field;
@@ -110,7 +114,7 @@ void DataLogger::Add_Var(const int field)
 void DataLogger::Add_Var(const float field)
 {
 	if (! writer.is_open())
-		writer.open (name, ios_base::app);
+		writer.open (name.c_str(), ios_base::app);
 	ChecktoAddTime();
 
 	writer << field;
@@ -122,10 +126,10 @@ void DataLogger::Add_Var(const float field)
 }
 
 //*******************************************************************************************
-void DataLogger::RecordLine(void);
+void DataLogger::RecordLine(void)
 {
 	if (! writer.is_open())
-		writer.open (name, ios_base::app);
+		writer.open (name.c_str(), ios_base::app);
 	ChecktoAddTime();
 
 	writer << "\r\n";
@@ -138,5 +142,4 @@ void DataLogger::RecordLine(void);
 
 //*******************************************************************************************
 //*******************************************************************************************
-#endif
 
