@@ -21,124 +21,189 @@
  THE SOFTWARE.
 */
 
-//*******************************************************************************************
+// *******************************************************************************************
 #include <time.h>
+#include <sstream>
 
 using namespace std;
 
 #include "DataLogger.h"
 
-//*******************************************************************************************
-DataLogger::DataLogger(const string filename, int opt)
+// *******************************************************************************************
+DataLogger::DataLogger(const string path, const string filename, const DataLoggerOpt *options)
 {
-  options = opt;
-  name = filename;
-  writer.open(name.c_str());
+	ofstream writer;
+
+	time_t current;
+  struct tm *loc_time;
+
+  current = time(NULL);
+  loc_time = localtime(&current);
+
+  Col_Date = options->first_col_date;
+  Col_Time = options->first_col_time;
+
+  Name = path;
+  if ( options->filename_date )
+  {
+		char date[100];
+
+		snprintf(date, sizeof(date),"%04d%02d%02d", loc_time->tm_year + 1900, loc_time->tm_mon+1, loc_time->tm_mday);
+		string format(date);
+
+		Name += format;
+		Name += "_";
+  }
+  if ( options->filename_time )
+  {
+		char time[100];
+
+		snprintf(time, sizeof(time),"%02d%02d%02d", loc_time->tm_hour, loc_time->tm_min, loc_time->tm_sec);
+		string format(time);
+
+		Name += format;
+		Name += "_";
+  }
+
+  Name += filename;
+  writer.open(Name.c_str());
   writer.close();
+  Line_Started = false;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 DataLogger::~DataLogger()
 {
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 void DataLogger::ChecktoAddTime(void)
 {
-	if (( options & DL_ADD_TIME ) && ( line_started == false ))
-	{
-		time_t current;
+	ofstream writer;
 
-		time(&current);
-		writer << current;
-		writer << ",";
-		line_started = true;
-	}
+	if ( Line_Started == true )
+    return ;
+
+  writer.open(Name.c_str(), ios_base::app);
+
+	time_t current;
+  struct tm *loc_time;
+
+  current = time(NULL);
+  loc_time = localtime(&current);
+
+
+  if ( Col_Date )
+  {
+    writer << loc_time->tm_year+1900 <<"/";
+    writer << loc_time->tm_mon+1 <<"/";
+    writer << loc_time->tm_mday;
+		if ( Col_Time == true )
+			writer << ",";
+
+  }
+
+  if ( Col_Time )
+  {
+    writer << loc_time->tm_hour << ":";
+    writer << loc_time->tm_min << ":";
+    writer << loc_time->tm_sec;
+  }
+  Line_Started = true;
+  writer.close();
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 void DataLogger::ChecktoAddTimeTitle(void)
 {
-	if (( options & DL_ADD_TIME ) && ( line_started == false ))
-	{
-		writer << "Time,";
-		line_started = true;
-	}
+	ofstream writer;
+  writer.open(Name.c_str(), ios_base::app);
+
+	if ( Line_Started == false )
+  {
+    if ( Col_Date )
+      writer << "Date,";
+    if ( Col_Time )
+      writer << "Time,";
+    Line_Started = true;
+  }
+  writer.close();
 }
 
 //*******************************************************************************************
 void DataLogger::Add_Title(const string field)
 {
-	if (! writer.is_open())
-		writer.open (name.c_str(), ios_base::app);
-	ChecktoAddTimeTitle();
-	writer << field.c_str();
-	writer << ",";
-	writer.flush();
+	ofstream writer;
 
-	if (!( options & DL_LEAVE_FILE_OPEN ))
-		writer.close();
-	line_started = true;
+	ChecktoAddTimeTitle();
+  writer.open(Name.c_str(), ios_base::app);
+	if ( Line_Started == true )
+		writer << ",";
+  writer << field.c_str();
+  writer.flush();
+  writer.close();
+  Line_Started = true;
 }
 
 //*******************************************************************************************
 void DataLogger::Add_Var(const string field)
 {
-	if (! writer.is_open())
-		writer.open (name.c_str(), ios_base::app);
-	ChecktoAddTime();
+	ofstream writer;
 
-	writer << "\"";
-	writer << field;
-	writer << "\", ";
-	writer.flush();
-	if (!( options & DL_LEAVE_FILE_OPEN ))
-		writer.close();
-	line_started = true;
+	ChecktoAddTime();
+  writer.open(Name.c_str(), ios_base::app);
+
+	if ( Line_Started == true )
+		writer << ",";
+
+  writer << "\"" << field << "\"";
+  writer.flush();
+  writer.close();
+  Line_Started = true;
 }
 
 //*******************************************************************************************
 void DataLogger::Add_Var(const int field)
 {
-	if (! writer.is_open())
-		writer.open (name.c_str(), ios_base::app);
-	ChecktoAddTime();
+	ofstream writer;
 
-	writer << field;
-	writer << ", ";
-	writer.flush();
-	if (!( options & DL_LEAVE_FILE_OPEN ))
-		writer.close();
-	line_started = true;
+	ChecktoAddTime();
+  writer.open(Name.c_str(), ios_base::app);
+	if ( Line_Started == true )
+		writer << ",";
+  writer << field;
+  writer.flush();
+  writer.close();
+  Line_Started = true;
 }
 
 //*******************************************************************************************
 void DataLogger::Add_Var(const float field)
 {
-	if (! writer.is_open())
-		writer.open (name.c_str(), ios_base::app);
-	ChecktoAddTime();
+	ofstream writer;
 
-	writer << field;
-	writer << ", ";
-	writer.flush();
-	if (!( options & DL_LEAVE_FILE_OPEN ))
-		writer.close();
-	line_started = true;
+	ChecktoAddTime();
+  writer.open(Name.c_str(), ios_base::app);
+	if ( Line_Started == true )
+		writer << ",";
+
+  writer << field;
+  writer.close();
+  Line_Started = true;
 }
 
 //*******************************************************************************************
 void DataLogger::RecordLine(void)
 {
-	if (! writer.is_open())
-		writer.open (name.c_str(), ios_base::app);
-	ChecktoAddTime();
+	ofstream writer;
 
-	writer << "\r\n";
-	writer.flush();
-	if (!( options & DL_LEAVE_FILE_OPEN ))
-		writer.close();
-	line_started = false;
+  ChecktoAddTime();
+
+  writer.open(Name.c_str(), ios_base::app);
+  writer << "\r\n";
+  writer.flush();
+  writer.close();
+  Line_Started = false;
 }
 
 

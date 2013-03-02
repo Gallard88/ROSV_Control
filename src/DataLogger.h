@@ -30,13 +30,20 @@
 #include <fstream>
 
 //*******************************************************************************************
+typedef struct
+{
+  bool filename_date;
+  bool filename_time;
+  bool first_col_date;
+  bool first_col_time;
+
+} DataLoggerOpt;
+
+//*******************************************************************************************
 class  DataLogger
 {
 public:
-	DataLogger(const string filename, int opt);
-#define DL_ADD_DATE			1
-#define DL_ADD_TIME			2
-#define DL_LEAVE_FILE_OPEN	4
+	DataLogger(const string path, const string filename, const DataLoggerOpt *options);
 	~DataLogger();
 
 	void Add_Title(const string field);
@@ -47,12 +54,11 @@ public:
 	void RecordLine(void);
 
 private:
-	string line;
-	string name;
-	int fp;
-	int options;
-	ofstream writer;
-	bool line_started;
+//	ofstream FileWriter;
+  string Name;
+	bool Line_Started;
+	bool Col_Date;
+	bool Col_Time;
 
 	void ChecktoAddTime(void);
 	void ChecktoAddTimeTitle(void);
