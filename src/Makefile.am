@@ -11,6 +11,8 @@ ROSV_Control_PROGRAMS = ROSV_Control
 ROSV_Control_SOURCES = \
 	DataLogger.cpp \
 	DataLogger.h \
+	DepthManager.cpp \
+	DepthManager.h \
 	LightManager.cpp \
 	LightManager.h \
 	PowerMonitor.cpp \

@@ -45,9 +45,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = DataLogger.$(OBJEXT) LightManager.$(OBJEXT) \
-	PowerMonitor.$(OBJEXT) PWM_Con.$(OBJEXT) parson.$(OBJEXT) \
-	TcpServer.$(OBJEXT) main.$(OBJEXT)
+am_ROSV_Control_OBJECTS = DataLogger.$(OBJEXT) DepthManager.$(OBJEXT) \
+	LightManager.$(OBJEXT) PowerMonitor.$(OBJEXT) \
+	PWM_Con.$(OBJEXT) parson.$(OBJEXT) TcpServer.$(OBJEXT) \
+	main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -171,6 +172,8 @@ ROSV_Controldir = ../
 ROSV_Control_SOURCES = \
 	DataLogger.cpp \
 	DataLogger.h \
+	DepthManager.cpp \
+	DepthManager.h \
 	LightManager.cpp \
 	LightManager.h \
 	PowerMonitor.cpp \
@@ -265,6 +268,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataLogger.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DepthManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PWM_Con.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerMonitor.Po@am__quote@
