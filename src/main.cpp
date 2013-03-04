@@ -130,15 +130,15 @@ int main (int argc, char *argv[])
 
   while (1)
   {
-    struct timeval timeout = system_time;
-    string line;
+//    struct timeval timeout = system_time;
+//    string line;
 
     // read data from connected clients.
-    Listner.Run(&timeout);
-    while ( Listner.ReadLine(&line) > 0 )
-    {
-      cout << line;
-    }
+//    Listner.Run(&timeout);
+//    while ( Listner.ReadLine(&line) > 0 )
+//    {
+//      cout << line;
+//    }
 
     if ( Run_Control == true)
     {
