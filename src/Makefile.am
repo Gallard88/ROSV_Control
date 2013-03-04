@@ -15,6 +15,8 @@ ROSV_Control_SOURCES = \
 	DepthManager.h \
 	LightManager.cpp \
 	LightManager.h \
+	PositionControl.cpp \
+	PositionControl.h \
 	PowerMonitor.cpp \
 	PowerMonitor.h \
 	PWM_Con.cpp \
