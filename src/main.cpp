@@ -15,40 +15,41 @@ using namespace std;
 #include "PWM_Con.h"
 #include "PowerMonitor.h"
 #include "LightManager.h"
+#include "DepthManager.h"
+#include "PositionControl.h"
+
+/* ======================== */
+#define RUN_INTERVAL 100000	// 100 ms
 
 /* ======================== */
 const char prop_file[] = "./ROSV_Motors.json";
-#define SYSTEM_DELAY	100
-const struct timeval system_time = {10,SYSTEM_DELAY};
+const struct timeval system_time = { 0 , RUN_INTERVAL};
 
 /* ======================== */
 volatile bool Run_Control;
-
-#define UV_INTERVAL 100000	// 100 ms
 
 /* ======================== */
 TcpServer Listner(1);
 PWM_Con Pwm;
 PowerMonitor *PowerMon;
 LightManager *Lighting;
+PositionControl *Position;
+DepthManager *Depth;
 
 /* ======================== */
 void alarm_wakeup (int i)
 {
-   struct itimerval tout_val;
+  struct itimerval tout_val;
 
-   signal(SIGALRM,alarm_wakeup);
+  signal(SIGALRM,alarm_wakeup);
 
-//   printf("Tick Tock\n");
-   tout_val.it_interval.tv_sec = 0;
-   tout_val.it_interval.tv_usec = 0;
-   tout_val.it_value.tv_sec = 0; // 10 seconds timer
-   tout_val.it_value.tv_usec = UV_INTERVAL;
+  tout_val.it_interval.tv_sec = 0;
+  tout_val.it_interval.tv_usec = 0;
+  tout_val.it_value.tv_sec = 0; // 10 seconds timer
+  tout_val.it_value.tv_usec = RUN_INTERVAL;
 
-   setitimer(ITIMER_REAL, &tout_val,0);
-
-   Run_Control = true;
-
+  setitimer(ITIMER_REAL, &tout_val,0);
+  Run_Control = true;
 }
 
 // *****************
@@ -71,73 +72,83 @@ void Setup_SignalHandler(void)
 }
 
 /* ======================== */
+void System_Shutdown(void)
+{
+  delete PowerMon;
+  delete Lighting;
+  delete Position;
+  delete Depth;
+}
+
+/* ======================== */
 int main (int argc, char *argv[])
 {
-	JSON_Object *settings;
-	JSON_Value *val;
-	int rv;
+  JSON_Object *settings;
+  JSON_Value *val;
+  int rv;
 
-	Setup_SignalHandler();
+  Setup_SignalHandler();
+  atexit(System_Shutdown);
 
-	// load paramaters
-	val = json_parse_file(prop_file);
-	rv = json_value_get_type(val);
-	if ( rv != JSONObject )
-	{
-		printf("System didn't work %d\n", rv);
-		return -1;
-	}
-	settings = json_value_get_object(val);
-	if ( settings == NULL )
-	{
-		printf("Settings == NULL\n");
-		return -1;
-	}
+  // load paramaters
+  val = json_parse_file(prop_file);
+  rv = json_value_get_type(val);
+  if ( rv != JSONObject )
+  {
+    printf("System didn't work %d\n", rv);
+    return -1;
+  }
 
+  settings = json_value_get_object(val);
+  if ( settings == NULL )
+  {
+    printf("Settings == NULL\n");
+    return -1;
+  }
 
-	// open logging module
-	PowerMon = new PowerMonitor(&Pwm);
-	Lighting = new LightManager(settings, &Pwm);
+  // open sub-modules
+  PowerMon = new PowerMonitor(&Pwm);
+  Lighting = new LightManager(settings, &Pwm);
+  Position = new PositionControl(settings, &Pwm );
+  Depth = new DepthManager(settings, &Pwm );
+  Depth->Enable();
 
-
-
-	// open TCP server
-	if ( Listner.Connect(8090) < 0)
-	{
-		cout << "Listner Failed" << endl;
-		return -1;
-	}
-	cout << "Listner setup" << endl;
-	// start command processor
-
-	// set up timer signal and signal handler
-	alarm_wakeup(0);
+  // open TCP server
+  if ( Listner.Connect(8090) < 0)
+  {
+    cout << "Listner Failed" << endl;
+    return -1;
+  }
 
 
-	// Starting the control module
-//	prop_con = new PropulsionControl(prop_file);
-//	Listner.CheckNewConnetions();
+  // set up timer signal and signal handler
+  alarm_wakeup(0);
 
-	cout << "Starting Main Program" << endl;
+//  Listner.CheckNewConnetions();
 
-	while (1)
-	{
-		struct timeval timeout = system_time;
-		string cmd, arg;
+  cout << "Starting Main Program" << endl;
 
-		// read data from connected clients.
-//		Listner.Run(&timeout);
-//		while ( Listner.ReadLine(&cmd, &arg) > 0)
-//			cout << "Cmd: " << cmd << " Arg: " << arg << endl;
+  while (1)
+  {
+    struct timeval timeout = system_time;
+    string line;
 
-		if ( Run_Control == true)
-		{
-			Run_Control = false;
-			PowerMon->Run();
-		}
-	}
+    // read data from connected clients.
+    Listner.Run(&timeout);
+    while ( Listner.ReadLine(&line) > 0 )
+    {
+      cout << line;
+    }
 
-	return 0;
+    if ( Run_Control == true)
+    {
+      Run_Control = false;
+      PowerMon->Run();
+      Depth->Run();
+      Position->Run();
+    }
+  }
+  return 0;
 }
 
 /* ======================== */
