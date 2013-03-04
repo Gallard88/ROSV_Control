@@ -34,7 +34,7 @@ public:
 	int Connect(int port);
 	void Run(struct timeval *timeout);
 
-	int ReadLine(string *cmd, string *arg);
+	int ReadLine(string *data);
 };
 
 /* ======================== */

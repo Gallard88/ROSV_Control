@@ -118,7 +118,7 @@ void TcpServer::Run(struct timeval *timeout)
 }
 
 /* ======================== */
-int TcpServer::ReadLine(string *cmd, string *arg)
+int TcpServer::ReadLine(string *data)
 {
 	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
 	{
@@ -129,17 +129,9 @@ int TcpServer::ReadLine(string *cmd, string *arg)
 		size_t found = line->find_first_of("\r\n");
 		if ( found != string::npos)
 		{
-			*cmd = line->substr(0, found);
+			*data = line->substr(0, found);
 			line->erase(0, found+1);
 
-			size_t x = cmd->find_first_of("=:");
-			if ( x != string::npos )
-			{
-				*arg = cmd->substr((size_t) x+1, cmd->size());
-				cmd->erase((size_t)x, cmd->size());
-				// need to parse white space at beginning of arg.
-			}
-				// need to parse white space at end of cmd.
 			return 1;
 		}
 	}
