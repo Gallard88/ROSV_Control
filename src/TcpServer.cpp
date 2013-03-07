@@ -140,4 +140,19 @@ int TcpServer::ReadLine(string *data)
 }
 
 /* ======================== */
+TcpServer::~TcpServer(void)
+{
+	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
+	{
+		shutdown(it->fd, 2);
+		close(it->fd);
+		it->fd = -1;
+	}
+	Socket_Vec.clear();
+	shutdown(listen_fd, 2);
+	close(listen_fd);
+	listen_fd = -1;
+}
+
+/* ======================== */
 /* ======================== */

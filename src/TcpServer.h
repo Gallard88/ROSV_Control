@@ -27,6 +27,7 @@ private:
 public:
 
 	TcpServer(int max_clients);
+	~TcpServer(void);
 
 	void BuildSelectList(void);
 	int CheckNewConnetions(void);
