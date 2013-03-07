@@ -124,21 +124,22 @@ int main (int argc, char *argv[])
   // set up timer signal and signal handler
   alarm_wakeup(0);
 
-//  Listner.CheckNewConnetions();
+  Listner.CheckNewConnetions();
 
   cout << "Starting Main Program" << endl;
 
   while (1)
   {
-//    struct timeval timeout = system_time;
-//    string line;
+    struct timeval timeout = system_time;
+    string line;
 
     // read data from connected clients.
-//    Listner.Run(&timeout);
-//    while ( Listner.ReadLine(&line) > 0 )
-//    {
-//      cout << line;
-//    }
+    Listner.Run(&timeout);
+		line.clear();
+    while ( Listner.ReadLine(&line) > 0 )
+    {
+      cout << line;// << endl;
+    }
 
     if ( Run_Control == true)
     {

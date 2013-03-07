@@ -130,6 +130,7 @@ int TcpServer::ReadLine(string *data)
 		if ( found != string::npos)
 		{
 			*data = line->substr(0, found);
+			data->append("\r\n");
 			line->erase(0, found+1);
 
 			return 1;
