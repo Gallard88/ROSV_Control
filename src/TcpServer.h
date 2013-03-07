@@ -35,6 +35,8 @@ public:
 
 	int Connect(int port);
 	void Run(struct timeval *timeout);
+  void SendMsg(const string msg);
+  void SendMsg(const char *data, int size);
 
 	int ReadLine(string *data);
 };

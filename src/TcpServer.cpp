@@ -145,6 +145,43 @@ int TcpServer::ReadLine(string *data)
 }
 
 /* ======================== */
+void TcpServer::Prune(void)
+{
+	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
+	{
+		if ( it->fd < 0 )
+		{
+			cout << "Client Lost" << endl;
+			it->buffer.clear();
+			Socket_Vec.erase(it);
+			it = Socket_Vec.begin();
+		}
+	}
+}
+
+/* ======================== */
+void TcpServer::SendMsg(const string msg)
+{
+	SendMsg((const char *)msg.c_str(), (int ) msg.size());
+}
+
+/* ======================== */
+void TcpServer::SendMsg(const char *data, int size)
+{
+	int rv;
+
+	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
+	{
+		rv = write(it->fd, data, size);
+		if (rv < 0 )
+		{
+			shutdown(it->fd, 2);
+			it->fd = -1;
+		}
+	}
+}
+
+/* ======================== */
 TcpServer::~TcpServer(void)
 {
 	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
