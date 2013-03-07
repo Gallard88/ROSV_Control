@@ -17,6 +17,7 @@ using namespace std;
 #include "LightManager.h"
 #include "DepthManager.h"
 #include "PositionControl.h"
+#include "CmdProc.h"
 
 /* ======================== */
 #define RUN_INTERVAL 100000	// 100 ms
@@ -35,6 +36,7 @@ PowerMonitor *PowerMon;
 LightManager *Lighting;
 PositionControl *Position;
 DepthManager *Depth;
+Cmdproc *Cmd;
 
 /* ======================== */
 void alarm_wakeup (int i)
@@ -81,6 +83,52 @@ void System_Shutdown(void)
 }
 
 /* ======================== */
+void Func_Forward(string arg)
+{
+	double temp = ::atof(arg.c_str()) / 100.0;
+
+	cout << "Func_Forward: " << temp << endl;
+	Position->Set_TargFwdVel(temp);
+}
+
+/* ======================== */
+void Func_Sideward(string arg)
+{
+	double temp = ::atof(arg.c_str()) / 100.0;
+	cout << "Func_Sideward: " << temp << endl;
+
+	Position->Set_TargSwdVel(temp);
+}
+
+/* ======================== */
+void Func_Turn(string arg)
+{
+	double temp = ::atof(arg.c_str()) / 100.0;
+	cout << "Func_Turn: " << temp << endl;
+	Position->Set_TargTurnVel(temp);
+}
+
+/* ======================== */
+void Func_Depth(string arg)
+{
+	double temp = ::atof(arg.c_str()) / 100.0;
+
+	cout << "Func_Depth: " << temp << endl;
+
+	Depth->SetDepthPower(temp);
+}
+
+/* ======================== */
+void Setup_Callbacks(void)
+{
+	Cmd->AddCallBack("Forward", Func_Forward);
+	Cmd->AddCallBack("Sideward", Func_Sideward);
+	Cmd->AddCallBack("Turn", Func_Turn);
+	Cmd->AddCallBack("Depth", Func_Depth);
+}
+
+
+/* ======================== */
 int main (int argc, char *argv[])
 {
   JSON_Object *settings;
@@ -107,11 +155,15 @@ int main (int argc, char *argv[])
   }
 
   // open sub-modules
+  Cmd = new Cmdproc();
   PowerMon = new PowerMonitor(&Pwm);
   Lighting = new LightManager(settings, &Pwm);
   Position = new PositionControl(settings, &Pwm );
   Depth = new DepthManager(settings, &Pwm );
   Depth->Enable();
+	Depth->SetDepthPower(0.0);
+
+	Setup_Callbacks();
 
   // open TCP server
   if ( Listner.Connect(8090) < 0)
@@ -138,7 +190,10 @@ int main (int argc, char *argv[])
 		line.clear();
     while ( Listner.ReadLine(&line) > 0 )
     {
-      cout << line;// << endl;
+			if ( line.size() > 0 )
+			{
+				Cmd->ProcessLine(line);
+			}
     }
 
     if ( Run_Control == true)

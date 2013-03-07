@@ -4,6 +4,7 @@
 *.lo
 *.o
 *.csv
+*.log
 ROSV_Control
 
 # Compiled Dynamic libraries

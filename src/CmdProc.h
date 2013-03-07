@@ -7,23 +7,23 @@
 #include <vector>
 
 /* ======================== */
+typedef void (*CmdProc_Func)(string arg);
 
-struct cmd_Callback {
+struct Cmd_Callback {
 	string cmd;
-	void (*callback)(string arg);
+	CmdProc_Func func;
 };
 
 /* ======================== */
 class Cmdproc
 {
 private:
-	vector<struct cmd_Callback> Callback_List;
-	string Buffer;
+	vector<struct Cmd_Callback> Callback_List;
 
 public:
 
-	int AddCallBack(struct cmd_Callback *callback);
-	int Process(string buf);
+	int AddCallBack(const string cmd, CmdProc_Func callback);
+	int ProcessLine(string buf);
 
 };
 

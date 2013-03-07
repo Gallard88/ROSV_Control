@@ -9,6 +9,8 @@ ROSV_Controldir = ../
 ROSV_Control_PROGRAMS = ROSV_Control
 
 ROSV_Control_SOURCES = \
+	CmdProc.c \
+	CmdProc.h \
 	DataLogger.cpp \
 	DataLogger.h \
 	DepthManager.cpp \
