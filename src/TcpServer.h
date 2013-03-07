@@ -17,11 +17,12 @@ class TcpServer
 {
 private:
 	int listen_fd;
-
 	int Max_Connections;
 
 	vector<struct TcpData> Socket_Vec;
+	fd_set readfs;
 
+	void CheckNewConnetions(void);
 
 
 public:
@@ -30,7 +31,6 @@ public:
 	~TcpServer(void);
 
 	void BuildSelectList(void);
-	int CheckNewConnetions(void);
 
 	int Connect(int port);
 	void Run(struct timeval *timeout);

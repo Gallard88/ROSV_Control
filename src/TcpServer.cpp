@@ -46,26 +46,23 @@ int TcpServer::Connect(int port)
 }
 
 /* ======================== */
-int TcpServer::CheckNewConnetions(void)
+void TcpServer::CheckNewConnetions(void)
 {
 	struct TcpData new_sock;
 	socklen_t clilen;
 	struct sockaddr_in cli_addr;
 
-//	if ( FD_ISSET(listen_fd, &readfds) )
+	if ( FD_ISSET(listen_fd, &readfs) )
 	{
 //		cout << "FD set" << endl;
 		clilen = sizeof(cli_addr);
 		new_sock.fd = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
 
 		if (new_sock.fd < 0 )
-		{
-//			printf("ERROR on accept");
-			return -1;
-		}
+			return ;
+
 		Socket_Vec.push_back(new_sock);
 	}
-	return 0;
 }
 
 /* ======================== */
@@ -74,27 +71,33 @@ int TcpServer::CheckNewConnetions(void)
 /* ======================== */
 void TcpServer::Run(struct timeval *timeout)
 {
-	fd_set readfs;
+//	fd_set readfs;
 	int max_sock = 0;
 	struct TcpData new_sock;
 	struct timeval to = { 0, 0};
 	char buffer[4096];
-
 
 	if ( timeout)
 		to = *timeout;
 
 	// reset Select Data.
   FD_ZERO(&readfs);
-	FD_SET(listen_fd, &readfs);
-	max_sock = listen_fd;
+	if ( Socket_Vec.size() < Max_Connections)
+	{
+		FD_SET(listen_fd, &readfs);
+		max_sock = listen_fd;
+	}
 
 	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
 	{
 		FD_SET(it->fd, &readfs);
 		SET_MAX_SOCK( it->fd );
 	}
-	select(max_sock+1, &readfs, NULL, NULL, &to);
+	if ( select(max_sock+1, &readfs, NULL, NULL, &to) <= 0)
+		return;
+
+	if ( Socket_Vec.size() < Max_Connections)
+		CheckNewConnetions();
 
 	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
 	{
@@ -105,6 +108,7 @@ void TcpServer::Run(struct timeval *timeout)
 			if ( n <= 0 )
 			{
 				cout << "Client Lost" << endl;
+				it->buffer.clear();
 				Socket_Vec.erase(it);
 				break;
 			}
@@ -147,6 +151,7 @@ TcpServer::~TcpServer(void)
 	{
 		shutdown(it->fd, 2);
 		close(it->fd);
+		it->buffer.clear();
 		it->fd = -1;
 	}
 	Socket_Vec.clear();

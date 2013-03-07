@@ -176,10 +176,7 @@ int main (int argc, char *argv[])
   // set up timer signal and signal handler
   alarm_wakeup(0);
 
-  Listner.CheckNewConnetions();
-
   cout << "Starting Main Program" << endl;
-
   while (1)
   {
     struct timeval timeout = system_time;
