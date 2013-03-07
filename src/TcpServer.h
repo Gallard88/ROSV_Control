@@ -23,6 +23,7 @@ private:
 	fd_set readfs;
 
 	void CheckNewConnetions(void);
+  void Prune(void);
 
 
 public:

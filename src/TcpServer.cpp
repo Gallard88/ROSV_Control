@@ -80,9 +80,11 @@ void TcpServer::Run(struct timeval *timeout)
 	if ( timeout)
 		to = *timeout;
 
+	Prune();
+
 	// reset Select Data.
   FD_ZERO(&readfs);
-	if ( Socket_Vec.size() < Max_Connections)
+	if ( Socket_Vec.size() < (size_t) Max_Connections )
 	{
 		FD_SET(listen_fd, &readfs);
 		max_sock = listen_fd;
@@ -96,7 +98,7 @@ void TcpServer::Run(struct timeval *timeout)
 	if ( select(max_sock+1, &readfs, NULL, NULL, &to) <= 0)
 		return;
 
-	if ( Socket_Vec.size() < Max_Connections)
+	if ( Socket_Vec.size() < (size_t) Max_Connections)
 		CheckNewConnetions();
 
 	for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
@@ -107,10 +109,8 @@ void TcpServer::Run(struct timeval *timeout)
 			int n = read(sock, buffer, sizeof(buffer));
 			if ( n <= 0 )
 			{
-				cout << "Client Lost" << endl;
-				it->buffer.clear();
-				Socket_Vec.erase(it);
-				break;
+				shutdown(it->fd, 2);
+				it->fd = -1;
 			}
 			else if ( n > 0 )
 			{
