@@ -23,7 +23,7 @@ using namespace std;
 #define RUN_INTERVAL 100000	// 100 ms
 
 /* ======================== */
-const char prop_file[] = "./ROSV_Motors.json";
+const char prop_file[] = "/etc/ROSV_Motors.json";
 const struct timeval system_time = { 0 , RUN_INTERVAL};
 
 /* ======================== */
@@ -143,7 +143,7 @@ int main (int argc, char *argv[])
   rv = json_value_get_type(val);
   if ( rv != JSONObject )
   {
-    printf("System didn't work %d\n", rv);
+    printf("JSON Parse file failed\n");
     return -1;
   }
 

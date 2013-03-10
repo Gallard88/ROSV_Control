@@ -5,8 +5,11 @@ AM_CFLAGS = --pedantic -Wall
 #LDFLAGS =
 # this lists the binaries to produce, the (non-PHONY, binary) targets in
 # the previous manual Makefile
-ROSV_Controldir = ../
+ROSV_Controldir = /usr/bin/
 ROSV_Control_PROGRAMS = ROSV_Control
+
+ROSV_Control_Filesdir= /etc
+ROSV_Control_Files_DATA=ROSV_Motors.json
 
 ROSV_Control_SOURCES = \
 	CmdProc.c \
