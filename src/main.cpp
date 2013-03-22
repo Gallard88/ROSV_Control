@@ -10,6 +10,7 @@ using namespace std;
 #include <signal.h>
 #include <sys/time.h>
 #include <sstream>
+#include <syslog.h>
 
 #include "TcpServer.h"
 #include "CmdStream.h"
@@ -81,6 +82,8 @@ void System_Shutdown(void)
   delete Lighting;
   delete Position;
   delete Depth;
+  syslog(LOG_EMERG, "System shutting down");
+  closelog();
 }
 
 /* ======================== */
@@ -134,8 +137,11 @@ int main (int argc, char *argv[])
   JSON_Object *settings;
   JSON_Value *val;
   int rv;
-	string msg;
-  stringstream ss;//create a stringstream
+  string msg;
+  stringstream ss;
+
+  openlog("ROSV_Control", LOG_PID, LOG_USER);
+  syslog(LOG_EMERG, "Starting program");
 
   Setup_SignalHandler();
   atexit(System_Shutdown);

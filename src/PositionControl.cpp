@@ -28,6 +28,8 @@ using namespace std;
 #include <iostream>
 #include <cmath>
 
+#include <syslog.h>
+
 #include "PositionControl.h"
 
 //*******************************************************************************************
@@ -44,7 +46,7 @@ PositionControl::PositionControl(const JSON_Object *settings, PWM_Con *pwm)
 	array = json_object_get_array( settings, "PropulsionMotor");
 	if ( array == NULL )
 	{
-		cout << "Position Motor Array" << endl;
+		syslog(LOG_EMERG,"Failed to find \"PropulsionMotor\" array in settings");
 		return ;
 	}
 
@@ -54,7 +56,6 @@ PositionControl::PositionControl(const JSON_Object *settings, PWM_Con *pwm)
 	PropList = new PropulsionMotor[rv];
 	Num_Prop = rv;
 
-	cout <<"Array Count "<< rv << endl;
 	for ( i = 0; i < rv; i++)
 	{
 		new_mot = &PropList[i];
@@ -66,11 +67,8 @@ PositionControl::PositionControl(const JSON_Object *settings, PWM_Con *pwm)
 
 		new_mot->power = 0.0;
 
-		cout <<"Name "<< name << endl;
-
 		var_name = name + "." + "ch";
 		new_mot->ch = (int)json_object_dotget_number(settings, var_name.c_str());
-		cout << var_name << ":" << new_mot->ch << endl;
 
 		var_name = name + "." + "ratio";
 		JSON_Array *scale = json_object_dotget_array(settings, var_name.c_str());
@@ -82,9 +80,7 @@ PositionControl::PositionControl(const JSON_Object *settings, PWM_Con *pwm)
 		for ( int j = 0; j < size; j ++ )
 		{
 			new_mot->scale[j] = json_array_get_number(scale, j);
-			cout << var_name << j <<":" << new_mot->scale[j] << endl;
 		}
-		cout <<"Stored...\n"<< endl;
 	}
 }
 

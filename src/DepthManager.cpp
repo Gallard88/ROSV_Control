@@ -26,6 +26,8 @@ using namespace std;
 #include <string>
 #include <iostream>
 
+#include <syslog.h>
+
 #include "DepthManager.h"
 
 // *******************************************************************************************
@@ -43,7 +45,7 @@ DepthManager::DepthManager(const JSON_Object *settings, PWM_Con *pwm)
   array = json_object_get_array( settings, "DepthMotor");
   if ( array == NULL )
   {
-    cout << "Depth Motor Array" << endl;
+    syslog(LOG_EMERG, "Failed to find \"DepthMotor\" array in settings file");
     return ;
   }
 
@@ -53,7 +55,6 @@ DepthManager::DepthManager(const JSON_Object *settings, PWM_Con *pwm)
   Num_Motor = rv;
   MotorList = new DepthMotor[rv];
 
-  cout <<"Array Count "<< rv << endl;
   for ( i = 0; i < rv; i++ )
   {
     new_mot = &MotorList[i];
@@ -65,21 +66,8 @@ DepthManager::DepthManager(const JSON_Object *settings, PWM_Con *pwm)
 
     new_mot->power = 0.0;
 
-    cout <<"Name "<< name << endl;
-
     var_name = name + "." + "ch";
     new_mot->ch = (int)json_object_dotget_number(settings, var_name.c_str());
-    cout << var_name << ":" << new_mot->ch << endl;
-/*
-		var_name = name + "." + "pitch";
-		new_mot->pitch_ratio = (float)json_object_dotget_number(settings, var_name.c_str());
-		cout << var_name << ":" << new_mot->pitch_ratio << endl;
-
-		var_name = name + "." + "roll";
-		new_mot->roll_ratio = (float)json_object_dotget_number(settings, var_name.c_str());
-		cout << var_name << ":" << new_mot->roll_ratio << endl;
-*/
-    cout <<"Stored...\n"<< endl;
   }
 }
 
