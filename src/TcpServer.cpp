@@ -154,7 +154,9 @@ void TcpServer::Prune(void)
 			cout << "Client Lost" << endl;
 			it->buffer.clear();
 			Socket_Vec.erase(it);
-			it = Socket_Vec.begin();
+			Prune(); // recursive to remove all closes sockets.
+			// any other method seems to cause a seg fault on the next iteration of the for() loop
+			return;
 		}
 	}
 }
