@@ -9,6 +9,7 @@ using namespace std;
 #include <unistd.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <sstream>
 
 #include "TcpServer.h"
 #include "CmdStream.h"
@@ -127,13 +128,14 @@ void Setup_Callbacks(void)
 	Cmd->AddCallBack("Depth", Func_Depth);
 }
 
-
 /* ======================== */
 int main (int argc, char *argv[])
 {
   JSON_Object *settings;
   JSON_Value *val;
   int rv;
+	string msg;
+  stringstream ss;//create a stringstream
 
   Setup_SignalHandler();
   atexit(System_Shutdown);
@@ -199,6 +201,22 @@ int main (int argc, char *argv[])
       PowerMon->Run();
       Depth->Run();
       Position->Run();
+			// send data back to console.
+			msg.clear();
+			ss.str(std::string());
+			ss << Pwm.GetTemp();
+			msg = "Temp=" + ss.str() + "\r\n";
+
+			ss.str(std::string());
+			ss << Pwm.GetVolt();
+			msg += "Volt=" + ss.str() + "\r\n";
+
+			ss.str(std::string());
+			ss << Pwm.GetCurrent();
+			msg += "Current=" + ss.str() + "\r\n";
+
+			Listner.SendMsg(msg);
+
     }
   }
   return 0;
