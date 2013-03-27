@@ -32,12 +32,12 @@
 class PowerMonitor
 {
 public:
-	PowerMonitor(PWM_Con *pwm);
-	void Run(void);
+  PowerMonitor(PWM_Con *pwm);
+  void Run(void);
 
 private:
-	DataLogger *Log;
-	PWM_Con *Pwm;
+  DataLogger *Log;
+  PWM_Con *Pwm;
 };
 
 

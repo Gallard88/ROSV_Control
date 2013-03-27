@@ -59,7 +59,7 @@ void alarm_wakeup (int i)
 // *****************
 void Run_CtrlC(int sig)
 {
-	exit(0);
+  exit(0);
 }
 
 // *****************
@@ -67,7 +67,7 @@ void Setup_SignalHandler(void)
 {
   struct sigaction sig;
 
-	// Install timer_handler as the signal handler for SIGVTALRM.
+  // Install timer_handler as the signal handler for SIGVTALRM.
   memset (&sig, 0, sizeof (struct sigaction));
   sig.sa_handler = &Run_CtrlC;
   sigaction (SIGINT , &sig, NULL);
@@ -89,46 +89,46 @@ void System_Shutdown(void)
 /* ======================== */
 void Func_Forward(string arg)
 {
-	double temp = ::atof(arg.c_str()) / 100.0;
+  double temp = ::atof(arg.c_str()) / 100.0;
 
-	cout << "Func_Forward: " << temp << endl;
-	Position->Set_TargFwdVel(temp);
+  cout << "Func_Forward: " << temp << endl;
+  Position->Set_TargFwdVel(temp);
 }
 
 /* ======================== */
 void Func_Sideward(string arg)
 {
-	double temp = ::atof(arg.c_str()) / 100.0;
-	cout << "Func_Sideward: " << temp << endl;
+  double temp = ::atof(arg.c_str()) / 100.0;
+  cout << "Func_Sideward: " << temp << endl;
 
-	Position->Set_TargSwdVel(temp);
+  Position->Set_TargSwdVel(temp);
 }
 
 /* ======================== */
 void Func_Turn(string arg)
 {
-	double temp = ::atof(arg.c_str()) / 100.0;
-	cout << "Func_Turn: " << temp << endl;
-	Position->Set_TargTurnVel(temp);
+  double temp = ::atof(arg.c_str()) / 100.0;
+  cout << "Func_Turn: " << temp << endl;
+  Position->Set_TargTurnVel(temp);
 }
 
 /* ======================== */
 void Func_Depth(string arg)
 {
-	double temp = ::atof(arg.c_str()) / 100.0;
+  double temp = ::atof(arg.c_str()) / 100.0;
 
-	cout << "Func_Depth: " << temp << endl;
+  cout << "Func_Depth: " << temp << endl;
 
-	Depth->SetDepthPower(temp);
+  Depth->SetDepthPower(temp);
 }
 
 /* ======================== */
 void Setup_Callbacks(void)
 {
-	Cmd->AddCallBack("Forward", Func_Forward);
-	Cmd->AddCallBack("Sideward", Func_Sideward);
-	Cmd->AddCallBack("Turn", Func_Turn);
-	Cmd->AddCallBack("Depth", Func_Depth);
+  Cmd->AddCallBack("Forward", Func_Forward);
+  Cmd->AddCallBack("Sideward", Func_Sideward);
+  Cmd->AddCallBack("Turn", Func_Turn);
+  Cmd->AddCallBack("Depth", Func_Depth);
 }
 
 /* ======================== */
@@ -169,9 +169,9 @@ int main (int argc, char *argv[])
   Position = new PositionControl(settings, &Pwm );
   Depth = new DepthManager(settings, &Pwm );
   Depth->Enable();
-	Depth->SetDepthPower(0.0);
+  Depth->SetDepthPower(0.0);
 
-	Setup_Callbacks();
+  Setup_Callbacks();
 
   // open TCP server
   if ( Listner.Connect(8090) < 0)
@@ -192,13 +192,13 @@ int main (int argc, char *argv[])
 
     // read data from connected clients.
     Listner.Run(&timeout);
-		line.clear();
+    line.clear();
     while ( Listner.ReadLine(&line) > 0 )
     {
-			if ( line.size() > 0 )
-			{
-				Cmd->ProcessLine(line);
-			}
+      if ( line.size() > 0 )
+      {
+        Cmd->ProcessLine(line);
+      }
     }
 
     if ( Run_Control == true)
@@ -207,21 +207,21 @@ int main (int argc, char *argv[])
       PowerMon->Run();
       Depth->Run();
       Position->Run();
-			// send data back to console.
-			msg.clear();
-			ss.str(std::string());
-			ss << Pwm.GetTemp();
-			msg = "Temp=" + ss.str() + "\r\n";
+      // send data back to console.
+      msg.clear();
+      ss.str(std::string());
+      ss << Pwm.GetTemp();
+      msg = "Temp=" + ss.str() + "\r\n";
 
-			ss.str(std::string());
-			ss << Pwm.GetVolt();
-			msg += "Volt=" + ss.str() + "\r\n";
+      ss.str(std::string());
+      ss << Pwm.GetVolt();
+      msg += "Volt=" + ss.str() + "\r\n";
 
-			ss.str(std::string());
-			ss << Pwm.GetCurrent();
-			msg += "Current=" + ss.str() + "\r\n";
+      ss.str(std::string());
+      ss << Pwm.GetCurrent();
+      msg += "Current=" + ss.str() + "\r\n";
 
-			Listner.SendMsg(msg);
+      Listner.SendMsg(msg);
 
     }
   }

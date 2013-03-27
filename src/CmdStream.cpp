@@ -27,39 +27,39 @@ CmdStream::CmdStream()
 /* ======================== */
 void CmdStream::AddSouce(int fd)
 {
-	string str;
+  string str;
 
-	SrcMap[fd] = str;
-	SET_MAX_SOCK(fd);
-	FD_SET(fd, &readfds);
+  SrcMap[fd] = str;
+  SET_MAX_SOCK(fd);
+  FD_SET(fd, &readfds);
 }
 
 /* ======================== */
 void CmdStream::RemoveSource(int fd)
 {
-	;
+  ;
 }
 
 /* ======================== */
 void CmdStream::AddCmd(string cmd, cmd_func_t func)
 {
-	CmdMap[cmd] = func;
+  CmdMap[cmd] = func;
 }
 
 /* ======================== */
 void CmdStream::RemoveCmd(string cmd)
 {
-	;
+  ;
 }
 
 /* ======================== */
 void CmdStream::Run(void)
 {
-	select(max_sock+1, &readfds, NULL, NULL, NULL);	// wait indefinately
-	for ( std::map<int, std::string>::iterator it = SrcMap.begin(); it != SrcMap.end(); it++ )
-	{
-		if ( FD_ISSET(DataSocket, &readfds) )
-	}
+  select(max_sock+1, &readfds, NULL, NULL, NULL);	// wait indefinately
+  for ( std::map<int, std::string>::iterator it = SrcMap.begin(); it != SrcMap.end(); it++ )
+  {
+    if ( FD_ISSET(DataSocket, &readfds) )
+    }
 }
 
 /* ======================== */

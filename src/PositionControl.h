@@ -32,39 +32,39 @@
 //*******************************************************************************************
 typedef struct
 {
-	int ch;
-	float scale[3];
-	// forward
-	// sideward
-	// turn
-	float power;
+  int ch;
+  float scale[3];
+  // forward
+  // sideward
+  // turn
+  float power;
 } PropulsionMotor;
 
 //*******************************************************************************************
 class PositionControl
 {
 public:
-	PositionControl(const JSON_Object *settings, PWM_Con *pwm);
-	void Run(void);
+  PositionControl(const JSON_Object *settings, PWM_Con *pwm);
+  void Run(void);
 
-	void Set_FwdVel(float vel);
-	void Set_SwdVel(float vel);
-	void Set_TurnVel(float vel);
+  void Set_FwdVel(float vel);
+  void Set_SwdVel(float vel);
+  void Set_TurnVel(float vel);
 
-	void Set_TargFwdVel(float vel);
-	void Set_TargSwdVel(float vel);
-	void Set_TargTurnVel(float vel);
+  void Set_TargFwdVel(float vel);
+  void Set_TargSwdVel(float vel);
+  void Set_TargTurnVel(float vel);
 
 private:
-	PWM_Con *Pwm;
+  PWM_Con *Pwm;
 
-	float Targ_Fwd_Vel;
-	float Targ_Swd_Vel;
-	float Targ_Turn_Vel;
+  float Targ_Fwd_Vel;
+  float Targ_Swd_Vel;
+  float Targ_Turn_Vel;
 
 
-	PropulsionMotor *PropList;
-	int Num_Prop;
+  PropulsionMotor *PropList;
+  int Num_Prop;
 };
 
 //*******************************************************************************************

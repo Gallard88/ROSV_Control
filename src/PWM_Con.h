@@ -31,14 +31,14 @@
 class PWM_Con
 {
 public:
-	PWM_Con(void);
-	void SetLevel(int ch, float level);
-	float GetTemp(void);
-	float GetVolt(void);
-	float GetCurrent(void);
+  PWM_Con(void);
+  void SetLevel(int ch, float level);
+  float GetTemp(void);
+  float GetVolt(void);
+  float GetCurrent(void);
 
 private:
-	Pwm_Con_Mem *PWM_mem;
+  Pwm_Con_Mem *PWM_mem;
 };
 
 

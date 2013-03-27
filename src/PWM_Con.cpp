@@ -49,91 +49,91 @@ using namespace std;
 PWM_Con::PWM_Con(void)
 {
 //	if ( PWM_mem == NULL )
-	{
-		int shmid;
+  {
+    int shmid;
 
-		// Make sure the file exists.
-		int fd = open(PWM_KEY_FILE, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
-		/* Only wanted to make sure that the file exists. */
-		close(fd);
+    // Make sure the file exists.
+    int fd = open(PWM_KEY_FILE, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
+    /* Only wanted to make sure that the file exists. */
+    close(fd);
 
-		// Generate memory key. */
-		key_t key = ftok(PWM_KEY_FILE, PWM_MEM_KEY);
-		if (key	 == -1)
-		{
-			perror("ftok");
-			exit(1);
-		}
+    // Generate memory key. */
+    key_t key = ftok(PWM_KEY_FILE, PWM_MEM_KEY);
+    if (key	 == -1)
+    {
+      perror("ftok");
+      exit(1);
+    }
 
-		// connect to (and possibly create) the segment:
-		if ((shmid = shmget(key, PWM_CON_SHM_SIZE, O_RDWR)) == -1)
-		{
-			perror("shmget");
-			exit(1);
-		}
+    // connect to (and possibly create) the segment:
+    if ((shmid = shmget(key, PWM_CON_SHM_SIZE, O_RDWR)) == -1)
+    {
+      perror("shmget");
+      exit(1);
+    }
 
-		// attach to the segment to get a pointer to it:
-		PWM_mem = (Pwm_Con_Mem *)shmat(shmid, (void *)0, 0);
-		if ((char *)PWM_mem == (char *)(-1))
-		{
-			perror("shmat");
-			exit(1);
-		}
-	}
+    // attach to the segment to get a pointer to it:
+    PWM_mem = (Pwm_Con_Mem *)shmat(shmid, (void *)0, 0);
+    if ((char *)PWM_mem == (char *)(-1))
+    {
+      perror("shmat");
+      exit(1);
+    }
+  }
 }
 
 //*******************************************************************************************
 void PWM_Con::SetLevel(int ch, float level)
 {
-	if ( level > 1.0 )
-		level = 1.0;
-	if ( level < 0.0 )
-		level = 0.0;
-	if ( ch >= PWM_NUM_CHANELS )
-		return ;
+  if ( level > 1.0 )
+    level = 1.0;
+  if ( level < 0.0 )
+    level = 0.0;
+  if ( ch >= PWM_NUM_CHANELS )
+    return ;
 
-	pthread_mutex_lock( &PWM_mem->access );
+  pthread_mutex_lock( &PWM_mem->access );
 
-	PWM_mem->ch[ch] = level;
-	PWM_mem->data_ready = 1;
+  PWM_mem->ch[ch] = level;
+  PWM_mem->data_ready = 1;
 
-	pthread_mutex_unlock( &PWM_mem->access );
+  pthread_mutex_unlock( &PWM_mem->access );
 }
 
 //*******************************************************************************************
 float PWM_Con::GetTemp(void)
 {
-	float temp;
+  float temp;
 
-	pthread_mutex_lock( &PWM_mem->access );
-	temp = PWM_mem->temperature;
-	pthread_mutex_unlock( &PWM_mem->access );
+  pthread_mutex_lock( &PWM_mem->access );
+  temp = PWM_mem->temperature;
+  pthread_mutex_unlock( &PWM_mem->access );
 
-	return temp;
+  return temp;
 }
 
 //*******************************************************************************************
 float PWM_Con::GetVolt(void)
 {
-	float voltage;
+  float voltage;
 
-	pthread_mutex_lock( &PWM_mem->access );
-	voltage = PWM_mem->voltage;
-	pthread_mutex_unlock( &PWM_mem->access );
+  pthread_mutex_lock( &PWM_mem->access );
+  voltage = PWM_mem->voltage;
+  pthread_mutex_unlock( &PWM_mem->access );
 
-	return voltage;
+  return voltage;
 }
 
 //*******************************************************************************************
 float PWM_Con::GetCurrent(void)
 {
-	float current;
+  float current;
 
-	pthread_mutex_lock( &PWM_mem->access );
-	current = PWM_mem->current;
-	pthread_mutex_unlock( &PWM_mem->access );
+  pthread_mutex_lock( &PWM_mem->access );
+  current = PWM_mem->current;
+  pthread_mutex_unlock( &PWM_mem->access );
 
-	return current;
+  return current;
 }
 
 //*******************************************************************************************

@@ -8,37 +8,37 @@
 
 struct TcpData
 {
-	int fd;
-	string buffer;
+  int fd;
+  string buffer;
 };
 
 /* ======================== */
 class TcpServer
 {
 private:
-	int listen_fd;
-	int Max_Connections;
+  int listen_fd;
+  int Max_Connections;
 
-	vector<struct TcpData> Socket_Vec;
-	fd_set readfs;
+  vector<struct TcpData> Socket_Vec;
+  fd_set readfs;
 
-	void CheckNewConnetions(void);
+  void CheckNewConnetions(void);
   void Prune(void);
 
 
 public:
 
-	TcpServer(int max_clients);
-	~TcpServer(void);
+  TcpServer(int max_clients);
+  ~TcpServer(void);
 
-	void BuildSelectList(void);
+  void BuildSelectList(void);
 
-	int Connect(int port);
-	void Run(struct timeval *timeout);
+  int Connect(int port);
+  void Run(struct timeval *timeout);
   void SendMsg(const string msg);
   void SendMsg(const char *data, int size);
 
-	int ReadLine(string *data);
+  int ReadLine(string *data);
 };
 
 /* ======================== */
