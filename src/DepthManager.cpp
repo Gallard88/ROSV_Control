@@ -41,6 +41,11 @@ DepthManager::DepthManager(const JSON_Object *settings)
 
     DiveEnable = false;
     MotorList = NULL;
+    Depth_Power = 0.0;
+    Pitch = 0.0;
+    Roll = 0.0;
+    Targ_Pitch = 0.0;
+    Targ_Roll = 0.0;
 
     array = json_object_get_array( settings, "DepthMotor");
     if ( array == NULL )
@@ -68,6 +73,8 @@ DepthManager::DepthManager(const JSON_Object *settings)
 
         var_name = name + "." + "ch";
         new_mot->ch = (int)json_object_dotget_number(settings, var_name.c_str());
+        new_mot->pitch_ratio = 0.0;
+        new_mot->roll_ratio = 0.0;
     }
 }
 

@@ -27,6 +27,7 @@ using namespace std;
 #include <string>
 #include <iostream>
 #include <cmath>
+#include <string.h>
 
 #include <syslog.h>
 #include <PWM_Controller.h>
@@ -42,6 +43,9 @@ PositionControl::PositionControl(const JSON_Object *settings)
     int rv, i;
 
     PropList = NULL;
+    Targ_Fwd_Vel = 0.0;
+    Targ_Swd_Vel = 0.0;
+    Targ_Turn_Vel = 0.0;
 
     array = json_object_get_array( settings, "PropulsionMotor");
     if ( array == NULL )
@@ -77,6 +81,7 @@ PositionControl::PositionControl(const JSON_Object *settings)
         int size = json_array_get_count(scale);
         if ( size > 3 )
             size = 3;
+        memset(new_mot->scale, 0, sizeof(float)*3);
         for ( int j = 0; j < size; j ++ )
         {
             new_mot->scale[j] = json_array_get_number(scale, j);
