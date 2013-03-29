@@ -26,44 +26,45 @@
 //*******************************************************************************************
 using namespace std;
 
+#include <PWM_Controller.h>
+
 #include "time.h"
 
 #include "PowerMonitor.h"
 
 const DataLoggerOpt DL_Opt =
 {
-  true,	//	filename_date
-  false,	//	filename_time
-  true,	//	first_col_date
-  true	//	first_col_time
+    true,	//	filename_date
+    false,	//	filename_time
+    true,	//	first_col_date
+    true	//	first_col_time
 };
 
 //*******************************************************************************************
-PowerMonitor::PowerMonitor(PWM_Con *pwm)
+PowerMonitor::PowerMonitor(void)
 {
-  Pwm = pwm;
-  Log = new DataLogger("./", "ROSV_Power.csv", &DL_Opt);
-  Log->Add_Title("Temp");
-  Log->Add_Title("Voltage");
-  Log->Add_Title("Current");
-  Log->RecordLine();
+    Log = new DataLogger("./", "ROSV_Power.csv", &DL_Opt);
+    Log->Add_Title("Temp");
+    Log->Add_Title("Voltage");
+    Log->Add_Title("Current");
+    Log->RecordLine();
 }
 
 //*******************************************************************************************
 void PowerMonitor::Run(void)
 {
-  static time_t update;
-  time_t current;
+    static time_t update;
+    time_t current;
 
-  time(&current);
-  if ( update == current )
-    return;
-  update = current;
+    time(&current);
+    if ( update == current )
+        return;
+    update = current;
 
-  Log->Add_Var(Pwm->GetTemp());
-  Log->Add_Var(Pwm->GetVolt());
-  Log->Add_Var(Pwm->GetCurrent());
-  Log->RecordLine();
+    Log->Add_Var(PWM_GetTemp());
+    Log->Add_Var(PWM_GetVoltage());
+    Log->Add_Var(PWM_GetCurrent());
+    Log->RecordLine();
 }
 
 //*******************************************************************************************

@@ -29,111 +29,111 @@ using namespace std;
 #include <cmath>
 
 #include <syslog.h>
+#include <PWM_Controller.h>
 
 #include "PositionControl.h"
 
 //*******************************************************************************************
-PositionControl::PositionControl(const JSON_Object *settings, PWM_Con *pwm)
+PositionControl::PositionControl(const JSON_Object *settings)
 {
-  string var_name;
-  JSON_Array *array;
-  PropulsionMotor *new_mot;
-  int rv, i;
+    string var_name;
+    JSON_Array *array;
+    PropulsionMotor *new_mot;
+    int rv, i;
 
-  Pwm = pwm;
-  PropList = NULL;
+    PropList = NULL;
 
-  array = json_object_get_array( settings, "PropulsionMotor");
-  if ( array == NULL )
-  {
-    syslog(LOG_EMERG,"Failed to find \"PropulsionMotor\" array in settings");
-    return ;
-  }
-
-  rv = json_array_get_count(array);
-  if ( rv == 0 )
-    return ;
-  PropList = new PropulsionMotor[rv];
-  Num_Prop = rv;
-
-  for ( i = 0; i < rv; i++)
-  {
-    new_mot = &PropList[i];
-
-    const char *ptr = json_array_get_string(array, i);
-    if ( ptr == NULL )
-      continue;
-    std::string name(ptr);
-
-    new_mot->power = 0.0;
-
-    var_name = name + "." + "ch";
-    new_mot->ch = (int)json_object_dotget_number(settings, var_name.c_str());
-
-    var_name = name + "." + "ratio";
-    JSON_Array *scale = json_object_dotget_array(settings, var_name.c_str());
-    if ( scale == NULL )
-      continue;
-    int size = json_array_get_count(scale);
-    if ( size > 3 )
-      size = 3;
-    for ( int j = 0; j < size; j ++ )
+    array = json_object_get_array( settings, "PropulsionMotor");
+    if ( array == NULL )
     {
-      new_mot->scale[j] = json_array_get_number(scale, j);
+        syslog(LOG_EMERG,"Failed to find \"PropulsionMotor\" array in settings");
+        return ;
     }
-  }
+
+    rv = json_array_get_count(array);
+    if ( rv == 0 )
+        return ;
+    PropList = new PropulsionMotor[rv];
+    Num_Prop = rv;
+
+    for ( i = 0; i < rv; i++)
+    {
+        new_mot = &PropList[i];
+
+        const char *ptr = json_array_get_string(array, i);
+        if ( ptr == NULL )
+            continue;
+        std::string name(ptr);
+
+        new_mot->power = 0.0;
+
+        var_name = name + "." + "ch";
+        new_mot->ch = (int)json_object_dotget_number(settings, var_name.c_str());
+
+        var_name = name + "." + "ratio";
+        JSON_Array *scale = json_object_dotget_array(settings, var_name.c_str());
+        if ( scale == NULL )
+            continue;
+        int size = json_array_get_count(scale);
+        if ( size > 3 )
+            size = 3;
+        for ( int j = 0; j < size; j ++ )
+        {
+            new_mot->scale[j] = json_array_get_number(scale, j);
+        }
+    }
 }
 
 //*******************************************************************************************
 void PositionControl::Run(void)
 {
-  PropulsionMotor *motor;
-  int i;
-  float max_power = 0;
-  float scale = 1;
+    PropulsionMotor *motor;
+    int i;
+    float max_power = 0;
+    float scale = 1;
 
-  if ( PropList == NULL )
-    return;
+    if ( PropList == NULL )
+        return;
 
-  // Set power Levels
-  for ( i = 0; i < Num_Prop; i++)
-  {
-    motor = &PropList[i];
-    motor->power = 0;
-    motor->power += Targ_Fwd_Vel * motor->scale[0];
-    motor->power += Targ_Swd_Vel * motor->scale[1];
-    motor->power += Targ_Turn_Vel * motor->scale[2];
-    if ( abs(motor->power) > max_power )
-      max_power = motor->power;
-  }
-  if ( max_power > 1 )
-    scale = 1.0 / max_power;
-  for ( i = 0; i < Num_Prop; i++)
-  {
-    motor = &PropList[i];
-    Pwm->SetLevel(motor->ch, motor->power * scale );
-  }
+    // Set power Levels
+    for ( i = 0; i < Num_Prop; i++)
+    {
+        motor = &PropList[i];
+        motor->power = 0;
+        motor->power += Targ_Fwd_Vel * motor->scale[0];
+        motor->power += Targ_Swd_Vel * motor->scale[1];
+        motor->power += Targ_Turn_Vel * motor->scale[2];
+        if ( abs(motor->power) > max_power )
+            max_power = motor->power;
+    }
+    if ( max_power > 1 )
+        scale = 1.0 / max_power;
+    for ( i = 0; i < Num_Prop; i++)
+    {
+        motor = &PropList[i];
+        PWM_SetPWM(motor->ch,  motor->power * scale );
+    }
 }
 
 //*******************************************************************************************
 void PositionControl::Set_TargFwdVel(float vel)
 {
-  Targ_Fwd_Vel = vel;
-  Run();
+    Targ_Fwd_Vel = vel;
+    Run();
 }
 
 //*******************************************************************************************
 void PositionControl::Set_TargSwdVel(float vel)
 {
-  Targ_Swd_Vel = vel;
-  Run();
+    Targ_Swd_Vel = vel;
+    Run();
 }
 
 //*******************************************************************************************
 void PositionControl::Set_TargTurnVel(float vel)
 {
-  Targ_Turn_Vel = vel;
-  Run();
+    Targ_Turn_Vel = vel;
+    Run();
 }
 
 //*******************************************************************************************

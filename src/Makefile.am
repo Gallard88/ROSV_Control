@@ -10,6 +10,7 @@ ROSV_Control_PROGRAMS = ROSV_Control
 
 ROSV_Control_Filesdir= /etc
 ROSV_Control_Files_DATA=ROSV_Motors.json
+LDADD=/usr/local/lib/libPWMControl.a
 
 ROSV_Control_SOURCES = \
 	CmdProc.c \
@@ -24,8 +25,6 @@ ROSV_Control_SOURCES = \
 	PositionControl.h \
 	PowerMonitor.cpp \
 	PowerMonitor.h \
-	PWM_Con.cpp \
-	PWM_Con.h \
 	parson.c \
 	parson.h \
 	TcpServer.cpp \

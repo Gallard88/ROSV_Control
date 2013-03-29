@@ -26,16 +26,15 @@
 #define __LIGHT_MANAGER__
 //*******************************************************************************************
 #include "parson.h"
-#include "PWM_Con.h"
 
 //*******************************************************************************************
 struct LightCh
 {
 #define LM_NAME_SZE	64
-  char name[LM_NAME_SZE];
-  int ch;
-  float max;
-  float min;
+    char name[LM_NAME_SZE];
+    int ch;
+    float max;
+    float min;
 };
 
 //*******************************************************************************************
@@ -43,14 +42,13 @@ struct LightCh
 class  LightManager
 {
 public:
-  LightManager(const JSON_Object *settings, PWM_Con *pwm);
+    LightManager(const JSON_Object *settings);
 
-  void SetBrightness(const char *ch, const float level);
+    void SetBrightness(const char *ch, const float level);
 
 private:
-  PWM_Con *Pwm;
-  LightCh *Chanels;
-  int Num_Chanels;
+    LightCh *Chanels;
+    int Num_Chanels;
 };
 
 //*******************************************************************************************

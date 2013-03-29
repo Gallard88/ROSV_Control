@@ -50,10 +50,10 @@ PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = CmdProc.$(OBJEXT) DataLogger.$(OBJEXT) \
 	DepthManager.$(OBJEXT) LightManager.$(OBJEXT) \
 	PositionControl.$(OBJEXT) PowerMonitor.$(OBJEXT) \
-	PWM_Con.$(OBJEXT) parson.$(OBJEXT) TcpServer.$(OBJEXT) \
-	main.$(OBJEXT)
+	parson.$(OBJEXT) TcpServer.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
+ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -202,6 +202,7 @@ AM_CFLAGS = --pedantic -Wall
 ROSV_Controldir = /usr/bin/
 ROSV_Control_Filesdir = /etc
 ROSV_Control_Files_DATA = ROSV_Motors.json
+LDADD = /usr/local/lib/libPWMControl.a
 ROSV_Control_SOURCES = \
 	CmdProc.c \
 	CmdProc.h \
@@ -215,8 +216,6 @@ ROSV_Control_SOURCES = \
 	PositionControl.h \
 	PowerMonitor.cpp \
 	PowerMonitor.h \
-	PWM_Con.cpp \
-	PWM_Con.h \
 	parson.c \
 	parson.h \
 	TcpServer.cpp \
@@ -308,7 +307,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataLogger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DepthManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PWM_Con.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PositionControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerMonitor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@

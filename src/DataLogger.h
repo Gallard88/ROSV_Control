@@ -32,10 +32,10 @@
 //*******************************************************************************************
 typedef struct
 {
-  bool filename_date;
-  bool filename_time;
-  bool first_col_date;
-  bool first_col_time;
+    bool filename_date;
+    bool filename_time;
+    bool first_col_date;
+    bool first_col_time;
 
 } DataLoggerOpt;
 
@@ -43,25 +43,25 @@ typedef struct
 class  DataLogger
 {
 public:
-  DataLogger(const string path, const string filename, const DataLoggerOpt *options);
-  ~DataLogger();
+    DataLogger(const string path, const string filename, const DataLoggerOpt *options);
+    ~DataLogger();
 
-  void Add_Title(const string field);
-  void Add_Var(const string field);
-  void Add_Var(const int field);
-  void Add_Var(const float field);
+    void Add_Title(const string field);
+    void Add_Var(const string field);
+    void Add_Var(const int field);
+    void Add_Var(const float field);
 
-  void RecordLine(void);
+    void RecordLine(void);
 
 private:
 //	ofstream FileWriter;
-  string Name;
-  bool Line_Started;
-  bool Col_Date;
-  bool Col_Time;
+    string Name;
+    bool Line_Started;
+    bool Col_Date;
+    bool Col_Time;
 
-  void ChecktoAddTime(void);
-  void ChecktoAddTimeTitle(void);
+    void ChecktoAddTime(void);
+    void ChecktoAddTimeTitle(void);
 
 };
 
