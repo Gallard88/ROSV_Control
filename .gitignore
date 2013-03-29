@@ -26,3 +26,4 @@ Makefile
 *~
 aclocal.m4
 *Makefile
+config.status
