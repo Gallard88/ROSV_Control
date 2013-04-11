@@ -105,7 +105,7 @@ void DepthManager::Enable(void)
 //*******************************************************************************************
 void DepthManager::Disable(void)
 {
-    Depth_Power = 0;
+    Depth_Power = 0.0;
     Run();
 }
 

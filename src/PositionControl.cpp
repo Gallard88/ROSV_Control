@@ -94,8 +94,8 @@ void PositionControl::Run(void)
 {
     PropulsionMotor *motor;
     int i;
-    float max_power = 0;
-    float scale = 1;
+//    float max_power = 0.0;
+//    float scale = 1.0;
 
     if ( PropList == NULL )
         return;
@@ -108,15 +108,15 @@ void PositionControl::Run(void)
         motor->power += Targ_Fwd_Vel * motor->scale[0];
         motor->power += Targ_Swd_Vel * motor->scale[1];
         motor->power += Targ_Turn_Vel * motor->scale[2];
-        if ( abs(motor->power) > max_power )
-            max_power = motor->power;
+//        if ( abs(motor->power) > max_power )
+//            max_power = motor->power;
     }
-    if ( max_power > 1 )
-        scale = 1.0 / max_power;
+//    if ( max_power > 1.0 )
+//        scale = 1.0 / max_power;
     for ( i = 0; i < Num_Prop; i++)
     {
         motor = &PropList[i];
-        PWM_SetPWM(motor->ch,  motor->power * scale );
+        PWM_SetPWM(motor->ch,  motor->power );
     }
 }
 
