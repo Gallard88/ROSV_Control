@@ -1,0 +1,6 @@
+#!/bin/bash
+
+install ROSV_Control_Init /etc/init.d
+chmod +x /etc/init.d/ROSV_Control_Init
+update-rc.d ROSV_Control_Init defaults 80 10
+
