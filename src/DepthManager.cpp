@@ -34,100 +34,100 @@ using namespace std;
 // *******************************************************************************************
 DepthManager::DepthManager(const JSON_Object *settings)
 {
-    string var_name;
-    JSON_Array *array;
-    DepthMotor *new_mot;
-    int rv, i;
+  string var_name;
+  JSON_Array *array;
+  DepthMotor *new_mot;
+  int rv, i;
 
-    DiveEnable = false;
-    MotorList = NULL;
-    Depth_Power = 0.0;
-    Pitch = 0.0;
-    Roll = 0.0;
-    Targ_Pitch = 0.0;
-    Targ_Roll = 0.0;
+  DiveEnable = false;
+  MotorList = NULL;
+  Depth_Power = 0.0;
+  Pitch = 0.0;
+  Roll = 0.0;
+  Targ_Pitch = 0.0;
+  Targ_Roll = 0.0;
 
-    array = json_object_get_array( settings, "DepthMotor");
-    if ( array == NULL )
-    {
-        syslog(LOG_EMERG, "Failed to find \"DepthMotor\" array in settings file");
-        return ;
-    }
+  array = json_object_get_array( settings, "DepthMotor");
+  if ( array == NULL )
+  {
+    syslog(LOG_EMERG, "Failed to find \"DepthMotor\" array in settings file");
+    return ;
+  }
 
-    rv = json_array_get_count(array);
-    if ( rv <= 0 )
-        return ;
-    Num_Motor = rv;
-    MotorList = new DepthMotor[rv];
+  rv = json_array_get_count(array);
+  if ( rv <= 0 )
+    return ;
+  Num_Motor = rv;
+  MotorList = new DepthMotor[rv];
 
-    for ( i = 0; i < rv; i++ )
-    {
-        new_mot = &MotorList[i];
+  for ( i = 0; i < rv; i++ )
+  {
+    new_mot = &MotorList[i];
 
-        const char *ptr = json_array_get_string(array, i);
-        if ( ptr == NULL )
-            continue;
-        std::string name(ptr);
+    const char *ptr = json_array_get_string(array, i);
+    if ( ptr == NULL )
+      continue;
+    std::string name(ptr);
 
-        new_mot->power = 0.0;
+    new_mot->power = 0.0;
 
-        var_name = name + "." + "ch";
-        new_mot->ch = (int)json_object_dotget_number(settings, var_name.c_str());
-        new_mot->pitch_ratio = 0.0;
-        new_mot->roll_ratio = 0.0;
-    }
+    var_name = name + "." + "ch";
+    new_mot->ch = (int)json_object_dotget_number(settings, var_name.c_str());
+    new_mot->pitch_ratio = 0.0;
+    new_mot->roll_ratio = 0.0;
+  }
 }
 
 //*******************************************************************************************
 void DepthManager::Run(void)
 {
-    DepthMotor *motor;
-    int i;
+  DepthMotor *motor;
+  int i;
 
-    if ( DiveEnable == false )
-        return ;
-    if ( MotorList == NULL )
-        return;
+  if ( DiveEnable == false )
+    return ;
+  if ( MotorList == NULL )
+    return;
 
-    for ( i = 0; i < Num_Motor; i++)
-    {
-        motor = &MotorList[i];
-        PWM_SetPWM(motor->ch, Depth_Power );
-    }
+  for ( i = 0; i < Num_Motor; i++)
+  {
+    motor = &MotorList[i];
+    PWM_SetPWM(motor->ch, Depth_Power );
+  }
 }
 
 //*******************************************************************************************
 void DepthManager::Enable(void)
 {
-    DiveEnable = true;
+  DiveEnable = true;
 }
 
 //*******************************************************************************************
 void DepthManager::Disable(void)
 {
-    Depth_Power = 0.0;
-    Run();
+  Depth_Power = 0.0;
+  Run();
 }
 
 //*******************************************************************************************
 void DepthManager::SetDepthPower(float power)
 {
-    if ( DiveEnable )
-        Depth_Power = power;
+  if ( DiveEnable )
+    Depth_Power = power;
 }
 
 //*******************************************************************************************
 void DepthManager::SetPitch_Roll(float pitch, float roll)
 {
-    Pitch = pitch;
-    Roll = roll;
+  Pitch = pitch;
+  Roll = roll;
 }
 
 //*******************************************************************************************
 void DepthManager::SetTargetPitch_Roll(float pitch, float roll)
 {
-    Targ_Pitch = pitch;
-    Targ_Roll = roll;
+  Targ_Pitch = pitch;
+  Targ_Roll = roll;
 }
 
 //*******************************************************************************************

@@ -31,7 +31,7 @@
 class PowerMonitor
 {
 public:
-    PowerMonitor(void);
+    PowerMonitor(string path);
     void Run(void);
 
 private:
