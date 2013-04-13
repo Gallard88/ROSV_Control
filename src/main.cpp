@@ -31,6 +31,7 @@ const struct timeval system_time = { 0 , RUN_INTERVAL};
 
 /* ======================== */
 volatile bool Run_Control;
+bool Enable;
 
 /* ======================== */
 TcpServer Listner(1);
@@ -119,16 +120,34 @@ void Func_Depth(string arg)
 
   cout << "Func_Depth: " << temp << endl;
 
+	if ( Enable == false )
+		temp = 0.0;	// disable depth
   Depth->SetDepthPower(temp);
+}
+
+/* ======================== */
+void Func_Enable(string arg)
+{
+	Enable = true;
+  syslog(LOG_EMERG, "System Enabled");
+}
+
+/* ======================== */
+void Func_Disable(string arg)
+{
+	Enable = false;
+  syslog(LOG_EMERG, "System Disabled");
 }
 
 /* ======================== */
 void Setup_Callbacks(void)
 {
-  Cmd->AddCallBack("Forward", Func_Forward);
-  Cmd->AddCallBack("Sideward", Func_Sideward);
-  Cmd->AddCallBack("Turn", Func_Turn);
-  Cmd->AddCallBack("Depth", Func_Depth);
+  Cmd->AddCallBack("Forward", 		Func_Forward);
+  Cmd->AddCallBack("Sideward", 		Func_Sideward);
+  Cmd->AddCallBack("Turn", 				Func_Turn);
+  Cmd->AddCallBack("Depth", 			Func_Depth);
+  Cmd->AddCallBack("Disable", 		Func_Disable);
+  Cmd->AddCallBack("Enable", 			Func_Enable);
 }
 
 /* ======================== */
@@ -140,6 +159,7 @@ int main (int argc, char *argv[])
   string msg;
   stringstream ss;
 
+	Enable = false;
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_EMERG, "Starting program");
 
@@ -185,7 +205,6 @@ int main (int argc, char *argv[])
   Lighting = new LightManager(settings);
   Position = new PositionControl(settings);
   Depth = new DepthManager(settings );
-  Depth->Enable();
   Depth->SetDepthPower(0.0);
 
   Setup_Callbacks();

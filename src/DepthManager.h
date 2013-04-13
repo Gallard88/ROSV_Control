@@ -44,8 +44,6 @@ class DepthManager
 public:
     DepthManager(const JSON_Object *settings);
     void Run(void);
-    void Enable(void);
-    void Disable(void);
     void SetDepthPower(float power);
     void SetPitch_Roll(float pitch, float roll);
     void SetTargetPitch_Roll(float pitch, float roll);
@@ -55,7 +53,6 @@ private:
     float Depth_Power;
     float Pitch, Roll;
     float Targ_Pitch, Targ_Roll;
-    bool DiveEnable;
 
     DepthMotor *MotorList;
     int Num_Motor;

@@ -39,7 +39,6 @@ DepthManager::DepthManager(const JSON_Object *settings)
   DepthMotor *new_mot;
   int rv, i;
 
-  DiveEnable = false;
   MotorList = NULL;
   Depth_Power = 0.0;
   Pitch = 0.0;
@@ -84,8 +83,6 @@ void DepthManager::Run(void)
   DepthMotor *motor;
   int i;
 
-  if ( DiveEnable == false )
-    return ;
   if ( MotorList == NULL )
     return;
 
@@ -97,23 +94,9 @@ void DepthManager::Run(void)
 }
 
 //*******************************************************************************************
-void DepthManager::Enable(void)
-{
-  DiveEnable = true;
-}
-
-//*******************************************************************************************
-void DepthManager::Disable(void)
-{
-  Depth_Power = 0.0;
-  Run();
-}
-
-//*******************************************************************************************
 void DepthManager::SetDepthPower(float power)
 {
-  if ( DiveEnable )
-    Depth_Power = power;
+  Depth_Power = power;
 }
 
 //*******************************************************************************************
