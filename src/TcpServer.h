@@ -37,6 +37,7 @@ public:
     void Run(struct timeval *timeout);
     void SendMsg(const string msg);
     void SendMsg(const char *data, int size);
+    int NumberClients(void);
 
     int ReadLine(string *data);
 };

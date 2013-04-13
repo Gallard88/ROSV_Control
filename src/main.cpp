@@ -128,15 +128,21 @@ void Func_Depth(string arg)
 /* ======================== */
 void Func_Enable(string arg)
 {
-	Enable = true;
-  syslog(LOG_EMERG, "System Enabled");
+	if ( Enable == false )
+	{
+		Enable = true;
+		syslog(LOG_EMERG, "System Enabled");
+	}
 }
 
 /* ======================== */
 void Func_Disable(string arg)
 {
-	Enable = false;
-  syslog(LOG_EMERG, "System Disabled");
+	if ( Enable == true )
+	{
+		Enable = false;
+		syslog(LOG_EMERG, "System Disabled");
+	}
 }
 
 /* ======================== */
@@ -259,6 +265,8 @@ int main (int argc, char *argv[])
       msg += "Current=" + ss.str() + "\r\n";
 
       Listner.SendMsg(msg);
+			if ( Listner.NumberClients() == 0 )
+				Func_Disable(line);
 
     }
   }

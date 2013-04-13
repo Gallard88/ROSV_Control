@@ -168,6 +168,12 @@ void TcpServer::SendMsg(const string msg)
 }
 
 /* ======================== */
+int TcpServer::NumberClients(void)
+{
+	return Socket_Vec.size();
+}
+
+/* ======================== */
 void TcpServer::SendMsg(const char *data, int size)
 {
   int rv;
