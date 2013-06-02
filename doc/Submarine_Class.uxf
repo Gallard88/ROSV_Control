@@ -1,13 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="11.5.1">
-  <zoom_level>11</zoom_level>
+<?xml version="1.0" encoding="UTF-8"?><diagram program="umlet" version="11.3">
+  <zoom_level>5</zoom_level>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
       <x>0</x>
-      <y>396</y>
-      <w>209</w>
-      <h>264</h>
+      <y>375</y>
+      <w>95</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>TcpServer
 --
@@ -29,18 +28,27 @@ Close()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>385</x>
-      <y>77</y>
-      <w>286</w>
-      <h>275</h>
+      <x>125</x>
+      <y>235</y>
+      <w>140</w>
+      <h>125</h>
     </coordinates>
-    <panel_attributes>CmdProcessor
+    <panel_attributes>ControlProtocol
+
 --
 List of commands and look up functions.
 Converts raw text into cmd and arg.
 --
-ProcessLine()
-AddCallback()
+&lt;&lt;interface&gt;&gt;
+typedef int (*CmdCallBack)(String arg);
+--
++ AddDataSource()
++ Run()
++ AddCallBack(enum Cmd, Interface callback )
++ RemoveCallBack(enum Cmd )
++ SendMessage(String msg)
+--
+
 
 
 </panel_attributes>
@@ -49,97 +57,41 @@ AddCallback()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>176</x>
-      <y>528</y>
-      <w>241</w>
-      <h>54</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>220;33;33;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Class</type>
-    <coordinates>
-      <x>396</x>
-      <y>517</y>
-      <w>297</w>
-      <h>165</h>
-    </coordinates>
-    <panel_attributes>Main
---
-Links all relevant modules together.
---
-Main()
-RunTimer()
-RunMain()
-Start()
-Stop()
-GetSate()
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>440</x>
-      <y>319</y>
+      <x>80</x>
+      <y>275</y>
       <w>54</w>
-      <h>219</h>
+      <h>24</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 m1=1
 m2=1
 </panel_attributes>
-    <additional_attributes>33;198;33;33</additional_attributes>
+    <additional_attributes>45;15;15;15</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1298</x>
-      <y>187</y>
-      <w>253</w>
-      <h>176</h>
+      <x>485</x>
+      <y>100</y>
+      <w>115</w>
+      <h>115</h>
     </coordinates>
-    <panel_attributes>Navigation
+    <panel_attributes>Lib INS_Nav
 --
 Manages where we are. 
 Interfaces to INS daemon.
 --
-Navigation()
-Run()
-GetPosition()
-GetVelocity()
-GetAngularPos()
-GetAngularVel()
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Class</type>
-    <coordinates>
-      <x>1298</x>
-      <y>649</y>
-      <w>253</w>
-      <h>220</h>
-    </coordinates>
-    <panel_attributes>DepthManager
++ Navigation()
++ Run()
++ GetReading()
 --
-Controls motors responsible for:
-Depth
-Pitch &amp; Roll.
---
-Run()
-Enable()
-Disable()
-SetDepth()
-SetPitchRoll()
-SetTargetPitchRoll()
-
-
-
+&lt;&lt; enumeration&gt;&gt;
+X
+Y
+Z
+ROLL
+PITCH
+YAW
 
 </panel_attributes>
     <additional_attributes/>
@@ -147,52 +99,10 @@ SetTargetPitchRoll()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1298</x>
-      <y>418</y>
-      <w>253</w>
-      <h>198</h>
-    </coordinates>
-    <panel_attributes>PositionControl
---
-Controls the Position related motors.
-X,Y and Orientation.
---
-Run()
-
-Set_FwdVel()
-Set_SwdVel()
-Set_TurnVel()
-Set_TargFwdVel()
-Set_TargSwdVel()
-Set_TargTurnVel()
-
-
-
-
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>660</x>
-      <y>319</y>
-      <w>659</w>
-      <h>307</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>33;286;242;286;528;33;638;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Class</type>
-    <coordinates>
-      <x>220</x>
-      <y>836</y>
-      <w>242</w>
-      <h>143</h>
+      <x>150</x>
+      <y>385</y>
+      <w>110</w>
+      <h>65</h>
     </coordinates>
     <panel_attributes>CameraManager
 --
@@ -208,15 +118,16 @@ Stop()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>726</x>
-      <y>858</y>
-      <w>330</w>
-      <h>132</h>
+      <x>490</x>
+      <y>515</y>
+      <w>150</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>LightManager
 --
 Controls the brightness of the LED panels
 in the camera housing
+*Should be moved to a seperate system*
 --
 LightManager()
 SetBrightness()
@@ -225,190 +136,12 @@ SetBrightness()
     <additional_attributes/>
   </element>
   <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1023</x>
-      <y>880</y>
-      <w>912</w>
-      <h>54</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>33;33;891;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>341</x>
-      <y>649</y>
-      <w>142</w>
-      <h>208</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>121;33;33;187</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>583</x>
-      <y>649</y>
-      <w>230</w>
-      <h>230</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>33;33;209;209</additional_attributes>
-  </element>
-  <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1287</x>
-      <y>1012</y>
-      <w>308</w>
-      <h>110</h>
-    </coordinates>
-    <panel_attributes>Parson.c
---
-Parses JSON files.
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>429</x>
-      <y>924</y>
-      <w>879</w>
-      <h>197</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;154;176;858;176</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>935</x>
-      <y>957</y>
-      <w>373</w>
-      <h>109</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;33;88;352;88</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1485</x>
-      <y>583</y>
-      <w>142</w>
-      <h>450</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;121;99;121;374;88;429</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1386</x>
-      <y>836</y>
-      <w>54</w>
-      <h>197</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;33;176</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>627</x>
-      <y>649</y>
-      <w>725</w>
-      <h>384</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;165;165;462;165;704;363</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1518</x>
-      <y>264</y>
-      <w>758</w>
-      <h>835</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;495;33;737;33;737;242;737;814;506;814;77;814</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>660</x>
-      <y>429</y>
-      <w>659</w>
-      <h>230</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>638;33;550;33;330;209;33;209</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>660</x>
-      <y>627</y>
-      <w>659</w>
-      <h>131</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>638;110;550;110;407;33;33;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1518</x>
-      <y>539</y>
-      <w>417</w>
-      <h>307</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>396;286;33;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1518</x>
-      <y>726</y>
-      <w>417</w>
-      <h>142</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>396;121;143;121;33;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Class</type>
-    <coordinates>
-      <x>1694</x>
-      <y>0</y>
-      <w>253</w>
-      <h>176</h>
+      <x>295</x>
+      <y>485</y>
+      <w>170</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>DataLogger
 --
@@ -425,125 +158,41 @@ Record()
     <additional_attributes/>
   </element>
   <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1518</x>
-      <y>143</y>
-      <w>340</w>
-      <h>593</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;572;319;572;319;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1518</x>
-      <y>143</y>
-      <w>307</w>
-      <h>395</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;374;286;374;286;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1518</x>
-      <y>143</y>
-      <w>274</w>
-      <h>208</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;187;253;187;253;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1155</x>
-      <y>66</y>
-      <w>560</w>
-      <h>54</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;132;33;539;33</additional_attributes>
-  </element>
-  <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>935</x>
-      <y>22</y>
-      <w>253</w>
-      <h>176</h>
+      <x>295</x>
+      <y>380</y>
+      <w>155</w>
+      <h>80</h>
     </coordinates>
-    <panel_attributes>PowerMonitor
+    <panel_attributes>DiveMonitor
 --
-Monitors and Records System 
-power usage.
+Logs Dive data to CSV file.
+Navigation coorindates.
+Power Usage (Temp, Current, Batt Voltage)
+* Should probably be several new programs *
 --
-PowerMonitor()
+DiveMonitor()
 Run()
 
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>660</x>
-      <y>143</y>
-      <w>296</w>
-      <h>450</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>33;429;121;429;121;33;275;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1155</x>
-      <y>88</y>
-      <w>802</w>
-      <h>725</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-m1=1
-m2=1
-</panel_attributes>
-    <additional_attributes>781;704;737;660;737;275;473;275;473;33;33;33</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1111</x>
-      <y>165</y>
-      <w>197</w>
-      <h>934</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>33;33;33;913;176;913</additional_attributes>
-  </element>
-  <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1914</x>
-      <y>792</y>
-      <w>297</w>
-      <h>220</h>
+      <x>535</x>
+      <y>290</y>
+      <w>135</w>
+      <h>110</h>
     </coordinates>
-    <panel_attributes>PWM_Control
+    <panel_attributes>Lib PWM_Control
 --
 Interfaces to PWM_Control daemon.
---
-int channel
+
 --
 PWM_Control()
-SetLevel()
-GetMax()
-GetMin()
+SetDuty()
 ReadTemp()
 ReadVolt()
 ReadCurrent()
@@ -560,23 +209,309 @@ ReadCurrent()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1925</x>
-      <y>418</y>
-      <w>253</w>
-      <h>198</h>
+      <x>10</x>
+      <y>255</y>
+      <w>85</w>
+      <h>90</h>
     </coordinates>
-    <panel_attributes>PID
+    <panel_attributes>/AbstractClass/
+DataSource
 --
-PID Functions.
++ DataSource()
++ ~DataSource()
++ SetTimeout()
++ ReadData()
++ ReadLine()
++ WriteData()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>30</x>
+      <y>330</y>
+      <w>24</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>15;15;15;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>295</x>
+      <y>235</y>
+      <w>130</w>
+      <h>125</h>
+    </coordinates>
+    <panel_attributes>SubControl
+--
+Physically Controls the submarine
+Can Run as Position mode
+or Velocity Mode.
 
 --
-PID()
-LoadPars()
-SetTarget(float)
-Run(float)
++ Run()
++ SetTarget()
++ SetCmdProcesor()
+
+--
 
 
 
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>490</x>
+      <y>455</y>
+      <w>140</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Parson.c
+--
+Parses JSON files.
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>410</x>
+      <y>145</y>
+      <w>84</w>
+      <h>134</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;125;45;125;45;15;75;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>410</x>
+      <y>290</y>
+      <w>134</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;15;15;15;125;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>625</x>
+      <y>385</y>
+      <w>44</w>
+      <h>159</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>35;15;35;150;15;150</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>235</x>
+      <y>280</y>
+      <w>69</w>
+      <h>239</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;230;40;230;40;15;60;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>235</x>
+      <y>525</y>
+      <w>299</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;15;40;15;40;75;290;75;290;50</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>190</x>
+      <y>435</y>
+      <w>24</w>
+      <h>59</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;50;15;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>605</x>
+      <y>235</y>
+      <w>149</w>
+      <h>379</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;340;15;370;140;370;140;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>585</x>
+      <y>175</y>
+      <w>69</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;15;60;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>410</x>
+      <y>215</y>
+      <w>244</w>
+      <h>124</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;115;115;115;115;15;235;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>435</x>
+      <y>235</y>
+      <w>239</w>
+      <h>169</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;160;75;160;75;25;230;25;230;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>435</x>
+      <y>200</y>
+      <w>74</w>
+      <h>219</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;210;35;210;35;35;65;35;65;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>325</x>
+      <y>445</y>
+      <w>24</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>15;15;15;40</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>435</x>
+      <y>385</y>
+      <w>169</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>15;45;160;45;160;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>645</x>
+      <y>165</y>
+      <w>140</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>SystemSettings
+* Follows Singleton Pattern*
+--
+Loads System Settings.
+Parses JSON files.
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>615</x>
+      <y>235</y>
+      <w>94</w>
+      <h>254</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>85;15;85;165;85;245;15;245</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>355</x>
+      <y>95</y>
+      <w>85</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enumeration&gt;&gt;
+AxisOfFreedom
+--
+X
+Y
+Z
+ROLL
+PITCH
+YAW
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>425</x>
+      <y>115</y>
+      <w>69</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>60;15;15;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>380</x>
+      <y>155</y>
+      <w>24</w>
+      <h>89</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>15;80;15;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>135</x>
+      <y>0</y>
+      <w>85</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enumeration&gt;&gt;
+*CommandList*
+--
+Cam_Start, Cam_Stop
+
+Left_Bright, Right_Bright
+
+Control_Mode
+Pos_X, Pos_Y
+Pos_Z, Pos_Roll
+Pos_Pitch, Pos_Yaw
+Vel_X, Vel_Y
+Vel_Z, Vel_Roll
+Vel_Pitch, Vel_Yaw
 
 
 </panel_attributes>
@@ -585,40 +520,50 @@ Run(float)
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1562</x>
-      <y>550</y>
-      <w>692</w>
-      <h>505</h>
+      <x>175</x>
+      <y>155</y>
+      <w>24</w>
+      <h>89</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>616;33;671;33;671;484;33;484</additional_attributes>
+    <additional_attributes>15;80;15;15</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>140</x>
+      <y>485</y>
+      <w>110</w>
+      <h>65</h>
+    </coordinates>
+    <panel_attributes>Main
+--
+Ties the system together.
+
+--
+</panel_attributes>
+    <additional_attributes/>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1518</x>
-      <y>517</y>
-      <w>428</w>
-      <h>54</h>
+      <x>95</x>
+      <y>325</y>
+      <w>54</w>
+      <h>184</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-
-m1=1
-m2=3
-</panel_attributes>
-    <additional_attributes>33;33;407;33</additional_attributes>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>45;175;15;175;15;15;30;15</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1518</x>
-      <y>572</y>
-      <w>428</w>
-      <h>142</h>
+      <x>210</x>
+      <y>435</y>
+      <w>94</w>
+      <h>59</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-
-m1=1
-m2=3
-</panel_attributes>
-    <additional_attributes>33;121;286;121;407;33</additional_attributes>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>85;15;60;15;60;35;15;35;15;50</additional_attributes>
   </element>
 </diagram>
