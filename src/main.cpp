@@ -17,26 +17,8 @@ using namespace std;
 #include "DataSource.h"
 #include "ControlProtocol.h"
 #include "TcpServer.h"
-
-
-#include "CmdStream.h"
-#include "PowerMonitor.h"
 #include "LightManager.h"
-#include "DepthManager.h"
-#include "PositionControl.h"
-#include "CmdProc.h"
 
-/* ======================== */
-/**
- * To Remove:
- * CmdStream.cpp/h
- * CmdProc.c/h
- * DepthManager
- * PositionControl
- * PowerMonitor
- * ProtocolDecoder
- *
- */
 /* ======================== */
 /**
  * To Add:
@@ -67,11 +49,7 @@ TcpServer *Listner;
 ControlProtocol *Control;
 
 
-PowerMonitor *PowerMon;
-LightManager *Lighting;
-PositionControl *Position;
-DepthManager *Depth;
-Cmdproc *Cmd;
+//LightManager *Lighting;
 
 /* ======================== */
 void alarm_wakeup (int i)
@@ -111,10 +89,6 @@ void Setup_SignalHandler(void)
 /* ======================== */
 void System_Shutdown(void)
 {
-  delete PowerMon;
-  delete Lighting;
-  delete Position;
-  delete Depth;
   syslog(LOG_EMERG, "System shutting down");
   closelog();
 }
@@ -125,7 +99,7 @@ void Func_Forward(string arg)
   double temp = ::atof(arg.c_str()) / 100.0;
 
   cout << "Func_Forward: " << temp << endl;
-  Position->Set_TargFwdVel(temp);
+//  Position->Set_TargFwdVel(temp);
 }
 
 /* ======================== */
@@ -134,7 +108,7 @@ void Func_Sideward(string arg)
   double temp = ::atof(arg.c_str()) / 100.0;
   cout << "Func_Sideward: " << temp << endl;
 
-  Position->Set_TargSwdVel(temp);
+//  Position->Set_TargSwdVel(temp);
 }
 
 /* ======================== */
@@ -142,7 +116,7 @@ void Func_Turn(string arg)
 {
   double temp = ::atof(arg.c_str()) / 100.0;
   cout << "Func_Turn: " << temp << endl;
-  Position->Set_TargTurnVel(temp);
+//  Position->Set_TargTurnVel(temp);
 }
 
 /* ======================== */
@@ -154,7 +128,7 @@ void Func_Depth(string arg)
 
 	if ( Enable == false )
 		temp = 0.0;	// disable depth
-  Depth->SetDepthPower(temp);
+//  Depth->SetDepthPower(temp);
 }
 
 /* ======================== */
@@ -178,6 +152,7 @@ void Func_Disable(string arg)
 }
 
 /* ======================== */
+/*
 void Setup_Callbacks(void)
 {
   Cmd->AddCallBack("Forward", 		Func_Forward);
@@ -187,7 +162,7 @@ void Setup_Callbacks(void)
   Cmd->AddCallBack("Disable", 		Func_Disable);
   Cmd->AddCallBack("Enable", 			Func_Enable);
 }
-
+*/
 /* ======================== */
 int main (int argc, char *argv[])
 {
@@ -241,18 +216,9 @@ int main (int argc, char *argv[])
 	Control->AddDataSource(Listner);
 
 
-  Cmd = new Cmdproc();
-
-  PowerMon = new PowerMonitor(path);
-  Lighting = new LightManager(settings);
-  Position = new PositionControl(settings);
-  Depth = new DepthManager(settings );
-  Depth->SetDepthPower(0.0);
-
+//  Lighting = new LightManager(settings);
 	// register call backs
 	//Control->AddCallback("", );
-
-//  Setup_Callbacks();
 
   // set up timer signal and signal handler
   alarm_wakeup(0);
@@ -267,9 +233,6 @@ int main (int argc, char *argv[])
     if ( Run_Control == true)
     {
       Run_Control = false;
-      PowerMon->Run();
-      Depth->Run();
-      Position->Run();
 
       // send data back to console.
       msg.clear();

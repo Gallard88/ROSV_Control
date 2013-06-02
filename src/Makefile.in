@@ -47,11 +47,9 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 	"$(DESTDIR)$(ROSV_Control_Filesdir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = CmdProc.$(OBJEXT) ControlProtocol.$(OBJEXT) \
-	DataLogger.$(OBJEXT) DepthManager.$(OBJEXT) \
-	LightManager.$(OBJEXT) PositionControl.$(OBJEXT) \
-	PowerMonitor.$(OBJEXT) parson.$(OBJEXT) \
-	ProtocolDecoder.$(OBJEXT) TcpServer.$(OBJEXT) main.$(OBJEXT)
+am_ROSV_Control_OBJECTS = ControlProtocol.$(OBJEXT) \
+	DataLogger.$(OBJEXT) LightManager.$(OBJEXT) parson.$(OBJEXT) \
+	TcpServer.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a
@@ -205,25 +203,15 @@ ROSV_Control_Filesdir = /etc
 ROSV_Control_Files_DATA = ROSV_Motors.json
 LDADD = /usr/local/lib/libPWMControl.a
 ROSV_Control_SOURCES = \
-	CmdProc.c \
-	CmdProc.h \
 	ControlProtocol.cpp \
 	ControlProtocol.h \
 	DataLogger.cpp \
 	DataLogger.h \
 	DataSource.h \
-	DepthManager.cpp \
-	DepthManager.h \
 	LightManager.cpp \
 	LightManager.h \
-	PositionControl.cpp \
-	PositionControl.h \
-	PowerMonitor.cpp \
-	PowerMonitor.h \
 	parson.c \
 	parson.h \
-	ProtocolDecoder.cpp \
-	ProtocolDecoder.h \
 	TcpServer.cpp \
 	TcpServer.h \
 	main.cpp
@@ -309,14 +297,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CmdProc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ControlProtocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataLogger.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DepthManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PositionControl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerMonitor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProtocolDecoder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parson.Po@am__quote@
