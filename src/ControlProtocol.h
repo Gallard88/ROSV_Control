@@ -1,5 +1,5 @@
 /*
- TcpServer ( http://www.github.com/Gallard88/ROSV_Control )
+ ControlProtocol ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,35 +22,41 @@
 */
 
 /* ======================== */
-#ifndef __TCPSERVER__
-#define __TCPSERVER__
+#ifndef __CONTROL_PROTOCOL__
+#define __CONTROL_PROTOCOL__
 
 /* ======================== */
 #include <string>
+#include <vector>
+
+/* ======================== */
 
 #include "DataSource.h"
 
-/* ======================== */
-class TcpServer: public DataSource
+typedef int (*CmdCallback)(string arg);
+typedef struct
 {
-private:
-    int listen_fd;
+	const char *cmd;
+	CmdCallback func;
 
-		void CheckReturn(int rv);
+} CallBack;
 
+class ControlProtocol
+{
 
 public:
 
-    TcpServer(int port);
-    ~TcpServer(void);
+  void AddDataSource(DataSource *src);
+  void Run(const struct timeval *timeout);
+  void AddCallback(const char *cmd, CmdCallback func);
+  void SendMsg(const string msg);
 
-		int ReadLine(string *line);
-
-		int WriteData(const char *msg, int length);
-		int WriteData(const string & line);
-		void Run(const struct timeval *timeout);
+private:
+  DataSource *DSrc;
+	vector<CallBack> VecCallBack;
 };
 
 /* ======================== */
 /* ======================== */
 #endif
+

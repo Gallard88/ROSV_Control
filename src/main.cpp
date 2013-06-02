@@ -14,7 +14,11 @@ using namespace std;
 
 #include <PWM_Controller.h>
 
+#include "DataSource.h"
+#include "ControlProtocol.h"
 #include "TcpServer.h"
+
+
 #include "CmdStream.h"
 #include "PowerMonitor.h"
 #include "LightManager.h"
@@ -22,6 +26,31 @@ using namespace std;
 #include "PositionControl.h"
 #include "CmdProc.h"
 
+/* ======================== */
+/**
+ * To Remove:
+ * CmdStream.cpp/h
+ * CmdProc.c/h
+ * DepthManager
+ * PositionControl
+ * PowerMonitor
+ * ProtocolDecoder
+ *
+ */
+/* ======================== */
+/**
+ * To Add:
+ * ControlProtocol
+ * TcpServer
+ * DataSource
+ * CameraManager
+ * DiveMonitor
+ * SystemSettings
+ * DataLogger
+ * LightManager
+ * SubControl
+ *
+ */
 /* ======================== */
 #define RUN_INTERVAL 100000	// 100 ms
 
@@ -34,7 +63,10 @@ volatile bool Run_Control;
 bool Enable;
 
 /* ======================== */
-TcpServer Listner(1);
+TcpServer *Listner;
+ControlProtocol *Control;
+
+
 PowerMonitor *PowerMon;
 LightManager *Lighting;
 PositionControl *Position;
@@ -182,20 +214,17 @@ int main (int argc, char *argv[])
   }
 
   settings = json_value_get_object(val);
-  if ( settings == NULL )
-  {
+  if ( settings == NULL ) {
     printf("Settings == NULL\n");
     return -1;
   }
-  if ( PWM_Connect() < 0 )
-  {
+  if ( PWM_Connect() < 0 ) {
     printf("PWM_Connect() failed\n");
     return -1;
   }
   uid_t uid=getuid(), euid=geteuid();
   string path;
-  if ((uid <= 0 ) || ( uid != euid))
-  {
+  if ((uid <= 0 ) || ( uid != euid)) {
     /* We might have elevated privileges beyond that of the user who invoked
     * the program, due to suid bit. Be very careful about trusting any data! */
     path = "/var/log/";
@@ -206,22 +235,24 @@ int main (int argc, char *argv[])
   }
 
   // open sub-modules
+  Listner = new TcpServer(8090);
+
+  Control = new ControlProtocol();
+	Control->AddDataSource(Listner);
+
+
   Cmd = new Cmdproc();
+
   PowerMon = new PowerMonitor(path);
   Lighting = new LightManager(settings);
   Position = new PositionControl(settings);
   Depth = new DepthManager(settings );
   Depth->SetDepthPower(0.0);
 
-  Setup_Callbacks();
+	// register call backs
+	//Control->AddCallback("", );
 
-  // open TCP server
-  if ( Listner.Connect(8090) < 0)
-  {
-    cout << "Listner Failed" << endl;
-    return -1;
-  }
-
+//  Setup_Callbacks();
 
   // set up timer signal and signal handler
   alarm_wakeup(0);
@@ -229,19 +260,9 @@ int main (int argc, char *argv[])
   cout << "Starting Main Program" << endl;
   while (1)
   {
-    struct timeval timeout = system_time;
-    string line;
 
     // read data from connected clients.
-    Listner.Run(&timeout);
-    line.clear();
-    while ( Listner.ReadLine(&line) > 0 )
-    {
-      if ( line.size() > 0 )
-      {
-        Cmd->ProcessLine(line);
-      }
-    }
+		Control->Run(&system_time);
 
     if ( Run_Control == true)
     {
@@ -264,10 +285,7 @@ int main (int argc, char *argv[])
       ss << PWM_GetCurrent();
       msg += "Current=" + ss.str() + "\r\n";
 
-      Listner.SendMsg(msg);
-			if ( Listner.NumberClients() == 0 )
-				Func_Disable(line);
-
+      Control->SendMsg(msg);
     }
   }
   return 0;

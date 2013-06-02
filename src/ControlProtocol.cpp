@@ -1,5 +1,5 @@
 /*
- TcpServer ( http://www.github.com/Gallard88/ROSV_Control )
+ ControlProtocol ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,35 +22,68 @@
 */
 
 /* ======================== */
-#ifndef __TCPSERVER__
-#define __TCPSERVER__
+using namespace std;
 
 /* ======================== */
-#include <string>
-
-#include "DataSource.h"
+#include "ControlProtocol.h"
 
 /* ======================== */
-class TcpServer: public DataSource
+void ControlProtocol::AddDataSource(DataSource *src)
 {
-private:
-    int listen_fd;
+	DSrc = src;
+}
 
-		void CheckReturn(int rv);
+/* ======================== */
+void ControlProtocol::Run(const struct timeval *timeout)
+{
+	if ( DSrc != NULL )
+	{
+		string line, arg;
 
+		DSrc->Run(timeout);
+		while ( DSrc->ReadLine(&line) != 0)
+		{
+			// split into cmd and arg.
+			size_t x = line.find_first_of("=:");
+			if ( x != string::npos )
+			{
+				arg = line.substr((size_t) x+1, line.size());
+				line.erase((size_t)x, line.size());
+			}
+			// look up command
+			for ( int j = 0; j < (int)VecCallBack.size(); j ++ )
+			{
+				CallBack c;
 
-public:
+				c = VecCallBack[j];
+				if ( line.compare(c.cmd) == 0 )
+				{
+					(c.func)(arg);
+				}
+			}
+		}
+	}
+}
 
-    TcpServer(int port);
-    ~TcpServer(void);
+/* ======================== */
+void ControlProtocol::AddCallback(const char *cmd, CmdCallback func)
+{
+	CallBack callback;
 
-		int ReadLine(string *line);
+	callback.cmd = cmd;
+	callback.func = func;
 
-		int WriteData(const char *msg, int length);
-		int WriteData(const string & line);
-		void Run(const struct timeval *timeout);
-};
+	VecCallBack.push_back(callback);
+}
+
+/* ======================== */
+void ControlProtocol::SendMsg(const string msg)
+{
+	if ( DSrc != NULL )
+		DSrc->WriteData(msg);
+}
+
+/* ======================== */
 
 /* ======================== */
 /* ======================== */
-#endif

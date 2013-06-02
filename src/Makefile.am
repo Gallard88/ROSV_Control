@@ -15,8 +15,11 @@ LDADD=/usr/local/lib/libPWMControl.a
 ROSV_Control_SOURCES = \
 	CmdProc.c \
 	CmdProc.h \
+	ControlProtocol.cpp \
+	ControlProtocol.h \
 	DataLogger.cpp \
 	DataLogger.h \
+	DataSource.h \
 	DepthManager.cpp \
 	DepthManager.h \
 	LightManager.cpp \
@@ -27,6 +30,8 @@ ROSV_Control_SOURCES = \
 	PowerMonitor.h \
 	parson.c \
 	parson.h \
+	ProtocolDecoder.cpp \
+	ProtocolDecoder.h \
 	TcpServer.cpp \
 	TcpServer.h \
 	main.cpp

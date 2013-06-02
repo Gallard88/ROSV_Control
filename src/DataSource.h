@@ -1,5 +1,5 @@
 /*
- TcpServer ( http://www.github.com/Gallard88/ROSV_Control )
+ DataSource ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,37 +20,32 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-
-/* ======================== */
-#ifndef __TCPSERVER__
-#define __TCPSERVER__
-
-/* ======================== */
+//*******************************************************************************************
+//*******************************************************************************************
+#ifndef __DATASOURCE__
+#define __DATASOURCE__
+//*******************************************************************************************
 #include <string>
+#include <sys/time.h>
 
-#include "DataSource.h"
-
-/* ======================== */
-class TcpServer: public DataSource
+//*******************************************************************************************
+class DataSource
 {
-private:
-    int listen_fd;
-
-		void CheckReturn(int rv);
-
-
 public:
+  DataSource(void) { File = -1; }
+  ~DataSource(void) { if ( File >=0 ) { close(File); File = -1;} }
 
-    TcpServer(int port);
-    ~TcpServer(void);
+  virtual int ReadLine(string *line) = 0;
 
-		int ReadLine(string *line);
+  virtual int WriteData(const char *msg, int length) = 0;
+  virtual int WriteData(const string & line) = 0;
+  virtual void Run(const struct timeval *timeout) = 0;
 
-		int WriteData(const char *msg, int length);
-		int WriteData(const string & line);
-		void Run(const struct timeval *timeout);
+protected:
+  int File;
+	string Buffer;
 };
 
-/* ======================== */
-/* ======================== */
+//*******************************************************************************************
+//*******************************************************************************************
 #endif

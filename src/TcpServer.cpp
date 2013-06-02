@@ -1,3 +1,26 @@
+/*
+ TcpServer ( http://www.github.com/Gallard88/ROSV_Control )
+ Copyright (c) 2013 Thomas BURNS
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+*/
+
 /* ======================== */
 using namespace std;
 /* ======================== */
@@ -14,22 +37,17 @@ using namespace std;
 #include "TcpServer.h"
 
 /* ======================== */
-TcpServer::TcpServer(int max_clients)
-{
-  Max_Connections = max_clients;
-//	poll = new struct pollfd [max_clients];
-}
-
-/* ======================== */
-int TcpServer::Connect(int port)
+TcpServer::TcpServer(int port)
 {
   struct sockaddr_in serv_addr;
+
+	File = -1;
 
   listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (listen_fd < 0)
   {
     printf("Socket() error");
-    return -1;
+    return;
   }
   bzero((char *) &serv_addr, sizeof(serv_addr));
 
@@ -39,167 +57,115 @@ int TcpServer::Connect(int port)
   if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
   {
     printf("ERROR on binding\n");
-    return -1;
-  }
-  listen( listen_fd, Max_Connections);
-  return listen_fd;
-}
-
-/* ======================== */
-void TcpServer::CheckNewConnetions(void)
-{
-  struct TcpData new_sock;
-  socklen_t clilen;
-  struct sockaddr_in cli_addr;
-
-  if ( FD_ISSET(listen_fd, &readfs) )
-  {
-//		cout << "FD set" << endl;
-    clilen = sizeof(cli_addr);
-    new_sock.fd = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
-
-    if (new_sock.fd < 0 )
-      return ;
-
-    Socket_Vec.push_back(new_sock);
-  }
-}
-
-/* ======================== */
-#define SET_MAX_SOCK(x)	if( x > max_sock ) max_sock = x;
-
-/* ======================== */
-void TcpServer::Run(struct timeval *timeout)
-{
-//	fd_set readfs;
-  int max_sock = 0;
-  struct TcpData new_sock;
-  struct timeval to = { 0, 0};
-  char buffer[4096];
-
-  if ( timeout)
-    to = *timeout;
-
-  Prune();
-
-  // reset Select Data.
-  FD_ZERO(&readfs);
-  if ( Socket_Vec.size() < (size_t) Max_Connections )
-  {
-    FD_SET(listen_fd, &readfs);
-    max_sock = listen_fd;
-  }
-
-  for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
-  {
-    FD_SET(it->fd, &readfs);
-    SET_MAX_SOCK( it->fd );
-  }
-  if ( select(max_sock+1, &readfs, NULL, NULL, &to) <= 0)
     return;
-
-  if ( Socket_Vec.size() < (size_t) Max_Connections)
-    CheckNewConnetions();
-
-  for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
-  {
-    int sock = it->fd;
-    if ( FD_ISSET(sock, &readfs) )
-    {
-      int n = read(sock, buffer, sizeof(buffer));
-      if ( n <= 0 )
-      {
-        shutdown(it->fd, 2);
-        it->fd = -1;
-      }
-      else if ( n > 0 )
-      {
-        string msg = string(buffer);
-        it->buffer += msg;
-      }
-    }
   }
+  listen( listen_fd, 1);
+  return;
 }
 
 /* ======================== */
-int TcpServer::ReadLine(string *data)
+void TcpServer::CheckReturn(int rv)
 {
-  for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
+	if ( rv < 0 )
+	{
+		close(File);
+		File = -1;
+		Buffer.erase();
+	}
+}
+
+/* ======================== */
+int TcpServer::ReadLine(string *line)
+{
+	if ( File >= 0 )
   {
-    string *line = &it->buffer;
-    if ( line->size() == 0 )
-      continue;
-
-    size_t found = line->find_first_of("\r\n");
-    if ( found != string::npos)
-    {
-      *data = line->substr(0, found);
-//			if ( data->size() > 0 )
-//  			data->append("\r\n");
-      line->erase(0, found+1);
-
-      return 1;
-    }
+    if ( Buffer.size() == 0 )
+		{
+			size_t found = Buffer.find_first_of("\r\n");
+			if ( found != string::npos)
+			{
+				*line = Buffer.substr(0, found);
+				Buffer.erase(0, found+1);
+				return 1;
+			}
+		}
   }
   return 0;
 }
 
 /* ======================== */
-void TcpServer::Prune(void)
+int TcpServer::WriteData(const char *msg, int length)
 {
-  for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
-  {
-    if ( it->fd < 0 )
-    {
-      cout << "Client Lost" << endl;
-      it->buffer.clear();
-      Socket_Vec.erase(it);
-      Prune(); // recursive to remove all closes sockets.
-      // any other method seems to cause a seg fault on the next iteration of the for() loop
-      return;
-    }
-  }
+	int rv = 0;
+	if ( File >= 0 )
+	{
+		rv = write(File, msg, length);
+		CheckReturn(rv);
+	}
+	return rv;
 }
 
 /* ======================== */
-void TcpServer::SendMsg(const string msg)
+int TcpServer::WriteData(const string & line)
 {
-  SendMsg((const char *)msg.c_str(), (int ) msg.size());
+	int rv = 0;
+	if ( File >= 0 )
+	{
+		rv = write(File, line.c_str(), line.size());
+		CheckReturn(rv);
+	}
+	return rv;
 }
 
 /* ======================== */
-int TcpServer::NumberClients(void)
+void TcpServer::Run(const struct timeval *timeout)
 {
-	return Socket_Vec.size();
+	int fd;
+	fd_set readfs;
+  char buffer[4096];
+
+	if ( File < 0 ) // listen for new connections
+	  fd = listen_fd;
+	else // run file socket
+		fd = File;
+
+  FD_ZERO(&readfs);
+  FD_SET(fd, &readfs);
+	struct timeval to = *timeout;
+  if ( select(fd+1, &readfs, NULL, NULL, &to) <= 0)
+    return;
+
+	if (( File < 0 ) && FD_ISSET(listen_fd, &readfs))
+	{
+  socklen_t clilen;
+  struct sockaddr_in cli_addr;
+
+    clilen = sizeof(cli_addr);
+    File = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
+	}
+	else  if (FD_ISSET(File, &readfs))
+	{
+		int n = read(File, buffer, sizeof(buffer));
+		CheckReturn(n);
+		if ( n > 0 )
+		{
+			string msg = string(buffer);
+			Buffer += msg;
+		}
+	}
 }
 
 /* ======================== */
-void TcpServer::SendMsg(const char *data, int size)
-{
-  int rv;
-
-  for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
-  {
-    rv = write(it->fd, data, size);
-    if (rv < 0 )
-    {
-      shutdown(it->fd, 2);
-      it->fd = -1;
-    }
-  }
-}
-
 /* ======================== */
 TcpServer::~TcpServer(void)
 {
-  for (std::vector<struct TcpData>::iterator it = Socket_Vec.begin() ; it != Socket_Vec.end(); ++it)
-  {
-    shutdown(it->fd, 2);
-    close(it->fd);
-    it->buffer.clear();
-    it->fd = -1;
-  }
-  Socket_Vec.clear();
+	Buffer.clear();
+	if ( File >= 0 )
+	{
+    shutdown(File, 2);
+    close(File);
+		File = -1;
+	}
   shutdown(listen_fd, 2);
   close(listen_fd);
   listen_fd = -1;
