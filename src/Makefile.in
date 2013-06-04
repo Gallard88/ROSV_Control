@@ -47,9 +47,11 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 	"$(DESTDIR)$(ROSV_Control_Filesdir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = ControlProtocol.$(OBJEXT) \
-	DataLogger.$(OBJEXT) LightManager.$(OBJEXT) parson.$(OBJEXT) \
-	TcpServer.$(OBJEXT) main.$(OBJEXT)
+am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) \
+	ControlProtocol.$(OBJEXT) DataLogger.$(OBJEXT) \
+	DiveMonitor.$(OBJEXT) LightManager.$(OBJEXT) parson.$(OBJEXT) \
+	SubControl.$(OBJEXT) SysSettings.$(OBJEXT) TcpServer.$(OBJEXT) \
+	main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a
@@ -203,15 +205,23 @@ ROSV_Control_Filesdir = /etc
 ROSV_Control_Files_DATA = ROSV_Motors.json
 LDADD = /usr/local/lib/libPWMControl.a
 ROSV_Control_SOURCES = \
+	CameraManager.cpp \
+	CameraManager.h \
 	ControlProtocol.cpp \
 	ControlProtocol.h \
 	DataLogger.cpp \
 	DataLogger.h \
 	DataSource.h \
+	DiveMonitor.cpp \
+	DiveMonitor.h \
 	LightManager.cpp \
 	LightManager.h \
 	parson.c \
 	parson.h \
+	SubControl.cpp \
+	SubControl.h \
+	SysSettings.cpp \
+	SysSettings.h \
 	TcpServer.cpp \
 	TcpServer.h \
 	main.cpp
@@ -297,9 +307,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ControlProtocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataLogger.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DiveMonitor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SysSettings.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parson.Po@am__quote@

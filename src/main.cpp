@@ -15,9 +15,13 @@ using namespace std;
 #include <PWM_Controller.h>
 
 #include "DataSource.h"
+#include "DiveMonitor.h"
+#include "CameraManager.h"
+#include "LightManager.h"
 #include "ControlProtocol.h"
 #include "TcpServer.h"
-#include "LightManager.h"
+#include "SubControl.h"
+#include "SysSettings.h"
 
 /* ======================== */
 /**
@@ -45,9 +49,12 @@ volatile bool Run_Control;
 bool Enable;
 
 /* ======================== */
-TcpServer *Listner;
-ControlProtocol *Control;
-
+TcpServer        *Listner;
+ControlProtocol  *Control;
+SubControl       *MotorControl;
+DiveMonitor      *DiveMon;
+LightManager     *LightMan;
+CameraManager    *CamMan;
 
 //LightManager *Lighting;
 
@@ -197,8 +204,9 @@ int main (int argc, char *argv[])
     printf("PWM_Connect() failed\n");
     return -1;
   }
-  uid_t uid=getuid(), euid=geteuid();
+
   string path;
+  uid_t uid=getuid(), euid=geteuid();
   if ((uid <= 0 ) || ( uid != euid)) {
     /* We might have elevated privileges beyond that of the user who invoked
     * the program, due to suid bit. Be very careful about trusting any data! */
@@ -211,12 +219,16 @@ int main (int argc, char *argv[])
 
   // open sub-modules
   Listner = new TcpServer(8090);
+	MotorControl = new SubControl(settings);
+
+  DiveMon = new DiveMonitor(settings);
+  LightMan = new LightManager(settings);
+  CamMan = new CameraManager(settings);
 
   Control = new ControlProtocol();
 	Control->AddDataSource(Listner);
 
 
-//  Lighting = new LightManager(settings);
 	// register call backs
 	//Control->AddCallback("", );
 
