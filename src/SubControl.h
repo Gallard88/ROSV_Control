@@ -26,15 +26,43 @@
 #define __SUB_CONTROL__
 
 //*******************************************************************************************
+#include <string>
+#include <PWM_Controller.h>
+#include <INS_Data.h>
+
 #include "parson.h"
+
+//*******************************************************************************************
+enum SubMode {
+	Idle = 0,
+	Vel,
+	Pos
+};
+
+//*******************************************************************************************
+struct Motor {
+	int ch;
+	int mult[INS_AXES_SIZE];
+};
 
 //*******************************************************************************************
 class SubControl
 {
 public:
 	SubControl(const JSON_Object *settings);
+  void Run(void);
+	int SetTargetPos(INS_Bearings pos);
+	int SetTargetVel(INS_Bearings vel);
+	void SetMode(string mode);
+	const char *GetMode(void);
 
 private:
+	struct Motor *MotorList;
+	int NumMotor;
+
+	enum SubMode Mode;
+	INS_Bearings Position;
+	INS_Bearings Velocity;
 };
 
 //*******************************************************************************************

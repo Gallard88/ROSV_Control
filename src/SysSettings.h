@@ -31,7 +31,7 @@
 class SysSetting
 {
 public:
-	SysSetting(const JSON_Object *settings);
+	SysSetting(const char *filename);
 
 private:
 

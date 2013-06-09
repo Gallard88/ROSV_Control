@@ -33,6 +33,8 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <syslog.h>
+#include <arpa/inet.h>
 
 #include "TcpServer.h"
 
@@ -46,7 +48,7 @@ TcpServer::TcpServer(int port)
   listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (listen_fd < 0)
   {
-    printf("Socket() error");
+		syslog(LOG_EMERG, "Socket() error");
     return;
   }
   bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -56,7 +58,7 @@ TcpServer::TcpServer(int port)
   serv_addr.sin_port = htons(port);
   if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
   {
-    printf("ERROR on binding\n");
+		syslog(LOG_EMERG, "ERROR on binding");
     return;
   }
   listen( listen_fd, 1);
@@ -71,6 +73,7 @@ void TcpServer::CheckReturn(int rv)
 		close(File);
 		File = -1;
 		Buffer.erase();
+		syslog(LOG_EMERG, "Lost Connection: %s", inet_ntoa(cli_addr.sin_addr));
 	}
 }
 
@@ -79,7 +82,7 @@ int TcpServer::ReadLine(string *line)
 {
 	if ( File >= 0 )
   {
-    if ( Buffer.size() == 0 )
+    if ( Buffer.size() != 0 )
 		{
 			size_t found = Buffer.find_first_of("\r\n");
 			if ( found != string::npos)
@@ -137,21 +140,23 @@ void TcpServer::Run(const struct timeval *timeout)
 
 	if (( File < 0 ) && FD_ISSET(listen_fd, &readfs))
 	{
-  socklen_t clilen;
-  struct sockaddr_in cli_addr;
+		socklen_t clilen;
 
     clilen = sizeof(cli_addr);
     File = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
+		syslog(LOG_EMERG, "New Connection: %s", inet_ntoa(cli_addr.sin_addr));
 	}
 	else  if (FD_ISSET(File, &readfs))
 	{
 		int n = read(File, buffer, sizeof(buffer));
-		CheckReturn(n);
-		if ( n > 0 )
-		{
+		if ( n > 0 ) {
 			string msg = string(buffer);
 			Buffer += msg;
 		}
+		else {
+			n = -1;
+		}
+		CheckReturn(n);
 	}
 }
 
@@ -166,6 +171,7 @@ TcpServer::~TcpServer(void)
     close(File);
 		File = -1;
 	}
+	syslog(LOG_EMERG, "Shutting down module");
   shutdown(listen_fd, 2);
   close(listen_fd);
   listen_fd = -1;

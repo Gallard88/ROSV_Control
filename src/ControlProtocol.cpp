@@ -25,6 +25,8 @@
 using namespace std;
 
 /* ======================== */
+#include <stdio.h>
+
 #include "ControlProtocol.h"
 
 /* ======================== */
@@ -36,13 +38,11 @@ void ControlProtocol::AddDataSource(DataSource *src)
 /* ======================== */
 void ControlProtocol::Run(const struct timeval *timeout)
 {
-	if ( DSrc != NULL )
-	{
+	if ( DSrc != NULL ) {
 		string line, arg;
 
 		DSrc->Run(timeout);
-		while ( DSrc->ReadLine(&line) != 0)
-		{
+		while ( DSrc->ReadLine(&line) != 0) {
 			// split into cmd and arg.
 			size_t x = line.find_first_of("=:");
 			if ( x != string::npos )
@@ -58,7 +58,7 @@ void ControlProtocol::Run(const struct timeval *timeout)
 				c = VecCallBack[j];
 				if ( line.compare(c.cmd) == 0 )
 				{
-					(c.func)(arg);
+					(c.func)(DSrc->GetFd(), arg);
 				}
 			}
 		}

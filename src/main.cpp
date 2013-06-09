@@ -11,8 +11,10 @@ using namespace std;
 #include <sys/time.h>
 #include <sstream>
 #include <syslog.h>
+#include <ctype.h>
 
 #include <PWM_Controller.h>
+#include <INS_Data.h>
 
 #include "DataSource.h"
 #include "DiveMonitor.h"
@@ -41,12 +43,10 @@ using namespace std;
 #define RUN_INTERVAL 100000	// 100 ms
 
 /* ======================== */
-const char prop_file[] = "/etc/ROSV_Motors.json";
+const char prop_file[] = "./ROSV_Motors.json";
+//const char prop_file[] = "/etc/ROSV_Motors.json";
 const struct timeval system_time = { 0 , RUN_INTERVAL};
-
-/* ======================== */
 volatile bool Run_Control;
-bool Enable;
 
 /* ======================== */
 TcpServer        *Listner;
@@ -55,8 +55,7 @@ SubControl       *MotorControl;
 DiveMonitor      *DiveMon;
 LightManager     *LightMan;
 CameraManager    *CamMan;
-
-//LightManager *Lighting;
+SysSetting       *Settings;
 
 /* ======================== */
 void alarm_wakeup (int i)
@@ -101,97 +100,186 @@ void System_Shutdown(void)
 }
 
 /* ======================== */
-void Func_Forward(string arg)
+char *SkipSpace(char *ptr)
 {
-  double temp = ::atof(arg.c_str()) / 100.0;
-
-  cout << "Func_Forward: " << temp << endl;
-//  Position->Set_TargFwdVel(temp);
+	while ( *ptr && isspace(*ptr))
+		ptr++;
+	return ptr;
 }
 
 /* ======================== */
-void Func_Sideward(string arg)
+char *SkipChars(char *ptr)
 {
-  double temp = ::atof(arg.c_str()) / 100.0;
-  cout << "Func_Sideward: " << temp << endl;
-
-//  Position->Set_TargSwdVel(temp);
+	while ( *ptr && !isspace(*ptr))
+		ptr++;
+	return ptr;
 }
 
 /* ======================== */
-void Func_Turn(string arg)
+int setPos(int fd, string arg)
 {
-  double temp = ::atof(arg.c_str()) / 100.0;
-  cout << "Func_Turn: " << temp << endl;
-//  Position->Set_TargTurnVel(temp);
+	char *ptr = (char *)arg.c_str();
+	INS_Bearings pos;
+
+	ptr = SkipSpace(ptr);
+	pos.x = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	pos.y = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	pos.z = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	pos.roll = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	pos.pitch = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	pos.yaw = ::atof(ptr);
+
+	return MotorControl->SetTargetPos(pos);
 }
 
 /* ======================== */
-void Func_Depth(string arg)
+int setVel(int fd, string arg)
 {
-  double temp = ::atof(arg.c_str()) / 100.0;
+	char *ptr = (char *)arg.c_str();
+	INS_Bearings vel;
 
-  cout << "Func_Depth: " << temp << endl;
+	ptr = SkipSpace(ptr);
+	vel.x = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	vel.y = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	vel.z = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	vel.roll = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	vel.pitch = ::atof(ptr);
+	ptr = SkipChars(ptr);
+	ptr = SkipSpace(ptr);
+	vel.yaw = ::atof(ptr);
 
-	if ( Enable == false )
-		temp = 0.0;	// disable depth
-//  Depth->SetDepthPower(temp);
+	return MotorControl->SetTargetVel(vel);
+}
+
+
+/* ======================== */
+int getPos(int fd, string arg)
+{
+	string msg;
+	INS_Bearings pos;
+
+	pos = INS_GetPosition();
+
+	msg = "getPos: ";
+	msg += pos.x;
+	msg += ", ";
+	msg += pos.y;
+	msg += ", ";
+	msg += pos.z;
+	msg += ", ";
+	msg += pos.roll;
+	msg += ", ";
+	msg += pos.pitch;
+	msg += ", ";
+	msg += pos.yaw;
+	msg += "\r\n";
+
+	return write(fd, msg.c_str(), msg.size()+1);
 }
 
 /* ======================== */
-void Func_Enable(string arg)
+int getVel(int fd, string arg)
 {
-	if ( Enable == false )
-	{
-		Enable = true;
-		syslog(LOG_EMERG, "System Enabled");
-	}
+	string msg;
+	INS_Bearings vel;
+
+	vel = INS_GetVelocity();
+
+	msg = "getVel: ";
+	msg += vel.x;
+	msg += ",";
+	msg += vel.y;
+	msg += ",";
+	msg += vel.z;
+	msg += ",";
+	msg += vel.roll;
+	msg += ",";
+	msg += vel.pitch;
+	msg += ",";
+	msg += vel.yaw;
+	msg += "\r\n";
+
+	return write(fd, msg.c_str(), msg.size()+1);
+	return 0;
 }
 
 /* ======================== */
-void Func_Disable(string arg)
+int CamStart(int fd, string arg)
 {
-	if ( Enable == true )
-	{
-		Enable = false;
-		syslog(LOG_EMERG, "System Disabled");
-	}
+	CamMan->Start();
+	return 0;
 }
 
 /* ======================== */
-/*
-void Setup_Callbacks(void)
+int CamStop(int fd, string arg)
 {
-  Cmd->AddCallBack("Forward", 		Func_Forward);
-  Cmd->AddCallBack("Sideward", 		Func_Sideward);
-  Cmd->AddCallBack("Turn", 				Func_Turn);
-  Cmd->AddCallBack("Depth", 			Func_Depth);
-  Cmd->AddCallBack("Disable", 		Func_Disable);
-  Cmd->AddCallBack("Enable", 			Func_Enable);
+	CamMan->Stop();
+	return 0;
 }
-*/
+
+/* ======================== */
+int Brightness(int fd, string arg)
+{
+	return 0;
+}
+
+/* ======================== */
+int SetControlMode(int fd, string arg)
+{
+	MotorControl->SetMode(arg);
+	return 0;
+}
+
+/* ======================== */
+int GetControlMode(int fd, string arg)
+{
+	string msg;
+
+	msg += "getControlMode: ";
+	msg += MotorControl->GetMode();
+	msg += "\r\n";
+	return write(fd, msg.c_str(), msg.size()+1);
+}
+
 /* ======================== */
 int main (int argc, char *argv[])
 {
   JSON_Object *settings;
   JSON_Value *val;
   int rv;
-  string msg;
-  stringstream ss;
 
-	Enable = false;
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_EMERG, "Starting program");
 
   Setup_SignalHandler();
+  alarm_wakeup(0);
   atexit(System_Shutdown);
 
+	/* --------------------------------------------- */
   // load paramaters
   val = json_parse_file(prop_file);
   rv = json_value_get_type(val);
-  if ( rv != JSONObject )
-  {
+  if ( rv != JSONObject ) {
     printf("JSON Parse file failed\n");
+		syslog(LOG_EMERG, "JSON Parse file failed\n");
     return -1;
   }
 
@@ -200,24 +288,36 @@ int main (int argc, char *argv[])
     printf("Settings == NULL\n");
     return -1;
   }
+
+	/* --------------------------------------------- */
   if ( PWM_Connect() < 0 ) {
     printf("PWM_Connect() failed\n");
+		syslog(LOG_EMERG, "PWM_Connect() failed\n");
+    return -1;
+  }
+  if ( INS_Connect() < 0 ) {
+    printf("INS_Connect() failed\n");
+		syslog(LOG_EMERG, "INS_Connect() failed\n");
     return -1;
   }
 
+	/* --------------------------------------------- */
   string path;
   uid_t uid=getuid(), euid=geteuid();
   if ((uid <= 0 ) || ( uid != euid)) {
-    /* We might have elevated privileges beyond that of the user who invoked
-    * the program, due to suid bit. Be very careful about trusting any data! */
-    path = "/var/log/";
+    // We might have elevated privileges beyond that of the user who invoked
+    // the program, due to suid bit. Be very careful about trusting any data!
+//		Settings = new SysSetting("/var/log/");
     cout << "Operating as Root" << endl;
   } else {
-    path = "./";
+//		Settings = new SysSetting("./");
     cout << "Operating as User " << uid << endl;
   }
+		Settings = new SysSetting("./");
 
+	/* --------------------------------------------- */
   // open sub-modules
+
   Listner = new TcpServer(8090);
 	MotorControl = new SubControl(settings);
 
@@ -229,12 +329,19 @@ int main (int argc, char *argv[])
 	Control->AddDataSource(Listner);
 
 
+	/* --------------------------------------------- */
 	// register call backs
-	//Control->AddCallback("", );
+	Control->AddCallback("setPos", setPos);
+	Control->AddCallback("setVel", setVel);
+	Control->AddCallback("getPos", getPos);
+	Control->AddCallback("getVel", getVel);
+	Control->AddCallback("CamStart", CamStart);
+	Control->AddCallback("CamStop", CamStart);
+	Control->AddCallback("Bright", Brightness);
+	Control->AddCallback("setControlMode", SetControlMode);
+	Control->AddCallback("getControlMode", GetControlMode);
 
-  // set up timer signal and signal handler
-  alarm_wakeup(0);
-
+	/* --------------------------------------------- */
   cout << "Starting Main Program" << endl;
   while (1)
   {
@@ -245,22 +352,7 @@ int main (int argc, char *argv[])
     if ( Run_Control == true)
     {
       Run_Control = false;
-
-      // send data back to console.
-      msg.clear();
-      ss.str(std::string());
-      ss << PWM_GetTemp();
-      msg = "Temp=" + ss.str() + "\r\n";
-
-      ss.str(std::string());
-      ss << PWM_GetVoltage();
-      msg += "Volt=" + ss.str() + "\r\n";
-
-      ss.str(std::string());
-      ss << PWM_GetCurrent();
-      msg += "Current=" + ss.str() + "\r\n";
-
-      Control->SendMsg(msg);
+			MotorControl->Run();
     }
   }
   return 0;

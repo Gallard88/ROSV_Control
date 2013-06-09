@@ -33,7 +33,9 @@
 
 #include "DataSource.h"
 
-typedef int (*CmdCallback)(string arg);
+
+typedef int (*CmdCallback)(int fd, std::string arg);
+
 typedef struct
 {
 	const char *cmd;

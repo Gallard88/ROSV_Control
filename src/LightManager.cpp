@@ -24,6 +24,8 @@
 //*******************************************************************************************
 using namespace std;
 
+#include <syslog.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <string>

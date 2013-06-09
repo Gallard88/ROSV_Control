@@ -27,6 +27,9 @@
 
 /* ======================== */
 #include <string>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "DataSource.h"
 
@@ -34,6 +37,7 @@
 class TcpServer: public DataSource
 {
 private:
+		struct sockaddr_in cli_addr;
     int listen_fd;
 
 		void CheckReturn(int rv);

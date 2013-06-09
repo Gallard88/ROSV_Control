@@ -25,6 +25,8 @@
 #ifndef __CAMERA_MANAGER__
 #define __CAMERA_MANAGER__
 //*******************************************************************************************
+using namespace std;
+
 #include "parson.h"
 
 //*******************************************************************************************
@@ -32,6 +34,9 @@ class CameraManager
 {
 public:
 	CameraManager(const JSON_Object *settings);
+
+	void Start(void);
+	void Stop(void);
 
 private:
 

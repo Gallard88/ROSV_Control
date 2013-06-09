@@ -22,10 +22,12 @@
  THE SOFTWARE.
 */
 //*******************************************************************************************
+using namespace std;
+
 #include "SysSettings.h"
 
 //*******************************************************************************************
-SysSetting::SysSetting(const JSON_Object *settings)
+SysSetting::SysSetting(const char *filename)
 {
 	return;
 }

@@ -1,50 +1,36 @@
 {
-  "PropulsionMotor" : ["FrontLeft", "FrontRight", "RearLeft", "RearRight" ],
-  "DepthMotor" : [ "Dep_FrLeft", "Dep_FrRight", "Dep_RLeft", "Dep_RRight" ],
-  "Lights" : ["Left", "Right"],
-
-  "Left" : {
-    "max" : 1.0,
-    "min" : 0.0,
-    "ch"  : 1
-  },
-
-  "Right" : {
-    "max" : 1.0,
-    "min" : 0.0,
-    "ch"  : 2
-  },
-
-  "Dep_FrLeft" : {
-    "ch" : 7
-  },
-
-  "Dep_FrRight" : {
-    "ch" : 8
-  },
-
-  "Dep_RLeft" : {
-    "ch" : 9
-  },
-
-  "Dep_RRight" : {
-    "ch" : 10
-  },
-
+  "Motor" : ["FrontLeft", "FrontRight", "RearLeft", "RearRight", "Depth_FR", "Depth_FL", "Depth_RR", "Depth_RL" ],
   "FrontLeft" : {
-    "ch" : 3,
-    "ratio" : [ 1, 0, 0]
+    "ch"  : 1,
+    "mul" : [1, 1, 0, 0, 0, 0]
   },
   "FrontRight" : {
-    "ch" : 4,
-    "ratio" : [ 1, 0, 0 ]
+    "ch"  : 1,
+    "mul" : [0, 1, 1, 0, 0, 0]
   },
   "RearLeft" : {
-    "ch" : 5,
-    "ratio" : [ 1, 0, 0 ]
+    "ch"  : 1,
+    "mul" : [0, 0, 1, 1, 0, 0]
   },
   "RearRight" : {
-    "ch" : 6,
-    "ratio" : [ 1, 0, 0 ]
+    "ch"  : 1,
+    "mul" : [0, 0, 0, 1, 1, 0]
+  },
+  "Depth_FR" : {
+    "ch"  : 1,
+    "mul" : [0, 0, 0, 0, 1, 1]
+  },
+  "Depth_FL" : {
+    "ch"  : 1,
+    "mul" : [0, 0, 0, 0, 0, 0]
+  },
+  "Depth_RR" : {
+    "ch"  : 1,
+    "mul" : [0, 0, 0, 0, 0, 0]
+  },
+  "Depth_RL" : {
+    "ch"  : 1,
+    "mul" : [0, 0, 0, 0, 0, 0]
   }
+
 }
