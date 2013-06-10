@@ -74,6 +74,7 @@ void TcpServer::CheckReturn(int rv)
 		File = -1;
 		Buffer.erase();
 		syslog(LOG_EMERG, "Lost Connection: %s", inet_ntoa(cli_addr.sin_addr));
+		printf("Lost Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
 	}
 }
 
@@ -145,6 +146,7 @@ void TcpServer::Run(const struct timeval *timeout)
     clilen = sizeof(cli_addr);
     File = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
 		syslog(LOG_EMERG, "New Connection: %s", inet_ntoa(cli_addr.sin_addr));
+		printf("New Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
 	}
 	else  if (FD_ISSET(File, &readfs))
 	{

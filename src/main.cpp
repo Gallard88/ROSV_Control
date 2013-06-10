@@ -139,6 +139,7 @@ int setPos(int fd, string arg)
 	ptr = SkipSpace(ptr);
 	pos.yaw = ::atof(ptr);
 
+	printf("Pos: %s\n", arg.c_str());
 	return MotorControl->SetTargetPos(pos);
 }
 
@@ -198,27 +199,16 @@ int getPos(int fd, string arg)
 /* ======================== */
 int getVel(int fd, string arg)
 {
-	string msg;
+	char msg[256];
 	INS_Bearings vel;
 
-	vel = INS_GetVelocity();
+	vel = MotorControl->Velocity;
 
-	msg = "getVel: ";
-	msg += vel.x;
-	msg += ",";
-	msg += vel.y;
-	msg += ",";
-	msg += vel.z;
-	msg += ",";
-	msg += vel.roll;
-	msg += ",";
-	msg += vel.pitch;
-	msg += ",";
-	msg += vel.yaw;
-	msg += "\r\n";
-
-	return write(fd, msg.c_str(), msg.size()+1);
-	return 0;
+	sprintf(msg, "getVel: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", vel.x,vel.y, vel.z, vel.roll, vel.pitch, vel.yaw);
+//	printf("Msg, %d: %s\n", strlen(msg), msg);
+//  int bytes = ;
+//	printf("B: %d\n", bytes);
+	return write(fd, msg, strlen(msg));
 }
 
 /* ======================== */
@@ -278,9 +268,9 @@ int main (int argc, char *argv[])
   val = json_parse_file(prop_file);
   rv = json_value_get_type(val);
   if ( rv != JSONObject ) {
-    printf("JSON Parse file failed\n");
+		printf("JSON Parse file failed\n");
 		syslog(LOG_EMERG, "JSON Parse file failed\n");
-    return -1;
+		return -1;
   }
 
   settings = json_value_get_object(val);
@@ -313,7 +303,7 @@ int main (int argc, char *argv[])
 //		Settings = new SysSetting("./");
     cout << "Operating as User " << uid << endl;
   }
-		Settings = new SysSetting("./");
+	Settings = new SysSetting("./");
 
 	/* --------------------------------------------- */
   // open sub-modules
@@ -327,7 +317,6 @@ int main (int argc, char *argv[])
 
   Control = new ControlProtocol();
 	Control->AddDataSource(Listner);
-
 
 	/* --------------------------------------------- */
 	// register call backs
@@ -345,7 +334,6 @@ int main (int argc, char *argv[])
   cout << "Starting Main Program" << endl;
   while (1)
   {
-
     // read data from connected clients.
 		Control->Run(&system_time);
 

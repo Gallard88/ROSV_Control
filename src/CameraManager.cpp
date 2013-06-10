@@ -22,25 +22,48 @@
 */
 //*******************************************************************************************
 #include <syslog.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "CameraManager.h"
 
 //*******************************************************************************************
 CameraManager::CameraManager(const JSON_Object *settings)
 {
-	return;
+	const char *ptr;
+
+	ptr = json_object_get_string (settings, "CamStop");
+	if ( ptr != NULL )
+		strncpy(StartSc, ptr, CAMMAN_SC_SIZE);
+	else
+		syslog(LOG_EMERG, "\"CamStart\" script not found");
+
+	ptr = json_object_get_string (settings, "CamStop");
+	if ( ptr != NULL )
+		strncpy(StopSc, ptr, CAMMAN_SC_SIZE);
+	else
+		syslog(LOG_EMERG, "\"CamStop\" script not found");
 }
 
 //*******************************************************************************************
 void CameraManager::Start(void)
 {
-  syslog(LOG_EMERG, "Camera Start");
+	int i;
+	if ( system(NULL)) {
+		i = system(StartSc);
+		syslog(LOG_EMERG, "Camera Start: %d", i);
+	}
 }
 
 //*******************************************************************************************
 void CameraManager::Stop(void)
 {
-  syslog(LOG_EMERG, "Camera Stop");
+	int i ;
+	if ( system(NULL)) {
+		i = system(StopSc);
+    syslog(LOG_EMERG, "Camera Stop: %d", i);
+	}
 }
 
 //*******************************************************************************************

@@ -35,7 +35,8 @@ SubControl::SubControl(const JSON_Object *settings)
 	JSON_Array *array;
 	int i;
 
-	Mode = Idle;
+//	Mode = Idle;
+	Mode = Vel;
 
 	// load motor data
 	array = json_object_get_array( settings, "Motor");
@@ -161,6 +162,7 @@ int SubControl::SetTargetPos(INS_Bearings pos)
 {
 	if ( Mode == Pos )
 		Position = pos;
+	printf("Pos Update\n");
 	return 0;
 }
 

@@ -39,7 +39,9 @@ public:
 	void Stop(void);
 
 private:
-
+#define CAMMAN_SC_SIZE	4096
+  char StartSc[CAMMAN_SC_SIZE];
+  char StopSc[CAMMAN_SC_SIZE];
 };
 
 //*******************************************************************************************

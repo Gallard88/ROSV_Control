@@ -56,13 +56,14 @@ public:
 	void SetMode(string mode);
 	const char *GetMode(void);
 
+	INS_Bearings Position;
+	INS_Bearings Velocity;
+
 private:
 	struct Motor *MotorList;
 	int NumMotor;
 
 	enum SubMode Mode;
-	INS_Bearings Position;
-	INS_Bearings Velocity;
 };
 
 //*******************************************************************************************
