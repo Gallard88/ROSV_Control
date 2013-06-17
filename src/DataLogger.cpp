@@ -31,8 +31,9 @@ using namespace std;
 #include "DataLogger.h"
 
 // *******************************************************************************************
-DataLogger::DataLogger(const string path, const string filename, const DataLoggerOpt *options)
+DataLogger::DataLogger(const string path, const string filename)
 {
+	char datetime[100];
   ofstream writer;
 
   time_t current;
@@ -41,30 +42,19 @@ DataLogger::DataLogger(const string path, const string filename, const DataLogge
   current = time(NULL);
   loc_time = localtime(&current);
 
-  Col_Date = options->first_col_date;
-  Col_Time = options->first_col_time;
-
   Name = path;
-  if ( options->filename_date )
-  {
-    char date[100];
+	snprintf(datetime, sizeof(datetime),"%04d%02d%02d", loc_time->tm_year + 1900, loc_time->tm_mon+1, loc_time->tm_mday);
+	string date_format(datetime);
 
-    snprintf(date, sizeof(date),"%04d%02d%02d", loc_time->tm_year + 1900, loc_time->tm_mon+1, loc_time->tm_mday);
-    string format(date);
+	Name += date_format;
+	Name += "_";
 
-    Name += format;
-    Name += "_";
-  }
-  if ( options->filename_time )
-  {
-    char time[100];
 
-    snprintf(time, sizeof(time),"%02d%02d%02d", loc_time->tm_hour, loc_time->tm_min, loc_time->tm_sec);
-    string format(time);
+	snprintf(datetime, sizeof(datetime),"%02d%02d%02d", loc_time->tm_hour, loc_time->tm_min, loc_time->tm_sec);
+	string time_format(datetime);
 
-    Name += format;
-    Name += "_";
-  }
+	Name += time_format;
+	Name += "_";
 
   Name += filename;
   writer.open(Name.c_str());
@@ -94,23 +84,16 @@ void DataLogger::ChecktoAddTime(void)
   loc_time = localtime(&current);
 
 
-  if ( Col_Date )
-  {
-    writer << loc_time->tm_year+1900 <<"/";
-    writer << loc_time->tm_mon+1 <<"/";
-    writer << loc_time->tm_mday;
-    if ( Col_Time == true )
-      writer << ",";
+	writer << loc_time->tm_year+1900 <<"/";
+	writer << loc_time->tm_mon+1 <<"/";
+	writer << loc_time->tm_mday;
+	writer << ",";
 
-  }
+	writer << loc_time->tm_hour << ":";
+	writer << loc_time->tm_min << ":";
+	writer << loc_time->tm_sec;
 
-  if ( Col_Time )
-  {
-    writer << loc_time->tm_hour << ":";
-    writer << loc_time->tm_min << ":";
-    writer << loc_time->tm_sec;
-  }
-  Line_Started = true;
+	Line_Started = true;
   writer.close();
 }
 
@@ -122,10 +105,7 @@ void DataLogger::ChecktoAddTimeTitle(void)
 
   if ( Line_Started == false )
   {
-    if ( Col_Date )
-      writer << "Date,";
-    if ( Col_Time )
-      writer << "Time,";
+		writer << "Date,Time";
     Line_Started = true;
   }
   writer.close();

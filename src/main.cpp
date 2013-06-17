@@ -341,6 +341,7 @@ int main (int argc, char *argv[])
     {
       Run_Control = false;
 			MotorControl->Run();
+			DiveMon->Run();
     }
   }
   return 0;

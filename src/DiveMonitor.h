@@ -29,6 +29,9 @@
 #include <PWM_Controller.h>
 #include <INS_Data.h>
 
+#include <time.h>
+
+#include "DataLogger.h"
 #include "parson.h"
 
 //*******************************************************************************************
@@ -36,9 +39,17 @@ class DiveMonitor
 {
 public:
 	DiveMonitor(const JSON_Object *settings);
+	void Run(void);
 
 private:
+	void Rec_Bearing(DataLogger *log, INS_Bearings data);
+	void Rec_Power(void);
 
+	DataLogger *PositionLog;
+	DataLogger *VelocityLog;
+	DataLogger *PowerLog;
+
+  time_t LastUpdate;
 };
 
 //*******************************************************************************************
