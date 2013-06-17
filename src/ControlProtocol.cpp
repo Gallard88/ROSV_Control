@@ -32,55 +32,52 @@ using namespace std;
 /* ======================== */
 void ControlProtocol::AddDataSource(DataSource *src)
 {
-	DSrc = src;
+  DSrc = src;
 }
 
 /* ======================== */
 void ControlProtocol::Run(const struct timeval *timeout)
 {
-	if ( DSrc != NULL ) {
-		string line, arg;
+  if ( DSrc != NULL ) {
+    string line, arg;
 
-		DSrc->Run(timeout);
-		while ( DSrc->ReadLine(&line) != 0) {
-			// split into cmd and arg.
-			size_t x = line.find_first_of("=:");
-			if ( x != string::npos )
-			{
-				arg = line.substr((size_t) x+1, line.size());
-				line.erase((size_t)x, line.size());
-			}
-			// look up command
-			for ( int j = 0; j < (int)VecCallBack.size(); j ++ )
-			{
-				CallBack c;
+    DSrc->Run(timeout);
+    while ( DSrc->ReadLine(&line) != 0) {
+      // split into cmd and arg.
+      size_t x = line.find_first_of("=:");
+      if ( x != string::npos ) {
+        arg = line.substr((size_t) x+1, line.size());
+        line.erase((size_t)x, line.size());
+      }
+      // look up command
+      for ( int j = 0; j < (int)VecCallBack.size(); j ++ ) {
+        CallBack c;
 
-				c = VecCallBack[j];
-				if ( line.compare(c.cmd) == 0 )
-				{
-					(c.func)(DSrc->GetFd(), arg);
-				}
-			}
-		}
-	}
+        c = VecCallBack[j];
+        if ( line.compare(c.cmd) == 0 ) {
+          (c.func)(DSrc->GetFd(), arg);
+        }
+      }
+    }
+  }
 }
 
 /* ======================== */
 void ControlProtocol::AddCallback(const char *cmd, CmdCallback func)
 {
-	CallBack callback;
+  CallBack callback;
 
-	callback.cmd = cmd;
-	callback.func = func;
+  callback.cmd = cmd;
+  callback.func = func;
 
-	VecCallBack.push_back(callback);
+  VecCallBack.push_back(callback);
 }
 
 /* ======================== */
 void ControlProtocol::SendMsg(const string msg)
 {
-	if ( DSrc != NULL )
-		DSrc->WriteData(msg);
+  if ( DSrc != NULL )
+    DSrc->WriteData(msg);
 }
 
 /* ======================== */

@@ -31,39 +31,39 @@
 //*******************************************************************************************
 CameraManager::CameraManager(const JSON_Object *settings)
 {
-	const char *ptr;
+  const char *ptr;
 
-	ptr = json_object_get_string (settings, "CamStop");
-	if ( ptr != NULL )
-		strncpy(StartSc, ptr, CAMMAN_SC_SIZE);
-	else
-		syslog(LOG_EMERG, "\"CamStart\" script not found");
+  ptr = json_object_get_string (settings, "CamStop");
+  if ( ptr != NULL )
+    strncpy(StartSc, ptr, CAMMAN_SC_SIZE);
+  else
+    syslog(LOG_EMERG, "\"CamStart\" script not found");
 
-	ptr = json_object_get_string (settings, "CamStop");
-	if ( ptr != NULL )
-		strncpy(StopSc, ptr, CAMMAN_SC_SIZE);
-	else
-		syslog(LOG_EMERG, "\"CamStop\" script not found");
+  ptr = json_object_get_string (settings, "CamStop");
+  if ( ptr != NULL )
+    strncpy(StopSc, ptr, CAMMAN_SC_SIZE);
+  else
+    syslog(LOG_EMERG, "\"CamStop\" script not found");
 }
 
 //*******************************************************************************************
 void CameraManager::Start(void)
 {
-	int i;
-	if ( system(NULL)) {
-		i = system(StartSc);
-		syslog(LOG_EMERG, "Camera Start: %d", i);
-	}
+  int i;
+  if ( system(NULL)) {
+    i = system(StartSc);
+    syslog(LOG_EMERG, "Camera Start: %d", i);
+  }
 }
 
 //*******************************************************************************************
 void CameraManager::Stop(void)
 {
-	int i ;
-	if ( system(NULL)) {
-		i = system(StopSc);
+  int i ;
+  if ( system(NULL)) {
+    i = system(StopSc);
     syslog(LOG_EMERG, "Camera Stop: %d", i);
-	}
+  }
 }
 
 //*******************************************************************************************

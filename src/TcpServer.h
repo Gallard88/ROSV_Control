@@ -34,25 +34,24 @@
 #include "DataSource.h"
 
 /* ======================== */
-class TcpServer: public DataSource
-{
+class TcpServer: public DataSource {
 private:
-		struct sockaddr_in cli_addr;
-    int listen_fd;
+  struct sockaddr_in cli_addr;
+  int listen_fd;
 
-		void CheckReturn(int rv);
+  void CheckReturn(int rv);
 
 
 public:
 
-    TcpServer(int port);
-    ~TcpServer(void);
+  TcpServer(int port);
+  ~TcpServer(void);
 
-		int ReadLine(string *line);
+  int ReadLine(string *line);
 
-		int WriteData(const char *msg, int length);
-		int WriteData(const string & line);
-		void Run(const struct timeval *timeout);
+  int WriteData(const char *msg, int length);
+  int WriteData(const string & line);
+  void Run(const struct timeval *timeout);
 };
 
 /* ======================== */

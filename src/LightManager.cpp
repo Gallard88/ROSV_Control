@@ -41,15 +41,13 @@ LightManager::LightManager(const JSON_Object *settings)
   int i;
 
   array = json_object_get_array(settings, "Lights");
-  if (array == NULL )
-  {
+  if (array == NULL ) {
     printf( "LM Error, \"Lights\" array not found\n");
     return;
   }
 
   Num_Chanels = json_array_get_count(array);
-  if ( Num_Chanels <= 0 )
-  {
+  if ( Num_Chanels <= 0 ) {
     printf("Empty Array\n");
     return ;
   }
@@ -57,8 +55,7 @@ LightManager::LightManager(const JSON_Object *settings)
   Chanels = new struct LightCh[Num_Chanels];
 
 //  printf ( "Parsing Settings\n");
-  for ( i = 0; i < Num_Chanels; i ++ )
-  {
+  for ( i = 0; i < Num_Chanels; i ++ ) {
     new_ch = &Chanels[i];
     string search;
     const char *ptr = json_array_get_string(array, i);
@@ -93,11 +90,9 @@ void LightManager::SetBrightness(const char *ch, const float level)
   struct LightCh *ptr;
   int i;
 
-  for ( i = 0; i < Num_Chanels; i ++ )
-  {
+  for ( i = 0; i < Num_Chanels; i ++ ) {
     ptr = &Chanels[i];
-    if ( strcmp(ptr->name, ch) == 0)
-    {
+    if ( strcmp(ptr->name, ch) == 0) {
       if ( level > ptr->max)
         power = ptr->max;
       else if ( level < ptr->min )

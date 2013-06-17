@@ -32,31 +32,29 @@ using namespace std;
 //*******************************************************************************************
 SubControl::SubControl(const JSON_Object *settings)
 {
-	JSON_Array *array;
-	int i;
+  JSON_Array *array;
+  int i;
 
 //	Mode = Idle;
-	Mode = Vel;
+  Mode = Vel;
 
-	// load motor data
-	array = json_object_get_array( settings, "Motor");
-	if ( array == NULL )
-	{
-		syslog(LOG_EMERG,"Failed to find \"Motor\" array in settings");
-		printf("Failed to find \"Motor\" array in settings\n");
-		return ;
-	}
+  // load motor data
+  array = json_object_get_array( settings, "Motor");
+  if ( array == NULL ) {
+    syslog(LOG_EMERG,"Failed to find \"Motor\" array in settings");
+    printf("Failed to find \"Motor\" array in settings\n");
+    return ;
+  }
 
-	NumMotor = json_array_get_count(array);
+  NumMotor = json_array_get_count(array);
   if ( NumMotor == 0 )
     return ;
 
-	MotorList = new struct Motor[NumMotor];
-	memset(MotorList, 0, sizeof(struct Motor));
+  MotorList = new struct Motor[NumMotor];
+  memset(MotorList, 0, sizeof(struct Motor));
 
-  for ( i = 0; i < NumMotor; i++)
-  {
-		struct Motor *mptr = &MotorList[i];
+  for ( i = 0; i < NumMotor; i++) {
+    struct Motor *mptr = &MotorList[i];
 
     const char *ptr = json_array_get_string(array, i);
     if ( ptr == NULL )
@@ -66,13 +64,12 @@ SubControl::SubControl(const JSON_Object *settings)
     string var_name = name + "." + "ch";
     mptr->ch = (int)json_object_dotget_number(settings, var_name.c_str());
 
-		var_name = name + "." + "mul";
+    var_name = name + "." + "mul";
     JSON_Array *scale = json_object_dotget_array(settings, var_name.c_str());
-		if ( scale == NULL ) {
-			continue;
-		}
-    for ( int j = 0; j < INS_AXES_SIZE; j ++ )
-    {
+    if ( scale == NULL ) {
+      continue;
+    }
+    for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
       mptr->mult[j] = json_array_get_number(scale, j);
     }
   }
@@ -91,87 +88,83 @@ SubControl::SubControl(const JSON_Object *settings)
 //*******************************************************************************************
 void SubControl::Run(void)
 {
-	float power[INS_AXES_SIZE];
-	memset( power, 0, sizeof(float) * INS_AXES_SIZE);
+  float power[INS_AXES_SIZE];
+  memset( power, 0, sizeof(float) * INS_AXES_SIZE);
 
-	switch ( Mode ) {
+  switch ( Mode ) {
 
-		case Vel:
-			// run each Axes controller.
-			power[X] = Velocity.x;
-			power[Y] = Velocity.y;
-			power[Z] = Velocity.z;
-			power[ROLL] = Velocity.roll;
-			power[PITCH] = Velocity.pitch;
-			power[YAW] = Velocity.yaw;
-			break;
+  case Vel:
+    // run each Axes controller.
+    power[X] = Velocity.x;
+    power[Y] = Velocity.y;
+    power[Z] = Velocity.z;
+    power[ROLL] = Velocity.roll;
+    power[PITCH] = Velocity.pitch;
+    power[YAW] = Velocity.yaw;
+    break;
 
-		case Pos:
-			break;
+  case Pos:
+    break;
 
-		case Idle:
-		default:
-			break;
-	}
-	/* Update Motors */
-	for ( int i = 0; i < NumMotor; i ++ ) {
-		float output = 0;
-		for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
-			output += MotorList[i].mult[j] * power[j];
-		}
-		PWM_SetPWM(MotorList[i].ch, output);
-	}
+  case Idle:
+  default:
+    break;
+  }
+  /* Update Motors */
+  for ( int i = 0; i < NumMotor; i ++ ) {
+    float output = 0;
+    for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
+      output += MotorList[i].mult[j] * power[j];
+    }
+    PWM_SetPWM(MotorList[i].ch, output);
+  }
 }
 
 //*******************************************************************************************
 void SubControl::SetMode(string mode)
 {
-	if ( mode.compare("Vel") == 0 ) {
-		Mode = Vel;
-	}
-	else
-	if ( mode.compare("Pos") == 0 ) {
-		Mode = Pos;
-	}
-	else
-	if ( mode.compare("Idle") == 0 ) {
-		Mode = Idle;
-	}
-	syslog(LOG_EMERG, "Mode = %s", this->GetMode());
+  if ( mode.compare("Vel") == 0 ) {
+    Mode = Vel;
+  } else if ( mode.compare("Pos") == 0 ) {
+    Mode = Pos;
+  } else if ( mode.compare("Idle") == 0 ) {
+    Mode = Idle;
+  }
+  syslog(LOG_EMERG, "Mode = %s", this->GetMode());
 }
 
 //*******************************************************************************************
 const char *SubControl::GetMode(void)
 {
-	switch ( Mode ) {
+  switch ( Mode ) {
 
-		case Pos:
-			return "Pos";
+  case Pos:
+    return "Pos";
 
-		case Vel:
-			return "Vel";
+  case Vel:
+    return "Vel";
 
-		default:
-		case Idle:
-			return "Idle";
-	}
+  default:
+  case Idle:
+    return "Idle";
+  }
 }
 
 //*******************************************************************************************
 int SubControl::SetTargetPos(INS_Bearings pos)
 {
-	if ( Mode == Pos )
-		Position = pos;
-	printf("Pos Update\n");
-	return 0;
+  if ( Mode == Pos )
+    Position = pos;
+  printf("Pos Update\n");
+  return 0;
 }
 
 //*******************************************************************************************
 int SubControl::SetTargetVel(INS_Bearings vel)
 {
-	if ( Mode == Vel )
-		Velocity = vel;
-	return 0;
+  if ( Mode == Vel )
+    Velocity = vel;
+  return 0;
 }
 
 //*******************************************************************************************

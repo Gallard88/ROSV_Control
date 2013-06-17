@@ -29,57 +29,57 @@ using namespace std;
 //*******************************************************************************************
 DiveMonitor::DiveMonitor(const JSON_Object *settings)
 {
-	PositionLog = new DataLogger("./", "Position.csv");
+  PositionLog = new DataLogger("./", "Position.csv");
 
-	PositionLog->Add_Title("X");
-	PositionLog->Add_Title("Y");
-	PositionLog->Add_Title("Z");
-	PositionLog->Add_Title("Roll");
-	PositionLog->Add_Title("Pitch");
-	PositionLog->Add_Title("Yaw");
-	PositionLog->RecordLine();
+  PositionLog->Add_Title("X");
+  PositionLog->Add_Title("Y");
+  PositionLog->Add_Title("Z");
+  PositionLog->Add_Title("Roll");
+  PositionLog->Add_Title("Pitch");
+  PositionLog->Add_Title("Yaw");
+  PositionLog->RecordLine();
 
-	VelocityLog = new DataLogger("./", "Velocity.csv");
+  VelocityLog = new DataLogger("./", "Velocity.csv");
 
-	VelocityLog->Add_Title("X");
-	VelocityLog->Add_Title("Y");
-	VelocityLog->Add_Title("Z");
-	VelocityLog->Add_Title("Roll");
-	VelocityLog->Add_Title("Pitch");
-	VelocityLog->Add_Title("Yaw");
-	VelocityLog->RecordLine();
+  VelocityLog->Add_Title("X");
+  VelocityLog->Add_Title("Y");
+  VelocityLog->Add_Title("Z");
+  VelocityLog->Add_Title("Roll");
+  VelocityLog->Add_Title("Pitch");
+  VelocityLog->Add_Title("Yaw");
+  VelocityLog->RecordLine();
 
-	PowerLog = new DataLogger("./", "Power.csv");
+  PowerLog = new DataLogger("./", "Power.csv");
 
-	PowerLog->Add_Title("Volt");
-	PowerLog->Add_Title("Current");
-	PowerLog->Add_Title("Temp");
-	PowerLog->RecordLine();
+  PowerLog->Add_Title("Volt");
+  PowerLog->Add_Title("Current");
+  PowerLog->Add_Title("Temp");
+  PowerLog->RecordLine();
 }
 
 //*******************************************************************************************
 void DiveMonitor::Run(void)
 {
-	time_t current = time(NULL);
+  time_t current = time(NULL);
 
-	if ( current == LastUpdate )
-		return;
-	// here once a second
-	LastUpdate = current;
+  if ( current == LastUpdate )
+    return;
+  // here once a second
+  LastUpdate = current;
 
-	// record position into
-	Rec_Bearing(PositionLog, INS_GetPosition());
-	Rec_Bearing(VelocityLog, INS_GetVelocity());
-	Rec_Power();
+  // record position into
+  Rec_Bearing(PositionLog, INS_GetPosition());
+  Rec_Bearing(VelocityLog, INS_GetVelocity());
+  Rec_Power();
 }
 
 //*******************************************************************************************
 void DiveMonitor::Rec_Power(void)
 {
-	PowerLog->Add_Var(PWM_GetVoltage());
-	PowerLog->Add_Var(PWM_GetCurrent());
-	PowerLog->Add_Var(PWM_GetTemp());
-	PowerLog->RecordLine();
+  PowerLog->Add_Var(PWM_GetVoltage());
+  PowerLog->Add_Var(PWM_GetCurrent());
+  PowerLog->Add_Var(PWM_GetTemp());
+  PowerLog->RecordLine();
 }
 
 //*******************************************************************************************
@@ -91,7 +91,7 @@ void DiveMonitor::Rec_Bearing(DataLogger *log, INS_Bearings data)
   log->Add_Var(data.roll);
   log->Add_Var(data.pitch);
   log->Add_Var(data.yaw);
-	log->RecordLine();
+  log->RecordLine();
 }
 
 //*******************************************************************************************

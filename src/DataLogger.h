@@ -31,26 +31,25 @@
 
 //*******************************************************************************************
 //*******************************************************************************************
-class  DataLogger
-{
+class  DataLogger {
 public:
-    DataLogger(const string path, const string filename);
-    ~DataLogger();
+  DataLogger(const string path, const string filename);
+  ~DataLogger();
 
-    void Add_Title(const string field);
-    void Add_Var(const string field);
-    void Add_Var(const int field);
-    void Add_Var(const float field);
+  void Add_Title(const string field);
+  void Add_Var(const string field);
+  void Add_Var(const int field);
+  void Add_Var(const float field);
 
-    void RecordLine(void);
+  void RecordLine(void);
 
 private:
 //	ofstream FileWriter;
-    string Name;
-    bool Line_Started;
+  string Name;
+  bool Line_Started;
 
-    void ChecktoAddTime(void);
-    void ChecktoAddTimeTitle(void);
+  void ChecktoAddTime(void);
+  void ChecktoAddTimeTitle(void);
 
 };
 

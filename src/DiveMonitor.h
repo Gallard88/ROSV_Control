@@ -35,19 +35,18 @@
 #include "parson.h"
 
 //*******************************************************************************************
-class DiveMonitor
-{
+class DiveMonitor {
 public:
-	DiveMonitor(const JSON_Object *settings);
-	void Run(void);
+  DiveMonitor(const JSON_Object *settings);
+  void Run(void);
 
 private:
-	void Rec_Bearing(DataLogger *log, INS_Bearings data);
-	void Rec_Power(void);
+  void Rec_Bearing(DataLogger *log, INS_Bearings data);
+  void Rec_Power(void);
 
-	DataLogger *PositionLog;
-	DataLogger *VelocityLog;
-	DataLogger *PowerLog;
+  DataLogger *PositionLog;
+  DataLogger *VelocityLog;
+  DataLogger *PowerLog;
 
   time_t LastUpdate;
 };

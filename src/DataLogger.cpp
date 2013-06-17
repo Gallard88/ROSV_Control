@@ -33,7 +33,7 @@ using namespace std;
 // *******************************************************************************************
 DataLogger::DataLogger(const string path, const string filename)
 {
-	char datetime[100];
+  char datetime[100];
   ofstream writer;
 
   time_t current;
@@ -43,11 +43,11 @@ DataLogger::DataLogger(const string path, const string filename)
   loc_time = localtime(&current);
 
   Name = path;
-	snprintf(datetime, sizeof(datetime),"%04d%02d%02d", loc_time->tm_year + 1900, loc_time->tm_mon+1, loc_time->tm_mday);
-	string date_format(datetime);
+  snprintf(datetime, sizeof(datetime),"%04d%02d%02d", loc_time->tm_year + 1900, loc_time->tm_mon+1, loc_time->tm_mday);
+  string date_format(datetime);
 
-	Name += date_format;
-	Name += "_";
+  Name += date_format;
+  Name += "_";
   Name += filename;
 
   writer.open(Name.c_str());
@@ -77,11 +77,11 @@ void DataLogger::ChecktoAddTime(void)
   loc_time = localtime(&current);
 
 
-	writer << loc_time->tm_hour << ":";
-	writer << loc_time->tm_min << ":";
-	writer << loc_time->tm_sec;
+  writer << loc_time->tm_hour << ":";
+  writer << loc_time->tm_min << ":";
+  writer << loc_time->tm_sec;
 
-	Line_Started = true;
+  Line_Started = true;
   writer.close();
 }
 
@@ -91,9 +91,8 @@ void DataLogger::ChecktoAddTimeTitle(void)
   ofstream writer;
   writer.open(Name.c_str(), ios_base::app);
 
-  if ( Line_Started == false )
-  {
-		writer << "Time";
+  if ( Line_Started == false ) {
+    writer << "Time";
     Line_Started = true;
   }
   writer.close();

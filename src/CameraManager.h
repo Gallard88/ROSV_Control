@@ -30,13 +30,12 @@ using namespace std;
 #include "parson.h"
 
 //*******************************************************************************************
-class CameraManager
-{
+class CameraManager {
 public:
-	CameraManager(const JSON_Object *settings);
+  CameraManager(const JSON_Object *settings);
 
-	void Start(void);
-	void Stop(void);
+  void Start(void);
+  void Stop(void);
 
 private:
 #define CAMMAN_SC_SIZE	4096

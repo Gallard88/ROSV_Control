@@ -29,13 +29,21 @@
 #include <sys/time.h>
 
 //*******************************************************************************************
-class DataSource
-{
+class DataSource {
 public:
-  DataSource(void) { File = -1; }
-  ~DataSource(void) { if ( File >=0 ) { close(File); File = -1;} }
+  DataSource(void) {
+    File = -1;
+  }
+  ~DataSource(void) {
+    if ( File >=0 ) {
+      close(File);
+      File = -1;
+    }
+  }
 
-  virtual int GetFd(void) { return File; };
+  virtual int GetFd(void) {
+    return File;
+  };
   virtual int ReadLine(string *line) = 0;
 
   virtual int WriteData(const char *msg, int length) = 0;
@@ -44,7 +52,7 @@ public:
 
 protected:
   int File;
-	string Buffer;
+  string Buffer;
 };
 
 //*******************************************************************************************

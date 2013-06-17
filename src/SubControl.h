@@ -34,36 +34,35 @@
 
 //*******************************************************************************************
 enum SubMode {
-	Idle = 0,
-	Vel,
-	Pos
+  Idle = 0,
+  Vel,
+  Pos
 };
 
 //*******************************************************************************************
 struct Motor {
-	int ch;
-	int mult[INS_AXES_SIZE];
+  int ch;
+  int mult[INS_AXES_SIZE];
 };
 
 //*******************************************************************************************
-class SubControl
-{
+class SubControl {
 public:
-	SubControl(const JSON_Object *settings);
+  SubControl(const JSON_Object *settings);
   void Run(void);
-	int SetTargetPos(INS_Bearings pos);
-	int SetTargetVel(INS_Bearings vel);
-	void SetMode(string mode);
-	const char *GetMode(void);
+  int SetTargetPos(INS_Bearings pos);
+  int SetTargetVel(INS_Bearings vel);
+  void SetMode(string mode);
+  const char *GetMode(void);
 
-	INS_Bearings Position;
-	INS_Bearings Velocity;
+  INS_Bearings Position;
+  INS_Bearings Velocity;
 
 private:
-	struct Motor *MotorList;
-	int NumMotor;
+  struct Motor *MotorList;
+  int NumMotor;
 
-	enum SubMode Mode;
+  enum SubMode Mode;
 };
 
 //*******************************************************************************************

@@ -28,10 +28,9 @@
 #include "parson.h"
 
 //*******************************************************************************************
-class SysSetting
-{
+class SysSetting {
 public:
-	SysSetting(const char *filename);
+  SysSetting(const char *filename);
 
 private:
 

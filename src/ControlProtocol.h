@@ -36,15 +36,13 @@
 
 typedef int (*CmdCallback)(int fd, std::string arg);
 
-typedef struct
-{
-	const char *cmd;
-	CmdCallback func;
+typedef struct {
+  const char *cmd;
+  CmdCallback func;
 
 } CallBack;
 
-class ControlProtocol
-{
+class ControlProtocol {
 
 public:
 
@@ -55,7 +53,7 @@ public:
 
 private:
   DataSource *DSrc;
-	vector<CallBack> VecCallBack;
+  vector<CallBack> VecCallBack;
 };
 
 /* ======================== */

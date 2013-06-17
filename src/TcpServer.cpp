@@ -43,12 +43,11 @@ TcpServer::TcpServer(int port)
 {
   struct sockaddr_in serv_addr;
 
-	File = -1;
+  File = -1;
 
   listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (listen_fd < 0)
-  {
-		syslog(LOG_EMERG, "Socket() error");
+  if (listen_fd < 0) {
+    syslog(LOG_EMERG, "Socket() error");
     return;
   }
   bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -56,9 +55,8 @@ TcpServer::TcpServer(int port)
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = INADDR_ANY;
   serv_addr.sin_port = htons(port);
-  if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-  {
-		syslog(LOG_EMERG, "ERROR on binding");
+  if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+    syslog(LOG_EMERG, "ERROR on binding");
     return;
   }
   listen( listen_fd, 1);
@@ -68,31 +66,27 @@ TcpServer::TcpServer(int port)
 /* ======================== */
 void TcpServer::CheckReturn(int rv)
 {
-	if ( rv < 0 )
-	{
-		close(File);
-		File = -1;
-		Buffer.erase();
-		syslog(LOG_EMERG, "Lost Connection: %s", inet_ntoa(cli_addr.sin_addr));
-		printf("Lost Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
-	}
+  if ( rv < 0 ) {
+    close(File);
+    File = -1;
+    Buffer.erase();
+    syslog(LOG_EMERG, "Lost Connection: %s", inet_ntoa(cli_addr.sin_addr));
+    printf("Lost Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
+  }
 }
 
 /* ======================== */
 int TcpServer::ReadLine(string *line)
 {
-	if ( File >= 0 )
-  {
-    if ( Buffer.size() != 0 )
-		{
-			size_t found = Buffer.find_first_of("\r\n");
-			if ( found != string::npos)
-			{
-				*line = Buffer.substr(0, found);
-				Buffer.erase(0, found+1);
-				return 1;
-			}
-		}
+  if ( File >= 0 ) {
+    if ( Buffer.size() != 0 ) {
+      size_t found = Buffer.find_first_of("\r\n");
+      if ( found != string::npos) {
+        *line = Buffer.substr(0, found);
+        Buffer.erase(0, found+1);
+        return 1;
+      }
+    }
   }
   return 0;
 }
@@ -100,80 +94,73 @@ int TcpServer::ReadLine(string *line)
 /* ======================== */
 int TcpServer::WriteData(const char *msg, int length)
 {
-	int rv = 0;
-	if ( File >= 0 )
-	{
-		rv = write(File, msg, length);
-		CheckReturn(rv);
-	}
-	return rv;
+  int rv = 0;
+  if ( File >= 0 ) {
+    rv = write(File, msg, length);
+    CheckReturn(rv);
+  }
+  return rv;
 }
 
 /* ======================== */
 int TcpServer::WriteData(const string & line)
 {
-	int rv = 0;
-	if ( File >= 0 )
-	{
-		rv = write(File, line.c_str(), line.size());
-		CheckReturn(rv);
-	}
-	return rv;
+  int rv = 0;
+  if ( File >= 0 ) {
+    rv = write(File, line.c_str(), line.size());
+    CheckReturn(rv);
+  }
+  return rv;
 }
 
 /* ======================== */
 void TcpServer::Run(const struct timeval *timeout)
 {
-	int fd;
-	fd_set readfs;
+  int fd;
+  fd_set readfs;
   char buffer[4096];
 
-	if ( File < 0 ) // listen for new connections
-	  fd = listen_fd;
-	else // run file socket
-		fd = File;
+  if ( File < 0 ) // listen for new connections
+    fd = listen_fd;
+  else // run file socket
+    fd = File;
 
   FD_ZERO(&readfs);
   FD_SET(fd, &readfs);
-	struct timeval to = *timeout;
+  struct timeval to = *timeout;
   if ( select(fd+1, &readfs, NULL, NULL, &to) <= 0)
     return;
 
-	if (( File < 0 ) && FD_ISSET(listen_fd, &readfs))
-	{
-		socklen_t clilen;
+  if (( File < 0 ) && FD_ISSET(listen_fd, &readfs)) {
+    socklen_t clilen;
 
     clilen = sizeof(cli_addr);
     File = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
-		syslog(LOG_EMERG, "New Connection: %s", inet_ntoa(cli_addr.sin_addr));
-		printf("New Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
-	}
-	else  if (FD_ISSET(File, &readfs))
-	{
-		int n = read(File, buffer, sizeof(buffer));
-		if ( n > 0 ) {
-			string msg = string(buffer);
-			Buffer += msg;
-		}
-		else {
-			n = -1;
-		}
-		CheckReturn(n);
-	}
+    syslog(LOG_EMERG, "New Connection: %s", inet_ntoa(cli_addr.sin_addr));
+    printf("New Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
+  } else  if (FD_ISSET(File, &readfs)) {
+    int n = read(File, buffer, sizeof(buffer));
+    if ( n > 0 ) {
+      string msg = string(buffer);
+      Buffer += msg;
+    } else {
+      n = -1;
+    }
+    CheckReturn(n);
+  }
 }
 
 /* ======================== */
 /* ======================== */
 TcpServer::~TcpServer(void)
 {
-	Buffer.clear();
-	if ( File >= 0 )
-	{
+  Buffer.clear();
+  if ( File >= 0 ) {
     shutdown(File, 2);
     close(File);
-		File = -1;
-	}
-	syslog(LOG_EMERG, "Shutting down module");
+    File = -1;
+  }
+  syslog(LOG_EMERG, "Shutting down module");
   shutdown(listen_fd, 2);
   close(listen_fd);
   listen_fd = -1;

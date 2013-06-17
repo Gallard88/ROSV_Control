@@ -102,183 +102,183 @@ void System_Shutdown(void)
 /* ======================== */
 char *SkipSpace(char *ptr)
 {
-	while ( *ptr && isspace(*ptr))
-		ptr++;
-	return ptr;
+  while ( *ptr && isspace(*ptr))
+    ptr++;
+  return ptr;
 }
 
 /* ======================== */
 char *SkipChars(char *ptr)
 {
-	while ( *ptr && !isspace(*ptr))
-		ptr++;
-	return ptr;
+  while ( *ptr && !isspace(*ptr))
+    ptr++;
+  return ptr;
 }
 
 /* ======================== */
 int setPos(int fd, string arg)
 {
-	char *ptr = (char *)arg.c_str();
-	INS_Bearings pos;
+  char *ptr = (char *)arg.c_str();
+  INS_Bearings pos;
 
-	ptr = SkipSpace(ptr);
-	pos.x = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	pos.y = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	pos.z = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	pos.roll = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	pos.pitch = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	pos.yaw = ::atof(ptr);
+  ptr = SkipSpace(ptr);
+  pos.x = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  pos.y = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  pos.z = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  pos.roll = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  pos.pitch = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  pos.yaw = ::atof(ptr);
 
-	printf("Pos: %s\n", arg.c_str());
-	return MotorControl->SetTargetPos(pos);
+  printf("Pos: %s\n", arg.c_str());
+  return MotorControl->SetTargetPos(pos);
 }
 
 /* ======================== */
 int setVel(int fd, string arg)
 {
-	char *ptr = (char *)arg.c_str();
-	INS_Bearings vel;
+  char *ptr = (char *)arg.c_str();
+  INS_Bearings vel;
 
-	ptr = SkipSpace(ptr);
-	vel.x = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	vel.y = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	vel.z = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	vel.roll = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	vel.pitch = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	vel.yaw = ::atof(ptr);
+  ptr = SkipSpace(ptr);
+  vel.x = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  vel.y = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  vel.z = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  vel.roll = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  vel.pitch = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  vel.yaw = ::atof(ptr);
 
-	return MotorControl->SetTargetVel(vel);
+  return MotorControl->SetTargetVel(vel);
 }
 
 
 /* ======================== */
 int getRealPos(int fd, string arg)
 {
-	string msg;
-	INS_Bearings pos;
+  string msg;
+  INS_Bearings pos;
 
-	pos = INS_GetPosition();
+  pos = INS_GetPosition();
 
-	msg = "getRealPos: ";
-	msg += pos.x;
-	msg += ", ";
-	msg += pos.y;
-	msg += ", ";
-	msg += pos.z;
-	msg += ", ";
-	msg += pos.roll;
-	msg += ", ";
-	msg += pos.pitch;
-	msg += ", ";
-	msg += pos.yaw;
-	msg += "\r\n";
+  msg = "getRealPos: ";
+  msg += pos.x;
+  msg += ", ";
+  msg += pos.y;
+  msg += ", ";
+  msg += pos.z;
+  msg += ", ";
+  msg += pos.roll;
+  msg += ", ";
+  msg += pos.pitch;
+  msg += ", ";
+  msg += pos.yaw;
+  msg += "\r\n";
 
-	return write(fd, msg.c_str(), msg.size()+1);
+  return write(fd, msg.c_str(), msg.size()+1);
 }
 
 /* ======================== */
 int getRealVel(int fd, string arg)
 {
-	string msg;
-	INS_Bearings pos;
+  string msg;
+  INS_Bearings pos;
 
-	pos = INS_GetVelocity();
+  pos = INS_GetVelocity();
 
-	msg = "getRealPos: ";
-	msg += pos.x;
-	msg += ", ";
-	msg += pos.y;
-	msg += ", ";
-	msg += pos.z;
-	msg += ", ";
-	msg += pos.roll;
-	msg += ", ";
-	msg += pos.pitch;
-	msg += ", ";
-	msg += pos.yaw;
-	msg += "\r\n";
+  msg = "getRealPos: ";
+  msg += pos.x;
+  msg += ", ";
+  msg += pos.y;
+  msg += ", ";
+  msg += pos.z;
+  msg += ", ";
+  msg += pos.roll;
+  msg += ", ";
+  msg += pos.pitch;
+  msg += ", ";
+  msg += pos.yaw;
+  msg += "\r\n";
 
-	return write(fd, msg.c_str(), msg.size()+1);
+  return write(fd, msg.c_str(), msg.size()+1);
 }
 
 /* ======================== */
 int getTargetPos(int fd, string arg)
 {
-	char msg[256];
-	INS_Bearings data;
+  char msg[256];
+  INS_Bearings data;
 
-	data = MotorControl->Position;
-	sprintf(msg, "getTargetPos: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
-	return write(fd, msg, strlen(msg));
+  data = MotorControl->Position;
+  sprintf(msg, "getTargetPos: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
+  return write(fd, msg, strlen(msg));
 }
 
 /* ======================== */
 int getTargetVel(int fd, string arg)
 {
-	char msg[256];
-	INS_Bearings data;
+  char msg[256];
+  INS_Bearings data;
 
-	data = MotorControl->Velocity;
-	sprintf(msg, "getTargetVel: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
-	return write(fd, msg, strlen(msg));
+  data = MotorControl->Velocity;
+  sprintf(msg, "getTargetVel: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
+  return write(fd, msg, strlen(msg));
 }
 
 /* ======================== */
 int CamStart(int fd, string arg)
 {
-	CamMan->Start();
-	return 0;
+  CamMan->Start();
+  return 0;
 }
 
 /* ======================== */
 int CamStop(int fd, string arg)
 {
-	CamMan->Stop();
-	return 0;
+  CamMan->Stop();
+  return 0;
 }
 
 /* ======================== */
 int Brightness(int fd, string arg)
 {
-	return 0;
+  return 0;
 }
 
 /* ======================== */
 int SetControlMode(int fd, string arg)
 {
-	MotorControl->SetMode(arg);
-	return 0;
+  MotorControl->SetMode(arg);
+  return 0;
 }
 
 /* ======================== */
 int GetControlMode(int fd, string arg)
 {
-	string msg;
+  string msg;
 
-	msg += "getControlMode: ";
-	msg += MotorControl->GetMode();
-	msg += "\r\n";
-	return write(fd, msg.c_str(), msg.size()+1);
+  msg += "getControlMode: ";
+  msg += MotorControl->GetMode();
+  msg += "\r\n";
+  return write(fd, msg.c_str(), msg.size()+1);
 }
 
 /* ======================== */
@@ -295,14 +295,14 @@ int main (int argc, char *argv[])
   alarm_wakeup(0);
   atexit(System_Shutdown);
 
-	/* --------------------------------------------- */
+  /* --------------------------------------------- */
   // load paramaters
   val = json_parse_file(prop_file);
   rv = json_value_get_type(val);
   if ( rv != JSONObject ) {
-		printf("JSON Parse file failed\n");
-		syslog(LOG_EMERG, "JSON Parse file failed\n");
-		return -1;
+    printf("JSON Parse file failed\n");
+    syslog(LOG_EMERG, "JSON Parse file failed\n");
+    return -1;
   }
 
   settings = json_value_get_object(val);
@@ -311,19 +311,19 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-	/* --------------------------------------------- */
+  /* --------------------------------------------- */
   if ( PWM_Connect() < 0 ) {
     printf("PWM_Connect() failed\n");
-		syslog(LOG_EMERG, "PWM_Connect() failed\n");
+    syslog(LOG_EMERG, "PWM_Connect() failed\n");
     return -1;
   }
   if ( INS_Connect() < 0 ) {
     printf("INS_Connect() failed\n");
-		syslog(LOG_EMERG, "INS_Connect() failed\n");
+    syslog(LOG_EMERG, "INS_Connect() failed\n");
     return -1;
   }
 
-	/* --------------------------------------------- */
+  /* --------------------------------------------- */
   string path;
   uid_t uid=getuid(), euid=geteuid();
   if ((uid <= 0 ) || ( uid != euid)) {
@@ -335,52 +335,50 @@ int main (int argc, char *argv[])
 //		Settings = new SysSetting("./");
     cout << "Operating as User " << uid << endl;
   }
-	Settings = new SysSetting("./");
+  Settings = new SysSetting("./");
 
-	/* --------------------------------------------- */
+  /* --------------------------------------------- */
   // open sub-modules
 
   Listner = new TcpServer(8090);
-	MotorControl = new SubControl(settings);
+  MotorControl = new SubControl(settings);
 
   DiveMon = new DiveMonitor(settings);
   LightMan = new LightManager(settings);
   CamMan = new CameraManager(settings);
 
   Control = new ControlProtocol();
-	Control->AddDataSource(Listner);
+  Control->AddDataSource(Listner);
 
-	/* --------------------------------------------- */
-	// register call backs
-	/** =============================== **/
-	Control->AddCallback("setPos", setPos);
-	Control->AddCallback("setVel", setVel);
-	Control->AddCallback("getRealPos", getRealPos);
-	Control->AddCallback("getRealVel", getRealVel);
-	Control->AddCallback("getTargetPos", getTargetPos);
-	Control->AddCallback("getTargetVel", getTargetVel);
+  /* --------------------------------------------- */
+  // register call backs
+  /** =============================== **/
+  Control->AddCallback("setPos", setPos);
+  Control->AddCallback("setVel", setVel);
+  Control->AddCallback("getRealPos", getRealPos);
+  Control->AddCallback("getRealVel", getRealVel);
+  Control->AddCallback("getTargetPos", getTargetPos);
+  Control->AddCallback("getTargetVel", getTargetVel);
 
-	/** =============================== **/
-	Control->AddCallback("setControlMode", SetControlMode);
-	Control->AddCallback("getControlMode", GetControlMode);
+  /** =============================== **/
+  Control->AddCallback("setControlMode", SetControlMode);
+  Control->AddCallback("getControlMode", GetControlMode);
 
-	/** =============================== **/
-	Control->AddCallback("CamStart", CamStart);
-	Control->AddCallback("CamStop", CamStart);
-	Control->AddCallback("Bright", Brightness);
+  /** =============================== **/
+  Control->AddCallback("CamStart", CamStart);
+  Control->AddCallback("CamStop", CamStart);
+  Control->AddCallback("Bright", Brightness);
 
-	/* --------------------------------------------- */
+  /* --------------------------------------------- */
   cout << "Starting Main Program" << endl;
-  while (1)
-  {
+  while (1) {
     // read data from connected clients.
-		Control->Run(&system_time);
+    Control->Run(&system_time);
 
-    if ( Run_Control == true)
-    {
+    if ( Run_Control == true) {
       Run_Control = false;
-			MotorControl->Run();
-			DiveMon->Run();
+      MotorControl->Run();
+      DiveMon->Run();
     }
   }
   return 0;
