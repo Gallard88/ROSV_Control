@@ -172,14 +172,14 @@ int setVel(int fd, string arg)
 
 
 /* ======================== */
-int getPos(int fd, string arg)
+int getRealPos(int fd, string arg)
 {
 	string msg;
 	INS_Bearings pos;
 
 	pos = INS_GetPosition();
 
-	msg = "getPos: ";
+	msg = "getRealPos: ";
 	msg += pos.x;
 	msg += ", ";
 	msg += pos.y;
@@ -197,17 +197,49 @@ int getPos(int fd, string arg)
 }
 
 /* ======================== */
-int getVel(int fd, string arg)
+int getRealVel(int fd, string arg)
+{
+	string msg;
+	INS_Bearings pos;
+
+	pos = INS_GetVelocity();
+
+	msg = "getRealPos: ";
+	msg += pos.x;
+	msg += ", ";
+	msg += pos.y;
+	msg += ", ";
+	msg += pos.z;
+	msg += ", ";
+	msg += pos.roll;
+	msg += ", ";
+	msg += pos.pitch;
+	msg += ", ";
+	msg += pos.yaw;
+	msg += "\r\n";
+
+	return write(fd, msg.c_str(), msg.size()+1);
+}
+
+/* ======================== */
+int getTargetPos(int fd, string arg)
 {
 	char msg[256];
-	INS_Bearings vel;
+	INS_Bearings data;
 
-	vel = MotorControl->Velocity;
+	data = MotorControl->Position;
+	sprintf(msg, "getTargetPos: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
+	return write(fd, msg, strlen(msg));
+}
 
-	sprintf(msg, "getVel: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", vel.x,vel.y, vel.z, vel.roll, vel.pitch, vel.yaw);
-//	printf("Msg, %d: %s\n", strlen(msg), msg);
-//  int bytes = ;
-//	printf("B: %d\n", bytes);
+/* ======================== */
+int getTargetVel(int fd, string arg)
+{
+	char msg[256];
+	INS_Bearings data;
+
+	data = MotorControl->Velocity;
+	sprintf(msg, "getTargetVel: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
 	return write(fd, msg, strlen(msg));
 }
 
@@ -320,15 +352,22 @@ int main (int argc, char *argv[])
 
 	/* --------------------------------------------- */
 	// register call backs
+	/** =============================== **/
 	Control->AddCallback("setPos", setPos);
 	Control->AddCallback("setVel", setVel);
-	Control->AddCallback("getPos", getPos);
-	Control->AddCallback("getVel", getVel);
+	Control->AddCallback("getRealPos", getRealPos);
+	Control->AddCallback("getRealVel", getRealVel);
+	Control->AddCallback("getTargetPos", getTargetPos);
+	Control->AddCallback("getTargetVel", getTargetVel);
+
+	/** =============================== **/
+	Control->AddCallback("setControlMode", SetControlMode);
+	Control->AddCallback("getControlMode", GetControlMode);
+
+	/** =============================== **/
 	Control->AddCallback("CamStart", CamStart);
 	Control->AddCallback("CamStop", CamStart);
 	Control->AddCallback("Bright", Brightness);
-	Control->AddCallback("setControlMode", SetControlMode);
-	Control->AddCallback("getControlMode", GetControlMode);
 
 	/* --------------------------------------------- */
   cout << "Starting Main Program" << endl;
