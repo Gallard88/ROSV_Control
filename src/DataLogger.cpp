@@ -48,15 +48,8 @@ DataLogger::DataLogger(const string path, const string filename)
 
 	Name += date_format;
 	Name += "_";
-
-
-	snprintf(datetime, sizeof(datetime),"%02d%02d%02d", loc_time->tm_hour, loc_time->tm_min, loc_time->tm_sec);
-	string time_format(datetime);
-
-	Name += time_format;
-	Name += "_";
-
   Name += filename;
+
   writer.open(Name.c_str());
   writer.close();
   Line_Started = false;
@@ -84,11 +77,6 @@ void DataLogger::ChecktoAddTime(void)
   loc_time = localtime(&current);
 
 
-	writer << loc_time->tm_year+1900 <<"/";
-	writer << loc_time->tm_mon+1 <<"/";
-	writer << loc_time->tm_mday;
-	writer << ",";
-
 	writer << loc_time->tm_hour << ":";
 	writer << loc_time->tm_min << ":";
 	writer << loc_time->tm_sec;
@@ -105,7 +93,7 @@ void DataLogger::ChecktoAddTimeTitle(void)
 
   if ( Line_Started == false )
   {
-		writer << "Date,Time";
+		writer << "Time";
     Line_Started = true;
   }
   writer.close();
