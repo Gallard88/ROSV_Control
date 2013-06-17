@@ -343,7 +343,7 @@ int main (int argc, char *argv[])
   Listner = new TcpServer(8090);
   MotorControl = new SubControl(settings);
 
-  DiveMon = new DiveMonitor(settings);
+  DiveMon = new DiveMonitor(settings, MotorControl);
   LightMan = new LightManager(settings);
   CamMan = new CameraManager(settings);
 

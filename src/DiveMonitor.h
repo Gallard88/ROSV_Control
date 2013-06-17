@@ -33,15 +33,17 @@
 
 #include "DataLogger.h"
 #include "parson.h"
+#include "SubControl.h"
 
 //*******************************************************************************************
 class DiveMonitor {
 public:
-  DiveMonitor(const JSON_Object *settings);
+  DiveMonitor(const JSON_Object *settings, SubControl *sub);
   void Run(void);
 
 private:
-  void Rec_Bearing(DataLogger *log, INS_Bearings data);
+  void Rec_BearingTitle(DataLogger *log);
+  void Rec_Bearing(DataLogger *log, INS_Bearings real, INS_Bearings target);
   void Rec_Power(void);
 
   DataLogger *PositionLog;
@@ -49,6 +51,7 @@ private:
   DataLogger *PowerLog;
 
   time_t LastUpdate;
+	SubControl *Sub;
 };
 
 //*******************************************************************************************

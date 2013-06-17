@@ -27,34 +27,40 @@ using namespace std;
 #include "DiveMonitor.h"
 
 //*******************************************************************************************
-DiveMonitor::DiveMonitor(const JSON_Object *settings)
+DiveMonitor::DiveMonitor(const JSON_Object *settings, SubControl *sub)
 {
-  PositionLog = new DataLogger("./", "Position.csv");
+	Sub = sub;
 
-  PositionLog->Add_Title("X");
-  PositionLog->Add_Title("Y");
-  PositionLog->Add_Title("Z");
-  PositionLog->Add_Title("Roll");
-  PositionLog->Add_Title("Pitch");
-  PositionLog->Add_Title("Yaw");
-  PositionLog->RecordLine();
+  PositionLog = new DataLogger("./", "Position.csv");
+	Rec_BearingTitle(PositionLog);
+
 
   VelocityLog = new DataLogger("./", "Velocity.csv");
-
-  VelocityLog->Add_Title("X");
-  VelocityLog->Add_Title("Y");
-  VelocityLog->Add_Title("Z");
-  VelocityLog->Add_Title("Roll");
-  VelocityLog->Add_Title("Pitch");
-  VelocityLog->Add_Title("Yaw");
-  VelocityLog->RecordLine();
+	Rec_BearingTitle(VelocityLog);
 
   PowerLog = new DataLogger("./", "Power.csv");
-
   PowerLog->Add_Title("Volt");
   PowerLog->Add_Title("Current");
   PowerLog->Add_Title("Temp");
   PowerLog->RecordLine();
+}
+
+//*******************************************************************************************
+void DiveMonitor::Rec_BearingTitle(DataLogger *log)
+{
+  log->Add_Title("Real X");
+  log->Add_Title("Real Y");
+  log->Add_Title("Real Z");
+  log->Add_Title("Real Roll");
+  log->Add_Title("Real Pitch");
+  log->Add_Title("Real Yaw");
+  log->Add_Title("Target X");
+  log->Add_Title("Target Y");
+  log->Add_Title("Target Z");
+  log->Add_Title("Target Roll");
+  log->Add_Title("Target Pitch");
+  log->Add_Title("Target Yaw");
+  log->RecordLine();
 }
 
 //*******************************************************************************************
@@ -68,8 +74,8 @@ void DiveMonitor::Run(void)
   LastUpdate = current;
 
   // record position into
-  Rec_Bearing(PositionLog, INS_GetPosition());
-  Rec_Bearing(VelocityLog, INS_GetVelocity());
+  Rec_Bearing(PositionLog, INS_GetPosition(), Sub->Position);
+  Rec_Bearing(VelocityLog, INS_GetVelocity(), Sub->Velocity);
   Rec_Power();
 }
 
@@ -83,7 +89,7 @@ void DiveMonitor::Rec_Power(void)
 }
 
 //*******************************************************************************************
-void DiveMonitor::Rec_Bearing(DataLogger *log, INS_Bearings data)
+void DiveMonitor::Rec_Bearing(DataLogger *log, INS_Bearings data, INS_Bearings target)
 {
   log->Add_Var(data.x);
   log->Add_Var(data.y);
@@ -91,6 +97,12 @@ void DiveMonitor::Rec_Bearing(DataLogger *log, INS_Bearings data)
   log->Add_Var(data.roll);
   log->Add_Var(data.pitch);
   log->Add_Var(data.yaw);
+  log->Add_Var(target.x);
+  log->Add_Var(target.y);
+  log->Add_Var(target.z);
+  log->Add_Var(target.roll);
+  log->Add_Var(target.pitch);
+  log->Add_Var(target.yaw);
   log->RecordLine();
 }
 
