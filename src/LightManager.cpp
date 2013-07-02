@@ -33,76 +33,38 @@ using namespace std;
 
 #include "LightManager.h"
 
+const char ParName[] = "LightCh";
 //*******************************************************************************************
 LightManager::LightManager(const JSON_Object *settings)
 {
-  struct LightCh *new_ch;
-  JSON_Array *array;
-  int i;
+	OnOff = 0;
 
-  array = json_object_get_array(settings, "Lights");
-  if (array == NULL ) {
-    printf( "LM Error, \"Lights\" array not found\n");
-    return;
-  }
-
-  Num_Chanels = json_array_get_count(array);
-  if ( Num_Chanels <= 0 ) {
-    printf("Empty Array\n");
-    return ;
-  }
-//  printf("%d Light chanels\n", Num_Chanels);
-  Chanels = new struct LightCh[Num_Chanels];
-
-//  printf ( "Parsing Settings\n");
-  for ( i = 0; i < Num_Chanels; i ++ ) {
-    new_ch = &Chanels[i];
-    string search;
-    const char *ptr = json_array_get_string(array, i);
-    if ( ptr == NULL )
-      continue;
-    strncpy(new_ch->name, ptr, LM_NAME_SZE);
-
-    std::string name(ptr);
-    search = name + ".ch";
-    new_ch->ch = (int)json_object_dotget_number(settings, search.c_str());
-//    printf("%s %d\n", search.c_str(), new_ch->ch);
-
-    search = name + ".max";
-    new_ch->max = json_object_dotget_number(settings, search.c_str());
-//    printf("%s, %f\n", search.c_str(), new_ch->max);
-
-    search = name + ".min";
-    new_ch->min = json_object_dotget_number(settings, search.c_str());
-//    printf("%s, %f\n",search.c_str(), new_ch->min);
-
-//    printf("%s, %s\n", search.c_str(), new_ch->name);
-
-//    printf("Next Ch\n");
-  }
-//  printf("Light Manager setup\n");
+	if ( json_object_get_value(settings, ParName ) != NULL ) {
+		Chanel = json_object_get_number(settings, ParName );
+	} else {
+		Chanel = -1;
+	}
+	printf("Light Chanel = %d\n", Chanel);
 }
 
 //*******************************************************************************************
-void LightManager::SetBrightness(const char *ch, const float level)
+void LightManager::Run(void)
 {
-  float power;
-  struct LightCh *ptr;
-  int i;
+	if ( OnOff ) {
+		PWM_SetPWM(Chanel, 1.0);
+	} else {
+		PWM_SetPWM(Chanel, 0.0);
+	}
+}
 
-  for ( i = 0; i < Num_Chanels; i ++ ) {
-    ptr = &Chanels[i];
-    if ( strcmp(ptr->name, ch) == 0) {
-      if ( level > ptr->max)
-        power = ptr->max;
-      else if ( level < ptr->min )
-        power = ptr->min;
-      else
-        power = level;
-//      printf ("Ch %s = %f\n", ch, power);
-      PWM_SetPWM(ptr->ch, power);
-    }
-  }
+//*******************************************************************************************
+void LightManager::Toggle(void)
+{
+	if ( Chanel < 0 )
+		return;
+
+	OnOff ^= 1;
+
 }
 
 //*******************************************************************************************

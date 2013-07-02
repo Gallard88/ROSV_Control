@@ -282,6 +282,14 @@ int GetControlMode(int fd, string arg)
 }
 
 /* ======================== */
+int LightToggle(int fd, string arg)
+{
+	LightMan->Toggle();
+	printf("Toggle\n");
+	return 0;
+}
+
+/* ======================== */
 int main (int argc, char *argv[])
 {
   JSON_Object *settings;
@@ -365,6 +373,9 @@ int main (int argc, char *argv[])
   Control->AddCallback("getControlMode", GetControlMode);
 
   /** =============================== **/
+  Control->AddCallback("lightToggle", LightToggle);
+
+  /** =============================== **/
   Control->AddCallback("CamStart", CamStart);
   Control->AddCallback("CamStop", CamStart);
   Control->AddCallback("Bright", Brightness);
@@ -379,6 +390,7 @@ int main (int argc, char *argv[])
       Run_Control = false;
       MotorControl->Run();
       DiveMon->Run();
+    	LightMan->Run();
     }
   }
   return 0;

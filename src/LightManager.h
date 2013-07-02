@@ -28,25 +28,16 @@
 #include "parson.h"
 
 //*******************************************************************************************
-struct LightCh {
-#define LM_NAME_SZE	64
-  char name[LM_NAME_SZE];
-  int ch;
-  float max;
-  float min;
-};
-
-//*******************************************************************************************
 
 class  LightManager {
 public:
   LightManager(const JSON_Object *settings);
-
-  void SetBrightness(const char *ch, const float level);
+	void Toggle(void);
+	void Run(void);
 
 private:
-  LightCh *Chanels;
-  int Num_Chanels;
+  int Chanel;
+	int OnOff;
 };
 
 //*******************************************************************************************

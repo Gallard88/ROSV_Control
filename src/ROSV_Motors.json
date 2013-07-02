@@ -33,6 +33,6 @@
     "mul" : [0, 0, 0, 0, 0, 0]
   },
   "CamStart" : "echo \"Cam Start\"",
-  "CamStop" : "echo \"Cam Stop\""
-
+  "CamStop" : "echo \"Cam Stop\"",
+  "LightCh" : 10
 }
