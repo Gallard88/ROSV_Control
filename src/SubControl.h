@@ -52,8 +52,6 @@ public:
   void Run(void);
   int SetTargetPos(INS_Bearings pos);
   int SetTargetVel(INS_Bearings vel);
-  void SetMode(string mode);
-  const char *GetMode(void);
 
   INS_Bearings Position;
   INS_Bearings Velocity;

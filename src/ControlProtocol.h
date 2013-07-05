@@ -27,33 +27,42 @@
 
 /* ======================== */
 #include <string>
-#include <vector>
-
-/* ======================== */
 
 #include "DataSource.h"
 
+/* ======================== */
 
-typedef int (*CmdCallback)(int fd, std::string arg);
-
-typedef struct {
+struct Command {
   const char *cmd;
-  CmdCallback func;
-
-} CallBack;
+  bool read;
+  bool write;
+  int func_number;
+};
 
 class ControlProtocol {
 
 public:
+  ControlProtocol();
+  ~ControlProtocol();
 
-  void AddDataSource(DataSource *src);
-  void Run(const struct timeval *timeout);
-  void AddCallback(const char *cmd, CmdCallback func);
-  void SendMsg(const string msg);
+  void AddControlSource(DataSource *src);
+  bool IsControlSourceConnected(void);
+  int GetControlFileDescriptor(void);
+  void GetControlData(void);
+
+  void AddObserverSource(DataSource *src);
+  int GetNumberOfObservers(void);
+  int GetObserverFileDescriptor(void);
+  void GetObserverData(void);
+
+  const struct Command *GetCmds(const struct Command *list, string *arg, int *fp);
+
+  void Write(int fd, string msg);
+  void Write(int fd, const char *msg);
 
 private:
-  DataSource *DSrc;
-  vector<CallBack> VecCallBack;
+  DataSource *Controller;
+  DataSource *Observer;
 };
 
 /* ======================== */

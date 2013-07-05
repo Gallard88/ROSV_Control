@@ -23,24 +23,13 @@ using namespace std;
 #include "ControlProtocol.h"
 #include "TcpServer.h"
 #include "SubControl.h"
+#include "SubProtocol.h"
 #include "SysSettings.h"
 
 /* ======================== */
-/**
- * To Add:
- * ControlProtocol
- * TcpServer
- * DataSource
- * CameraManager
- * DiveMonitor
- * SystemSettings
- * DataLogger
- * LightManager
- * SubControl
- *
- */
 /* ======================== */
-#define RUN_INTERVAL 100000	// 100 ms
+#define RUN_INTERVAL	(10*1000)	//	10 ms
+#define ALAM_INT		(50*1000)	//	50 ms
 
 /* ======================== */
 const char prop_file[] = "./ROSV_Motors.json";
@@ -49,263 +38,76 @@ const struct timeval system_time = { 0 , RUN_INTERVAL};
 volatile bool Run_Control;
 
 /* ======================== */
-TcpServer        *Listner;
-ControlProtocol  *Control;
 SubControl       *MotorControl;
+SubProtocol      *SubProt;
 DiveMonitor      *DiveMon;
 LightManager     *LightMan;
 CameraManager    *CamMan;
-SysSetting       *Settings;
 
 /* ======================== */
-void alarm_wakeup (int i)
+/* ======================== */
+void Alarm_Wakeup (int i)
 {
-  struct itimerval tout_val;
-
-  signal(SIGALRM,alarm_wakeup);
-
-  tout_val.it_interval.tv_sec = 0;
-  tout_val.it_interval.tv_usec = 0;
-  tout_val.it_value.tv_sec = 0; // 10 seconds timer
-  tout_val.it_value.tv_usec = RUN_INTERVAL;
-
-  setitimer(ITIMER_REAL, &tout_val,0);
   Run_Control = true;
 }
 
-// *****************
-void Run_CtrlC(int sig)
+/* ======================== */
+void SignalHandler_Setup(void)
 {
-  exit(0);
-}
-
-// *****************
-void Setup_SignalHandler(void)
-{
+  struct itimerval timeout;
   struct sigaction sig;
 
   // Install timer_handler as the signal handler for SIGVTALRM.
   memset (&sig, 0, sizeof (struct sigaction));
-  sig.sa_handler = &Run_CtrlC;
+  sig.sa_handler = &exit;
   sigaction (SIGINT , &sig, NULL);
   sigaction (SIGTERM , &sig, NULL);
   sigaction (SIGABRT , &sig, NULL);
+
+  memset (&sig, 0, sizeof (struct sigaction));
+  sig.sa_handler = &Alarm_Wakeup;
+  sigaction (SIGALRM , &sig, NULL);
+
+  timeout.it_interval.tv_sec = 0;
+  timeout.it_interval.tv_usec = ALAM_INT;
+  timeout.it_value.tv_sec = 0;
+  timeout.it_value.tv_usec = ALAM_INT;
+
+  setitimer(ITIMER_REAL, &timeout,0);
+  Run_Control = true;
 }
 
 /* ======================== */
 void System_Shutdown(void)
 {
+	if ( MotorControl )
+		delete MotorControl;
+	if ( DiveMon )
+		delete DiveMon;
+	if ( LightMan )
+		delete LightMan;
+	if ( CamMan )
+		delete CamMan;
+
   syslog(LOG_EMERG, "System shutting down");
   closelog();
 }
 
 /* ======================== */
-char *SkipSpace(char *ptr)
-{
-  while ( *ptr && isspace(*ptr))
-    ptr++;
-  return ptr;
-}
-
-/* ======================== */
-char *SkipChars(char *ptr)
-{
-  while ( *ptr && !isspace(*ptr))
-    ptr++;
-  return ptr;
-}
-
-/* ======================== */
-int setPos(int fd, string arg)
-{
-  char *ptr = (char *)arg.c_str();
-  INS_Bearings pos;
-
-  ptr = SkipSpace(ptr);
-  pos.x = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  pos.y = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  pos.z = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  pos.roll = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  pos.pitch = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  pos.yaw = ::atof(ptr);
-
-  printf("Pos: %s\n", arg.c_str());
-  return MotorControl->SetTargetPos(pos);
-}
-
-/* ======================== */
-int setVel(int fd, string arg)
-{
-  char *ptr = (char *)arg.c_str();
-  INS_Bearings vel;
-
-  ptr = SkipSpace(ptr);
-  vel.x = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  vel.y = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  vel.z = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  vel.roll = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  vel.pitch = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  vel.yaw = ::atof(ptr);
-
-  return MotorControl->SetTargetVel(vel);
-}
-
-
-/* ======================== */
-int getRealPos(int fd, string arg)
-{
-  string msg;
-  INS_Bearings pos;
-
-  pos = INS_GetPosition();
-
-  msg = "getRealPos: ";
-  msg += pos.x;
-  msg += ", ";
-  msg += pos.y;
-  msg += ", ";
-  msg += pos.z;
-  msg += ", ";
-  msg += pos.roll;
-  msg += ", ";
-  msg += pos.pitch;
-  msg += ", ";
-  msg += pos.yaw;
-  msg += "\r\n";
-
-  return write(fd, msg.c_str(), msg.size()+1);
-}
-
-/* ======================== */
-int getRealVel(int fd, string arg)
-{
-  string msg;
-  INS_Bearings pos;
-
-  pos = INS_GetVelocity();
-
-  msg = "getRealPos: ";
-  msg += pos.x;
-  msg += ", ";
-  msg += pos.y;
-  msg += ", ";
-  msg += pos.z;
-  msg += ", ";
-  msg += pos.roll;
-  msg += ", ";
-  msg += pos.pitch;
-  msg += ", ";
-  msg += pos.yaw;
-  msg += "\r\n";
-
-  return write(fd, msg.c_str(), msg.size()+1);
-}
-
-/* ======================== */
-int getTargetPos(int fd, string arg)
-{
-  char msg[256];
-  INS_Bearings data;
-
-  data = MotorControl->Position;
-  sprintf(msg, "getTargetPos: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
-  return write(fd, msg, strlen(msg));
-}
-
-/* ======================== */
-int getTargetVel(int fd, string arg)
-{
-  char msg[256];
-  INS_Bearings data;
-
-  data = MotorControl->Velocity;
-  sprintf(msg, "getTargetVel: %2.0f, %2.0f, %2.0f, %2.0f, %2.0f, %2.0f\r\n", data.x,data.y, data.z, data.roll, data.pitch, data.yaw);
-  return write(fd, msg, strlen(msg));
-}
-
-/* ======================== */
-int CamStart(int fd, string arg)
-{
-  CamMan->Start();
-  return 0;
-}
-
-/* ======================== */
-int CamStop(int fd, string arg)
-{
-  CamMan->Stop();
-  return 0;
-}
-
-/* ======================== */
-int Brightness(int fd, string arg)
-{
-  return 0;
-}
-
-/* ======================== */
-int SetControlMode(int fd, string arg)
-{
-  MotorControl->SetMode(arg);
-  return 0;
-}
-
-/* ======================== */
-int GetControlMode(int fd, string arg)
-{
-  string msg;
-
-  msg += "getControlMode: ";
-  msg += MotorControl->GetMode();
-  msg += "\r\n";
-  return write(fd, msg.c_str(), msg.size()+1);
-}
-
-/* ======================== */
-int LightToggle(int fd, string arg)
-{
-	LightMan->Toggle();
-	printf("Toggle\n");
-	return 0;
-}
-
 /* ======================== */
 int main (int argc, char *argv[])
 {
-  JSON_Object *settings;
-  JSON_Value *val;
   int rv;
 
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_EMERG, "Starting program");
 
-  Setup_SignalHandler();
-  alarm_wakeup(0);
+  SignalHandler_Setup();
   atexit(System_Shutdown);
 
   /* --------------------------------------------- */
   // load paramaters
-  val = json_parse_file(prop_file);
+  JSON_Value *val = json_parse_file(prop_file);
   rv = json_value_get_type(val);
   if ( rv != JSONObject ) {
     printf("JSON Parse file failed\n");
@@ -313,18 +115,20 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  settings = json_value_get_object(val);
+  JSON_Object *settings = json_value_get_object(val);
   if ( settings == NULL ) {
     printf("Settings == NULL\n");
     return -1;
   }
 
   /* --------------------------------------------- */
+  // connect to other external systems
   if ( PWM_Connect() < 0 ) {
     printf("PWM_Connect() failed\n");
     syslog(LOG_EMERG, "PWM_Connect() failed\n");
     return -1;
   }
+
   if ( INS_Connect() < 0 ) {
     printf("INS_Connect() failed\n");
     syslog(LOG_EMERG, "INS_Connect() failed\n");
@@ -334,63 +138,43 @@ int main (int argc, char *argv[])
   /* --------------------------------------------- */
   string path;
   uid_t uid=getuid(), euid=geteuid();
+
   if ((uid <= 0 ) || ( uid != euid)) {
     // We might have elevated privileges beyond that of the user who invoked
     // the program, due to suid bit. Be very careful about trusting any data!
-//		Settings = new SysSetting("/var/log/");
     cout << "Operating as Root" << endl;
   } else {
-//		Settings = new SysSetting("./");
     cout << "Operating as User " << uid << endl;
   }
-  Settings = new SysSetting("./");
 
   /* --------------------------------------------- */
   // open sub-modules
 
-  Listner = new TcpServer(8090);
   MotorControl = new SubControl(settings);
 
   DiveMon = new DiveMonitor(settings, MotorControl);
   LightMan = new LightManager(settings);
   CamMan = new CameraManager(settings);
 
-  Control = new ControlProtocol();
-  Control->AddDataSource(Listner);
+  SubProt = new SubProtocol(8090, 8091);
+  SubProt->AddLightManager(LightMan);
+  SubProt->AddCameraManager(CamMan);
+  SubProt->AddSubControl(MotorControl);
 
-  /* --------------------------------------------- */
-  // register call backs
-  /** =============================== **/
-  Control->AddCallback("setPos", setPos);
-  Control->AddCallback("setVel", setVel);
-  Control->AddCallback("getRealPos", getRealPos);
-  Control->AddCallback("getRealVel", getRealVel);
-  Control->AddCallback("getTargetPos", getTargetPos);
-  Control->AddCallback("getTargetVel", getTargetVel);
-
-  /** =============================== **/
-  Control->AddCallback("setControlMode", SetControlMode);
-  Control->AddCallback("getControlMode", GetControlMode);
-
-  /** =============================== **/
-  Control->AddCallback("lightToggle", LightToggle);
-
-  /** =============================== **/
-  Control->AddCallback("CamStart", CamStart);
-  Control->AddCallback("CamStop", CamStart);
-  Control->AddCallback("Bright", Brightness);
+  json_value_free(val);
 
   /* --------------------------------------------- */
   cout << "Starting Main Program" << endl;
   while (1) {
     // read data from connected clients.
-    Control->Run(&system_time);
+    SubProt->Run(&system_time);
 
     if ( Run_Control == true) {
       Run_Control = false;
+
       MotorControl->Run();
       DiveMon->Run();
-    	LightMan->Run();
+      LightMan->Run();
     }
   }
   return 0;

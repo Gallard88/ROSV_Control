@@ -21,6 +21,7 @@ ROSV_Control_SOURCES = \
 	ControlProtocol.h \
 	DataLogger.cpp \
 	DataLogger.h \
+	DataSource.cpp \
 	DataSource.h \
 	DiveMonitor.cpp \
 	DiveMonitor.h \
@@ -30,6 +31,8 @@ ROSV_Control_SOURCES = \
 	parson.h \
 	SubControl.cpp \
 	SubControl.h \
+	SubProtocol.cpp \
+	SubProtocol.h \
 	SysSettings.cpp \
 	SysSettings.h \
 	TcpServer.cpp \

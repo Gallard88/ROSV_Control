@@ -28,29 +28,27 @@
 #include <string>
 #include <sys/time.h>
 
+extern const int DS_ReadEx;
 //*******************************************************************************************
 class DataSource {
 public:
-  DataSource(void) {
-    File = -1;
-  }
-  ~DataSource(void) {
-    if ( File >=0 ) {
-      close(File);
-      File = -1;
-    }
-  }
 
-  virtual int GetFd(void) {
+  DataSource(void);
+  DataSource(int fp, const char *name);
+  ~DataSource(void);
+
+  const char *GetName(void);
+  int GetFd(void) {
     return File;
   };
-  virtual int ReadLine(string *line) = 0;
 
-  virtual int WriteData(const char *msg, int length) = 0;
-  virtual int WriteData(const string & line) = 0;
-  virtual void Run(const struct timeval *timeout) = 0;
+  int ReadData(void);
+  int ReadLine(string *line);
+
+  int WriteData(const char *msg);
 
 protected:
+  char *Name;
   int File;
   string Buffer;
 };

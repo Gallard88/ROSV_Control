@@ -123,49 +123,16 @@ void SubControl::Run(void)
 }
 
 //*******************************************************************************************
-void SubControl::SetMode(string mode)
-{
-  if ( mode.compare("Vel") == 0 ) {
-    Mode = Vel;
-  } else if ( mode.compare("Pos") == 0 ) {
-    Mode = Pos;
-  } else if ( mode.compare("Idle") == 0 ) {
-    Mode = Idle;
-  }
-  syslog(LOG_EMERG, "Mode = %s", this->GetMode());
-}
-
-//*******************************************************************************************
-const char *SubControl::GetMode(void)
-{
-  switch ( Mode ) {
-
-  case Pos:
-    return "Pos";
-
-  case Vel:
-    return "Vel";
-
-  default:
-  case Idle:
-    return "Idle";
-  }
-}
-
-//*******************************************************************************************
 int SubControl::SetTargetPos(INS_Bearings pos)
 {
-  if ( Mode == Pos )
-    Position = pos;
-  printf("Pos Update\n");
+  Position = pos;
   return 0;
 }
 
 //*******************************************************************************************
 int SubControl::SetTargetVel(INS_Bearings vel)
 {
-  if ( Mode == Vel )
-    Velocity = vel;
+  Velocity = vel;
   return 0;
 }
 
