@@ -39,8 +39,7 @@ using namespace std;
 #include "ControlProtocol.h"
 
 //*******************************************************************************************
-class SubProtocol
-{
+class SubProtocol {
 public:
   SubProtocol(int control_port, int observer_port);
   ~SubProtocol();
@@ -59,9 +58,6 @@ private:
   SubControl                *SCon;
   CameraManager             *Cam;
   LightManager              *Light;
-
-  struct Command *CmdList;
-
 
   INS_Bearings ParseBearing(string data);
   string ParseBearing(INS_Bearings data);

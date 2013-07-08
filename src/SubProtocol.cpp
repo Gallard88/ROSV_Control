@@ -56,22 +56,23 @@ using namespace std;
 #define	GetVoltage			12
 #define	GetTemp					13
 
+//*******************************************************************************************
 const struct Command CmdList[] = {
-{ "SetPos",         true, true,   SetPos         },
-{ "SetVel",         true, true,   SetVel         },
-{ "SetControlMode", true, true,   SetControlMode },
-{ "CamStart",       true, true,   CamStart       },
-{ "CamStop",        true, true,   CamStop        },
-{ "LightToggle",    true, true,   LightToggle    },
-{ "GetRealPos",     true, false,  GetRealPos     },
-{ "GetTargetPos",   true, false,  GetTargetPos   },
-{ "GetRealVel",     true, false,  GetRealVel     },
-{ "GetTargetVel",   true, false,  GetTargetVel   },
-{ "GetDiveTime",    true, false,  GetDiveTime    },
-{ "GetVoltage",     true, false,  GetVoltage     },
-{ "GetTemp",        true, false,  GetTemp        },
-			// indicates end of the list.
-{ NULL,             false, false, 0              }
+  { "SetPos",         true, true,   SetPos         },
+  { "SetVel",         true, true,   SetVel         },
+  { "SetControlMode", true, true,   SetControlMode },
+  { "CamStart",       true, true,   CamStart       },
+  { "CamStop",        true, true,   CamStop        },
+  { "LightToggle",    true, true,   LightToggle    },
+  { "GetRealPos",     true, false,  GetRealPos     },
+  { "GetTargetPos",   true, false,  GetTargetPos   },
+  { "GetRealVel",     true, false,  GetRealVel     },
+  { "GetTargetVel",   true, false,  GetTargetVel   },
+  { "GetDiveTime",    true, false,  GetDiveTime    },
+  { "GetVoltage",     true, false,  GetVoltage     },
+  { "GetTemp",        true, false,  GetTemp        },
+  // indicates end of the list.
+  { NULL,             false, false, 0              }
 };
 
 //*******************************************************************************************
@@ -83,8 +84,6 @@ SubProtocol::SubProtocol(int control_port, int observer_port)
   this->Cam = NULL;
   this->Light = NULL;
   this->SCon = NULL;
-
-
 }
 
 //*******************************************************************************************
@@ -98,19 +97,19 @@ SubProtocol::~SubProtocol()
 //*******************************************************************************************
 void SubProtocol::AddCameraManager(CameraManager *cam)
 {
-	this->Cam = cam;
+  this->Cam = cam;
 }
 
 //*******************************************************************************************
 void SubProtocol::AddLightManager(LightManager *light)
 {
-	this->Light = light;
+  this->Light = light;
 }
 
 //*******************************************************************************************
 void SubProtocol::AddSubControl(SubControl *scon)
 {
-	this->SCon = scon;
+  this->SCon = scon;
 }
 
 //*******************************************************************************************
@@ -118,180 +117,176 @@ void SubProtocol::AddSubControl(SubControl *scon)
 //*******************************************************************************************
 void SubProtocol::Run(const struct timeval *timeout)
 {
-	DataSource *src;
-	fd_set readfs;
-	int fp;
-	int max_fp = 0;
-	struct timeval to = *timeout;
+  DataSource *src;
+  fd_set readfs;
+  int fp;
+  int max_fp = 0;
+  struct timeval to = *timeout;
 
-	FD_ZERO(&readfs);
-	if ( ConProt->IsControlSourceConnected() == false ) {
-  		fp  = Control_Server->GetFp();
-	} else {
-		fp = ConProt->GetControlFileDescriptor();
-	}
+  FD_ZERO(&readfs);
+  if ( ConProt->IsControlSourceConnected() == false ) {
+    fp  = Control_Server->GetFp();
+  } else {
+    fp = ConProt->GetControlFileDescriptor();
+  }
   FD_SET(fp, &readfs);
-	MAX_FP(fp, max_fp);
+  MAX_FP(fp, max_fp);
 
-	if ( ConProt->GetNumberOfObservers() == false ) {
-  		fp  = Observe_Server->GetFp();
-	} else {
-		fp = ConProt->GetControlFileDescriptor();
-	}
-  	FD_SET(fp, &readfs);
-	MAX_FP(fp, max_fp);
+  if ( ConProt->GetNumberOfObservers() == false ) {
+    fp  = Observe_Server->GetFp();
+  } else {
+    fp = ConProt->GetControlFileDescriptor();
+  }
+  FD_SET(fp, &readfs);
+  MAX_FP(fp, max_fp);
 
-	if ( select(max_fp+1, &readfs, NULL, NULL, &to) > 0 )
-	{
-		if ( ConProt->IsControlSourceConnected() == true ) {
+  if ( select(max_fp+1, &readfs, NULL, NULL, &to) > 0 ) {
+    if ( ConProt->IsControlSourceConnected() == true ) {
 
-			if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs))
-				ConProt->GetControlData();
-		} else {
+      if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs))
+        ConProt->GetControlData();
+    } else {
 
-			if ( FD_ISSET(Control_Server->GetFp(), &readfs)) {
+      if ( FD_ISSET(Control_Server->GetFp(), &readfs)) {
 
-				src = Control_Server->Listen();
-				if ( src != NULL )
-					ConProt->AddControlSource(src);
-			}
-		}
-		if ( ConProt->GetNumberOfObservers() != 0 ) {
+        src = Control_Server->Listen();
+        if ( src != NULL )
+          ConProt->AddControlSource(src);
+      }
+    }
+    if ( ConProt->GetNumberOfObservers() != 0 ) {
 
-			if ( FD_ISSET(ConProt->GetObserverFileDescriptor(), &readfs))
-				ConProt->GetObserverData();
-		} else {
+      if ( FD_ISSET(ConProt->GetObserverFileDescriptor(), &readfs))
+        ConProt->GetObserverData();
+    } else {
 
-			if ( FD_ISSET(Observe_Server->GetFp(), &readfs)) {
+      if ( FD_ISSET(Observe_Server->GetFp(), &readfs)) {
 
-				src = Observe_Server->Listen();
-				if ( src != NULL )
-					ConProt->AddObserverSource(src);
-			}
-		}
-	}
+        src = Observe_Server->Listen();
+        if ( src != NULL )
+          ConProt->AddObserverSource(src);
+      }
+    }
+  }
 
-	const struct Command *cmdPtr;
-	string arg;
+  string arg;
+  const struct Command *cmdPtr;
+  while ( (cmdPtr = ConProt->GetCmds(CmdList, &arg, &fp)) != NULL ) {
+    char buf[1024];
 
-	while ( (cmdPtr = ConProt->GetCmds(CmdList, &arg, &fp)) != NULL )
-	{
-		char buf[1024];
-
-		switch ( cmdPtr->func_number )
-		{
-/* --------------------------------------------------------------- */
+    switch ( cmdPtr->func_number ) {
+      // ---------------------------------------------------------------
 // write commands
-			case SetPos:
-				SCon->SetTargetPos(ParseBearing(arg));
-				printf("SetPos\n");
-				break;
+    case SetPos:
+      SCon->SetTargetPos(ParseBearing(arg));
+      printf("SetPos\n");
+      break;
 
-			case SetVel:
-				SCon->SetTargetVel(ParseBearing(arg));
-				printf("SetVel\n");
-				break;
+    case SetVel:
+      SCon->SetTargetVel(ParseBearing(arg));
+      printf("SetVel\n");
+      break;
 
-			case LightToggle:		// Write
-				Light->Toggle();
-				printf("Toggle Light\n");
-				break;
+    case LightToggle:		// Write
+      Light->Toggle();
+      printf("Toggle Light\n");
+      break;
 
-			case CamStart:			// Write
-				Cam->Start();
-				printf("Cam Start\n");
-				break;
+    case CamStart:			// Write
+      Cam->Start();
+      printf("Cam Start\n");
+      break;
 
-			case CamStop:			// Write
-				Cam->Stop();
-				printf("Cam Stop\n");
-				break;
+    case CamStop:			// Write
+      Cam->Stop();
+      printf("Cam Stop\n");
+      break;
 
-/* --------------------------------------------------------------- */
+      // ---------------------------------------------------------------
 // Read commands
-			case GetRealPos:
-				SendBearings(cmdPtr, fp, SCon->Position );
-				printf("GetRealPos\n");
-				break;
+    case GetRealPos:
+      SendBearings(cmdPtr, fp, SCon->Position );
+      printf("GetRealPos\n");
+      break;
 
-			case GetTargetPos:
-				SendBearings(cmdPtr, fp, SCon->Velocity );
-				printf("GetRealVel\n");
-				break;
+    case GetTargetPos:
+      SendBearings(cmdPtr, fp, SCon->Velocity );
+      printf("GetRealVel\n");
+      break;
 
-			case GetRealVel:
-				SendBearings(cmdPtr, fp, INS_GetPosition() );
-				printf("GetTargetPos\n");
-				break;
+    case GetRealVel:
+      SendBearings(cmdPtr, fp, INS_GetPosition() );
+      printf("GetTargetPos\n");
+      break;
 
-			case GetTargetVel:
-				SendBearings(cmdPtr, fp, INS_GetVelocity() );
-				printf("GetTargetVel\n");
-				break;
+    case GetTargetVel:
+      SendBearings(cmdPtr, fp, INS_GetVelocity() );
+      printf("GetTargetVel\n");
+      break;
 
-			case GetVoltage:
-				sprintf(buf, "%s: %f\r\n", cmdPtr->cmd, PWM_GetVoltage());
-				ConProt->Write(fp, buf);
-				break;
+    case GetVoltage:
+      sprintf(buf, "%s: %f\r\n", cmdPtr->cmd, PWM_GetVoltage());
+      ConProt->Write(fp, buf);
+      break;
 
-			case GetTemp:
-				sprintf(buf, "%s: %f\r\n", cmdPtr->cmd, PWM_GetTemp());
-				ConProt->Write(fp, buf);
-				break;
+    case GetTemp:
+      sprintf(buf, "%s: %f\r\n", cmdPtr->cmd, PWM_GetTemp());
+      ConProt->Write(fp, buf);
+      break;
 
-/* --------------------------------------------------------------- */
-/* --------------------------------------------------------------- */
-			case SetControlMode:	// Write
-			case GetDiveTime:
-			default :
-				printf("Unknown Cmd: %s\n", cmdPtr->cmd);
-				break;
-		}
-	}
+      // ---------------------------------------------------------------
+      // ---------------------------------------------------------------
+    case SetControlMode:	// Write
+    case GetDiveTime:
+    default :
+      printf("Unknown Cmd: %s\n", cmdPtr->cmd);
+      break;
+    }
+  }
 }
 
 //*******************************************************************************************
 char *SkipSpace(char *buf)
 {
-	while ( *buf && isspace(*buf))
-		buf++;
-	return buf;
+  while ( *buf && isspace(*buf))
+    buf++;
+  return buf;
 }
 
 //*******************************************************************************************
 char *SkipChars(char *buf)
 {
-	while ( *buf && !isspace(*buf))
-		buf++;
-	return buf;
+  while ( *buf && !isspace(*buf))
+    buf++;
+  return buf;
 }
 
 //*******************************************************************************************
 INS_Bearings SubProtocol::ParseBearing(string data)
 {
-	INS_Bearings bear;
+  INS_Bearings bear;
 
-	char *ptr = (char *)data.c_str();
+  char *ptr = (char *)data.c_str();
 
-	ptr = SkipSpace(ptr);
-	bear.x = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	bear.y = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	bear.z = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	bear.roll = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	bear.pitch = ::atof(ptr);
-	ptr = SkipChars(ptr);
-	ptr = SkipSpace(ptr);
-	bear.yaw = ::atof(ptr);
+  ptr = SkipSpace(ptr);
+  bear.x = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  bear.y = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  bear.z = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  bear.roll = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  bear.pitch = ::atof(ptr);
+  ptr = SkipChars(ptr);
+  ptr = SkipSpace(ptr);
+  bear.yaw = ::atof(ptr);
 
-	return bear;
+  return bear;
 }
 
 //*******************************************************************************************
@@ -317,10 +312,10 @@ string SubProtocol::ParseBearing(INS_Bearings data)
 //*******************************************************************************************
 void SubProtocol::SendBearings(const struct Command *cmdPtr, int fd, INS_Bearings data)
 {
-	string msg(cmdPtr->cmd);
-	msg += ": ";
-	msg += ParseBearing(data);
-	ConProt->Write(fd, msg);
+  string msg(cmdPtr->cmd);
+  msg += ": ";
+  msg += ParseBearing(data);
+  ConProt->Write(fd, msg);
 }
 
 //*******************************************************************************************

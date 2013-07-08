@@ -55,6 +55,7 @@ public:
   int GetObserverFileDescriptor(void);
   void GetObserverData(void);
 
+
   const struct Command *GetCmds(const struct Command *list, string *arg, int *fp);
 
   void Write(int fd, string msg);
