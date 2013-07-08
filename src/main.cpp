@@ -80,14 +80,14 @@ void SignalHandler_Setup(void)
 /* ======================== */
 void System_Shutdown(void)
 {
-	if ( MotorControl )
-		delete MotorControl;
-	if ( DiveMon )
-		delete DiveMon;
-	if ( LightMan )
-		delete LightMan;
-	if ( CamMan )
-		delete CamMan;
+  if ( MotorControl )
+    delete MotorControl;
+  if ( DiveMon )
+    delete DiveMon;
+  if ( LightMan )
+    delete LightMan;
+  if ( CamMan )
+    delete CamMan;
 
   syslog(LOG_EMERG, "System shutting down");
   closelog();
