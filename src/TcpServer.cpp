@@ -46,7 +46,7 @@ TcpServer::TcpServer(int port)
   listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (listen_fd < 0) {
     syslog(LOG_EMERG, "Socket() error, port %d", port);
-	// need to throw an expection here
+    // need to throw an expection here
     return;
   }
   bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -56,16 +56,16 @@ TcpServer::TcpServer(int port)
   serv_addr.sin_port = htons(port);
   if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
     syslog(LOG_EMERG, "ERROR on binding to port %d", port);
-	// need to throw an expection here
+    // need to throw an expection here
     return;
   }
+  syslog(LOG_EMERG, "TcpServer setup, port: %d", port);
   listen( listen_fd, 1);
 }
 
 /* ======================== */
 TcpServer::~TcpServer(void)
 {
-//  syslog(LOG_EMERG, "Shutting down module");
   shutdown(listen_fd, 2);
   close(listen_fd);
   listen_fd = -1;
@@ -87,7 +87,6 @@ DataSource *TcpServer::Listen(void)
   clilen = sizeof(cli_addr);
   fp = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
   if ( fp >= 0 ) {
-//    syslog(LOG_EMERG, "New Connection: %s", inet_ntoa(cli_addr.sin_addr));
     src = new DataSource(fp, inet_ntoa(cli_addr.sin_addr));
   }
   return src;

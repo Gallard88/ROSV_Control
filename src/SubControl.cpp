@@ -37,8 +37,8 @@ SubControl::SubControl(const JSON_Object *settings)
 
 //	Mode = Idle;
   Mode = Vel;
-	memset(&Position, 0, sizeof(INS_Bearings));
-	memset(&Velocity, 0, sizeof(INS_Bearings));
+  memset(&Position, 0, sizeof(INS_Bearings));
+  memset(&Velocity, 0, sizeof(INS_Bearings));
 
   // load motor data
   array = json_object_get_array( settings, "Motor");
