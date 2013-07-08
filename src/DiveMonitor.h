@@ -51,7 +51,7 @@ private:
   DataLogger *PowerLog;
 
   time_t LastUpdate;
-	SubControl *Sub;
+  SubControl *Sub;
 };
 
 //*******************************************************************************************

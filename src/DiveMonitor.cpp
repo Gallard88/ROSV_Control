@@ -29,14 +29,14 @@ using namespace std;
 //*******************************************************************************************
 DiveMonitor::DiveMonitor(const JSON_Object *settings, SubControl *sub)
 {
-	Sub = sub;
+  Sub = sub;
 
   PositionLog = new DataLogger("./", "Position.csv");
-	Rec_BearingTitle(PositionLog);
+  Rec_BearingTitle(PositionLog);
 
 
   VelocityLog = new DataLogger("./", "Velocity.csv");
-	Rec_BearingTitle(VelocityLog);
+  Rec_BearingTitle(VelocityLog);
 
   PowerLog = new DataLogger("./", "Power.csv");
   PowerLog->Add_Title("Volt");
