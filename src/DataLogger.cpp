@@ -64,7 +64,7 @@ DataLogger::~DataLogger()
 void DataLogger::ChecktoAddTime(void)
 {
   ofstream writer;
-	char timestr[50];
+  char timestr[50];
 
   if ( Line_Started == true )
     return ;
@@ -77,7 +77,7 @@ void DataLogger::ChecktoAddTime(void)
   current = time(NULL);
   loc_time = localtime(&current);
 
-	sprintf(timestr, "%02d:%02d:%02d", loc_time->tm_hour, loc_time->tm_min, loc_time->tm_sec);
+  sprintf(timestr, "%02d:%02d:%02d", loc_time->tm_hour, loc_time->tm_min, loc_time->tm_sec);
   writer << timestr;
 
   Line_Started = true;
@@ -106,9 +106,9 @@ void DataLogger::Add_Title(const string field)
   writer.open(Name.c_str(), ios_base::app);
   if ( Line_Started == true )
     writer << ",";
-	writer << "\"";
+  writer << "\"";
   writer << field.c_str();
-	writer << "\"";
+  writer << "\"";
   writer.flush();
   writer.close();
   Line_Started = true;
