@@ -32,12 +32,12 @@
 class  LightManager {
 public:
   LightManager(const JSON_Object *settings);
-	void Toggle(void);
-	void Run(void);
+  void Toggle(void);
+  void Run(void);
 
 private:
   int Chanel;
-	int OnOff;
+  int OnOff;
 };
 
 //*******************************************************************************************

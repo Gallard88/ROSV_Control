@@ -37,33 +37,33 @@ const char ParName[] = "LightCh";
 //*******************************************************************************************
 LightManager::LightManager(const JSON_Object *settings)
 {
-	OnOff = 0;
+  OnOff = 0;
 
-	if ( json_object_get_value(settings, ParName ) != NULL ) {
-		Chanel = json_object_get_number(settings, ParName );
-	} else {
-		Chanel = -1;
-	}
-	printf("Light Chanel = %d\n", Chanel);
+  if ( json_object_get_value(settings, ParName ) != NULL ) {
+    Chanel = json_object_get_number(settings, ParName );
+  } else {
+    Chanel = -1;
+  }
+  printf("Light Chanel = %d\n", Chanel);
 }
 
 //*******************************************************************************************
 void LightManager::Run(void)
 {
-	if ( OnOff ) {
-		PWM_SetPWM(Chanel, 1.0);
-	} else {
-		PWM_SetPWM(Chanel, 0.0);
-	}
+  if ( OnOff ) {
+    PWM_SetPWM(Chanel, 1.0);
+  } else {
+    PWM_SetPWM(Chanel, 0.0);
+  }
 }
 
 //*******************************************************************************************
 void LightManager::Toggle(void)
 {
-	if ( Chanel < 0 )
-		return;
+  if ( Chanel < 0 )
+    return;
 
-	OnOff ^= 1;
+  OnOff ^= 1;
 
 }
 
