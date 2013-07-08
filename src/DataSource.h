@@ -29,6 +29,7 @@
 #include <sys/time.h>
 
 extern const int DS_ReadEx;
+extern const int DS_WriteEx;
 //*******************************************************************************************
 class DataSource {
 public:

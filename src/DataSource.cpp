@@ -23,16 +23,19 @@
 //*******************************************************************************************
 //*******************************************************************************************
 #include <string.h>
+#include <stdio.h>
+#include <syslog.h>
 
 using namespace std;
 
 #include "DataSource.h"
 
 //*******************************************************************************************
-DataSource::DataSource(void) {
-    File = -1;
-	Name = NULL;
-  }
+DataSource::DataSource(void)
+{
+  File = -1;
+  Name = NULL;
+}
 
 //*******************************************************************************************
 DataSource::DataSource(int fp, const char *name)
@@ -43,11 +46,16 @@ DataSource::DataSource(int fp, const char *name)
   this->Name = new char[length+1];
   strncpy(this->Name, name, length);
   this->Name[length] = 0;
-
+  printf("New DataSource, %d, %s\n", fp, name);
+  syslog(LOG_EMERG, "New DataSource, %d, %s", fp, name);
 }
 
 //*******************************************************************************************
-DataSource::~DataSource(void) {
+DataSource::~DataSource(void)
+{
+
+  syslog(LOG_EMERG, "Del DataSource, %d, %s", File, this->Name);
+  printf("DataSource del , %d, %s\n", File, this->Name);
   if ( File >=0 ) {
     close(File);
     File = -1;
@@ -64,16 +72,17 @@ const char *DataSource::GetName(void)
 
 //*******************************************************************************************
 const int DS_ReadEx = 1;
+const int DS_WriteEx = 2;
 
 //*******************************************************************************************
 int DataSource::ReadData(void)
 {
-  char buffer[4096];
+  char buffer[8192];
 
   int n = read(File, buffer, sizeof(buffer));
-  if ( n < 0 ) {
-	throw DS_ReadEx;
-	// throw expection.
+  if ( n <= 0 ) {
+    throw DS_ReadEx;
+    // throw expection.
   } else {
     string msg = string(buffer);
     Buffer += msg;
@@ -99,83 +108,12 @@ int DataSource::ReadLine(string *line)
 //*******************************************************************************************
 int DataSource::WriteData(const char *msg)
 {
-	int n = write (File, msg, strlen(msg));
-//	if ( n <= 0 )
-	return n;
+  int n = write (File, msg, strlen(msg));
+  if ( n <= 0 ) {
+    throw DS_WriteEx;
+  }
+  return n;
 }
 
 //*******************************************************************************************
 //*******************************************************************************************
-/* ======================== */
-#if 0
-void TcpServer::CheckReturn(int rv)
-{
-  if ( rv < 0 ) {
-    close(File);
-    File = -1;
-    Buffer.erase();
-    syslog(LOG_EMERG, "Lost Connection: %s", inet_ntoa(cli_addr.sin_addr));
-    printf("Lost Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
-  }
-}
-
-/* ======================== */
-int TcpServer::WriteData(const char *msg, int length)
-{
-  int rv = 0;
-  if ( File >= 0 ) {
-    rv = write(File, msg, length);
-    CheckReturn(rv);
-  }
-  return rv;
-}
-
-/* ======================== */
-int TcpServer::WriteData(const string & line)
-{
-  int rv = 0;
-  if ( File >= 0 ) {
-    rv = write(File, line.c_str(), line.size());
-    CheckReturn(rv);
-  }
-  return rv;
-}
-
-/* ======================== */
-void TcpServer::Run(const struct timeval *timeout)
-{
-  int fd;
-  fd_set readfs;
-  char buffer[4096];
-
-  if ( File < 0 ) // listen for new connections
-    fd = listen_fd;
-  else // run file socket
-    fd = File;
-
-  FD_ZERO(&readfs);
-  FD_SET(fd, &readfs);
-  struct timeval to = *timeout;
-  if ( select(fd+1, &readfs, NULL, NULL, &to) <= 0)
-    return;
-
-  if (( File < 0 ) && FD_ISSET(listen_fd, &readfs)) {
-    socklen_t clilen;
-
-    clilen = sizeof(cli_addr);
-    File = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
-    syslog(LOG_EMERG, "New Connection: %s", inet_ntoa(cli_addr.sin_addr));
-    printf("New Connection: %s\n", inet_ntoa(cli_addr.sin_addr));
-  } else  if (FD_ISSET(File, &readfs)) {
-    int n = read(File, buffer, sizeof(buffer));
-    if ( n > 0 ) {
-      string msg = string(buffer);
-      Buffer += msg;
-    } else {
-      n = -1;
-    }
-    CheckReturn(n);
-  }
-}
-#endif
-
