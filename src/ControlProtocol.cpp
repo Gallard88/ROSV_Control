@@ -160,12 +160,14 @@ const struct Command *ControlProtocol::GetCmds(const struct Command *list, strin
     const struct Command *ptr = list;
     while ( ptr->cmd != NULL ) {
       if ( strcmp(ptr->cmd, line.c_str()) == 0 ) {
-        return ptr;
+				break;	// match
       }
       ptr++;
     }
-  }
-  return NULL;
+    return ptr;
+	} else {
+    return NULL;
+	}
 }
 
 /* ======================== */
