@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-//*******************************************************************************************
+// *******************************************************************************************
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,10 +34,10 @@
 
 #include "SubProtocol.h"
 
-//*******************************************************************************************
+// *******************************************************************************************
 using namespace std;
 
-//*******************************************************************************************
+// *******************************************************************************************
 // Protocol commands, version 0.01
 // Write Commands
 #define	SetPos					1
@@ -56,7 +56,7 @@ using namespace std;
 #define	GetVoltage			12
 #define	GetTemp					13
 
-//*******************************************************************************************
+// *******************************************************************************************
 const struct Command CmdList[] = {
   { "SetPos",         true, true,   SetPos         },
   { "SetVel",         true, true,   SetVel         },
@@ -75,7 +75,7 @@ const struct Command CmdList[] = {
   { NULL,             false, false, 0              }
 };
 
-//*******************************************************************************************
+// *******************************************************************************************
 SubProtocol::SubProtocol(int control_port, int observer_port)
 {
   Control_Server = new TcpServer(control_port);
@@ -86,7 +86,7 @@ SubProtocol::SubProtocol(int control_port, int observer_port)
   this->SCon = NULL;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 SubProtocol::~SubProtocol()
 {
   delete ConProt;
@@ -94,27 +94,27 @@ SubProtocol::~SubProtocol()
   delete Observe_Server;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 void SubProtocol::AddCameraManager(CameraManager *cam)
 {
   this->Cam = cam;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 void SubProtocol::AddLightManager(LightManager *light)
 {
   this->Light = light;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 void SubProtocol::AddSubControl(SubControl *scon)
 {
   this->SCon = scon;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 #define MAX_FP(a, b)	b = (a > b)? a : b
-//*******************************************************************************************
+// *******************************************************************************************
 void SubProtocol::Run(const struct timeval *timeout)
 {
   DataSource *src;
@@ -205,23 +205,21 @@ void SubProtocol::Run(const struct timeval *timeout)
       // ---------------------------------------------------------------
 // Read commands
     case GetRealPos:
-      SendBearings(cmdPtr, fp, SCon->Position );
+      SendBearings(cmdPtr, fp, INS_GetPosition());
       printf("GetRealPos\n");
       break;
 
-    case GetTargetPos:
-      SendBearings(cmdPtr, fp, SCon->Velocity );
-      printf("GetRealVel\n");
+    case GetRealVel:
+      SendBearings(cmdPtr, fp, INS_GetVelocity());
       break;
 
-    case GetRealVel:
-      SendBearings(cmdPtr, fp, INS_GetPosition() );
+    case GetTargetPos:
+      SendBearings(cmdPtr, fp, SCon->Position );
       printf("GetTargetPos\n");
       break;
 
     case GetTargetVel:
-      SendBearings(cmdPtr, fp, INS_GetVelocity() );
-      printf("GetTargetVel\n");
+      SendBearings(cmdPtr, fp, SCon->Velocity );
       break;
 
     case GetVoltage:
@@ -234,10 +232,14 @@ void SubProtocol::Run(const struct timeval *timeout)
       ConProt->Write(fp, buf);
       break;
 
+    case GetDiveTime:
+      sprintf(buf, "%s: 0\r\n", cmdPtr->cmd);
+      ConProt->Write(fp, buf);
+      break;
+
       // ---------------------------------------------------------------
       // ---------------------------------------------------------------
     case SetControlMode:	// Write
-    case GetDiveTime:
     default :
       printf("Unknown Cmd: %s\n", cmdPtr->cmd);
       break;
@@ -245,7 +247,7 @@ void SubProtocol::Run(const struct timeval *timeout)
   }
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 char *SkipSpace(char *buf)
 {
   while ( *buf && isspace(*buf))
@@ -253,7 +255,7 @@ char *SkipSpace(char *buf)
   return buf;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 char *SkipChars(char *buf)
 {
   while ( *buf && !isspace(*buf))
@@ -261,12 +263,14 @@ char *SkipChars(char *buf)
   return buf;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 INS_Bearings SubProtocol::ParseBearing(string data)
 {
   INS_Bearings bear;
 
   char *ptr = (char *)data.c_str();
+
+  printf("B: %s\n", data.c_str());
 
   ptr = SkipSpace(ptr);
   bear.x = ::atof(ptr);
@@ -289,23 +293,20 @@ INS_Bearings SubProtocol::ParseBearing(string data)
   return bear;
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 string SubProtocol::ParseBearing(INS_Bearings data)
 {
-  string msg;
+  stringstream ss;
 
-  msg += data.x;
-  msg += ", ";
-  msg += data.y;
-  msg += ", ";
-  msg += data.z;
-  msg += ", ";
-  msg += data.roll;
-  msg += ", ";
-  msg += data.pitch;
-  msg += ", ";
-  msg += data.yaw;
+  ss.clear();
+  ss << data.x << ", ";
+  ss << data.y << ", ";
+  ss << data.z << ", ";
+  ss << data.roll << ", ";
+  ss << data.pitch << ", ";
+  ss << data.yaw;
 
+  string msg(ss.str());
   return msg;
 }
 
