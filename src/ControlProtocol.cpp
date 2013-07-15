@@ -143,11 +143,12 @@ const struct Command *ControlProtocol::GetCmds(const struct Command *list, strin
     length = Controller->ReadLine(&line);
     *fp = Controller->GetFd();
   }
-
   if (( length <= 0 ) && ( Observer != NULL )) {
     length = Observer->ReadLine(&line);
     *fp = Observer->GetFd();
   }
+
+  const struct Command *ptr = NULL;
 
   if ( length > 0 ) {
     // split into cmd and arg.
@@ -155,19 +156,17 @@ const struct Command *ControlProtocol::GetCmds(const struct Command *list, strin
     if ( x != string::npos ) {
       *arg = line.substr((size_t) x+1, line.size());
       line.erase((size_t)x, line.size());
-    }
 
-    const struct Command *ptr = list;
-    while ( ptr->cmd != NULL ) {
-      if ( strcmp(ptr->cmd, line.c_str()) == 0 ) {
-				break;	// match
-      }
-      ptr++;
+			ptr = list;
+			while ( ptr->cmd != NULL ) {
+				if ( strcmp(ptr->cmd, line.c_str()) == 0 ) {
+					break;	// match
+				}
+				ptr++;
+			}
     }
-    return ptr;
-	} else {
-    return NULL;
 	}
+	return NULL;
 }
 
 /* ======================== */
