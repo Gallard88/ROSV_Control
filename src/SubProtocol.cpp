@@ -270,7 +270,7 @@ INS_Bearings SubProtocol::ParseBearing(string data)
 
   char *ptr = (char *)data.c_str();
 
-  printf("B: %s\n", data.c_str());
+  //printf("B: %s\n", data.c_str());
 
   ptr = SkipSpace(ptr);
   bear.x = ::atof(ptr);
@@ -289,6 +289,8 @@ INS_Bearings SubProtocol::ParseBearing(string data)
   ptr = SkipChars(ptr);
   ptr = SkipSpace(ptr);
   bear.yaw = ::atof(ptr);
+
+  //printf("--%f:%f:%f:%f:%f:%f\n", bear.x, bear.y, bear.z, bear.roll, bear.pitch, bear.yaw);
 
   return bear;
 }
