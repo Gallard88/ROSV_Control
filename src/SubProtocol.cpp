@@ -184,7 +184,7 @@ void SubProtocol::Run(const struct timeval *timeout)
 
     case SetVel:
       SCon->SetTargetVel(ParseBearing(arg));
-      printf("SetVel\n");
+      //printf("SetVel\n");
       break;
 
     case LightToggle:		// Write
@@ -241,7 +241,7 @@ void SubProtocol::Run(const struct timeval *timeout)
       // ---------------------------------------------------------------
     case SetControlMode:	// Write
     default :
-      printf("Unknown Cmd: %s\n", cmdPtr->cmd);
+      //printf("Unknown Cmd: %s\n", cmdPtr->cmd);
       break;
     }
   }
