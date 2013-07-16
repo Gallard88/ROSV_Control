@@ -143,8 +143,10 @@ void SubProtocol::Run(const struct timeval *timeout)
   if ( select(max_fp+1, &readfs, NULL, NULL, &to) > 0 ) {
     if ( ConProt->IsControlSourceConnected() == true ) {
 
-      if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs))
+      if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs)) {
+				printf("=======================================\n");
         ConProt->GetControlData();
+			}
     } else {
 
       if ( FD_ISSET(Control_Server->GetFp(), &readfs)) {
@@ -152,6 +154,7 @@ void SubProtocol::Run(const struct timeval *timeout)
         src = Control_Server->Listen();
         if ( src != NULL )
           ConProt->AddControlSource(src);
+				return;
       }
     }
 /*
@@ -170,11 +173,15 @@ void SubProtocol::Run(const struct timeval *timeout)
     }
 */
   }
+  else
+		return;
 
   string arg;
   const struct Command *cmdPtr;
+	int commands = 0;
   while ( (cmdPtr = ConProt->GetCmds(CmdList, &arg, &fp)) != NULL ) {
     char buf[1024];
+		commands++;
 
     switch ( cmdPtr->func_number ) {
       // ---------------------------------------------------------------
@@ -186,7 +193,7 @@ void SubProtocol::Run(const struct timeval *timeout)
 
     case SetVel:
       SCon->SetTargetVel(ParseBearing(arg));
-      //printf("SetVel\n");
+      printf("SetVel\n");
       break;
 
     case LightToggle:		// Write
@@ -213,6 +220,7 @@ void SubProtocol::Run(const struct timeval *timeout)
 
     case GetRealVel:
       SendBearings(cmdPtr, fp, INS_GetVelocity());
+      printf("GetRealVel\n");
       break;
 
     case GetTargetPos:
@@ -243,10 +251,13 @@ void SubProtocol::Run(const struct timeval *timeout)
       // ---------------------------------------------------------------
     case SetControlMode:	// Write
     default :
-      //printf("Unknown Cmd: %s\n", cmdPtr->cmd);
+			if ( cmdPtr->cmd)
+				printf("Unknown Cmd: %s\n", cmdPtr->cmd);
       break;
     }
   }
+  if ( commands > 0 )
+		printf("Commands: %d\n", commands);
 }
 
 // *******************************************************************************************

@@ -86,6 +86,7 @@ int DataSource::ReadData(void)
   } else {
     string msg = string(buffer);
     Buffer += msg;
+    printf("RBuf %d\n", Buffer.size());
   }
   return n;
 }
@@ -99,6 +100,7 @@ int DataSource::ReadLine(string *line)
       if ( found != string::npos) {
         *line = Buffer.substr(0, found);
         Buffer.erase(0, found+1);
+				printf("LBuf %d: %s\n", Buffer.size(), line->c_str());
         return line->length();
       }
     }
