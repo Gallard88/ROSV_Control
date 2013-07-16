@@ -79,7 +79,7 @@ const struct Command CmdList[] = {
 SubProtocol::SubProtocol(int control_port, int observer_port)
 {
   Control_Server = new TcpServer(control_port);
-  Observe_Server = new TcpServer(observer_port);
+//  Observe_Server = new TcpServer(observer_port);
   ConProt = new ControlProtocol();
   this->Cam = NULL;
   this->Light = NULL;
@@ -91,7 +91,7 @@ SubProtocol::~SubProtocol()
 {
   delete ConProt;
   delete Control_Server;
-  delete Observe_Server;
+//  delete Observe_Server;
 }
 
 // *******************************************************************************************
@@ -131,7 +131,7 @@ void SubProtocol::Run(const struct timeval *timeout)
   }
   FD_SET(fp, &readfs);
   MAX_FP(fp, max_fp);
-
+/*
   if ( ConProt->GetNumberOfObservers() == false ) {
     fp  = Observe_Server->GetFp();
   } else {
@@ -139,7 +139,7 @@ void SubProtocol::Run(const struct timeval *timeout)
   }
   FD_SET(fp, &readfs);
   MAX_FP(fp, max_fp);
-
+*/
   if ( select(max_fp+1, &readfs, NULL, NULL, &to) > 0 ) {
     if ( ConProt->IsControlSourceConnected() == true ) {
 
@@ -154,6 +154,7 @@ void SubProtocol::Run(const struct timeval *timeout)
           ConProt->AddControlSource(src);
       }
     }
+/*
     if ( ConProt->GetNumberOfObservers() != 0 ) {
 
       if ( FD_ISSET(ConProt->GetObserverFileDescriptor(), &readfs))
@@ -167,6 +168,7 @@ void SubProtocol::Run(const struct timeval *timeout)
           ConProt->AddObserverSource(src);
       }
     }
+*/
   }
 
   string arg;
