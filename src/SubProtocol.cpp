@@ -144,7 +144,6 @@ void SubProtocol::Run(const struct timeval *timeout)
     if ( ConProt->IsControlSourceConnected() == true ) {
 
       if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs)) {
-				printf("=======================================\n");
         ConProt->GetControlData();
 			}
     } else {
@@ -174,14 +173,12 @@ void SubProtocol::Run(const struct timeval *timeout)
 */
   }
   else
-		return;
+    return;
 
   string arg;
   const struct Command *cmdPtr;
-	int commands = 0;
   while ( (cmdPtr = ConProt->GetCmds(CmdList, &arg, &fp)) != NULL ) {
     char buf[1024];
-		commands++;
 
     switch ( cmdPtr->func_number ) {
       // ---------------------------------------------------------------
@@ -251,13 +248,11 @@ void SubProtocol::Run(const struct timeval *timeout)
       // ---------------------------------------------------------------
     case SetControlMode:	// Write
     default :
-			if ( cmdPtr->cmd)
-				printf("Unknown Cmd: %s\n", cmdPtr->cmd);
+      if ( cmdPtr->cmd)
+        printf("Unknown Cmd: %s\n", cmdPtr->cmd);
       break;
     }
   }
-  if ( commands > 0 )
-		printf("Commands: %d\n", commands);
 }
 
 // *******************************************************************************************
