@@ -28,8 +28,8 @@ using namespace std;
 
 /* ======================== */
 /* ======================== */
-#define RUN_INTERVAL	(10*1000)	//	10 ms
-#define ALAM_INT		(50*1000)	//	50 ms
+#define RUN_INTERVAL  (100*1000)	//  10 ms
+#define ALAM_INT      (50*1000)	//  50 ms
 
 /* ======================== */
 const char prop_file[] = "./ROSV_Motors.json";
@@ -169,8 +169,8 @@ int main (int argc, char *argv[])
     // read data from connected clients.
     SubProt->Run(&system_time);
 
-    if ( Run_Control == true) {
-      Run_Control = false;
+      if ( Run_Control == true) {
+        Run_Control = false;
 
       MotorControl->Run();
       DiveMon->Run();
