@@ -190,7 +190,7 @@ void SubProtocol::Run(const struct timeval *timeout)
 
     case SetVel:
       SCon->SetTargetVel(ParseBearing(arg));
-      printf("SetVel\n");
+      //printf("SetVel\n");
       break;
 
     case LightToggle:		// Write
@@ -217,7 +217,7 @@ void SubProtocol::Run(const struct timeval *timeout)
 
     case GetRealVel:
       SendBearings(cmdPtr, fp, INS_GetVelocity());
-      printf("GetRealVel\n");
+      //printf("GetRealVel\n");
       break;
 
     case GetTargetPos:
@@ -278,8 +278,6 @@ INS_Bearings SubProtocol::ParseBearing(string data)
 
   char *ptr = (char *)data.c_str();
 
-  //printf("B: %s\n", data.c_str());
-
   ptr = SkipSpace(ptr);
   bear.x = ::atof(ptr);
   ptr = SkipChars(ptr);
@@ -297,9 +295,6 @@ INS_Bearings SubProtocol::ParseBearing(string data)
   ptr = SkipChars(ptr);
   ptr = SkipSpace(ptr);
   bear.yaw = ::atof(ptr);
-
-  //printf("--%f:%f:%f:%f:%f:%f\n", bear.x, bear.y, bear.z, bear.roll, bear.pitch, bear.yaw);
-
   return bear;
 }
 
