@@ -78,13 +78,16 @@ const int DS_WriteEx = 2;
 int DataSource::ReadData(void)
 {
   char buffer[8192];
+  string msg;
 
-  int n = read(File, buffer, sizeof(buffer));
+  int n = read(File, buffer, sizeof(buffer)-1);
   if ( n <= 0 ) {
     throw DS_ReadEx;
     // throw expection.
   } else {
-    string msg = string(buffer);
+    buffer[n] = 0;
+    msg.clear();
+    msg = string(buffer);
     Buffer += msg;
   }
   return n;
@@ -93,13 +96,13 @@ int DataSource::ReadData(void)
 //*******************************************************************************************
 int DataSource::ReadLine(string *line)
 {
+  line->clear();
   if ( File >= 0 ) {
     while ( Buffer.size() != 0 ) {
       size_t found = Buffer.find_first_of("\r\n");
       if ( found != string::npos) {
         *line = Buffer.substr(0, found);
         Buffer.erase(0, found+1);
-	//printf("B %d, L %d\n", Buffer.length(), line->length());
         if ( line->length())
           return line->length();
       }
