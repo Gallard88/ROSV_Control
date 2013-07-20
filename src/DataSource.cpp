@@ -94,12 +94,14 @@ int DataSource::ReadData(void)
 int DataSource::ReadLine(string *line)
 {
   if ( File >= 0 ) {
-    if ( Buffer.size() != 0 ) {
+    while ( Buffer.size() != 0 ) {
       size_t found = Buffer.find_first_of("\r\n");
       if ( found != string::npos) {
         *line = Buffer.substr(0, found);
         Buffer.erase(0, found+1);
-        return line->length();
+	//printf("B %d, L %d\n", Buffer.length(), line->length());
+        if ( line->length())
+          return line->length();
       }
     }
   }
