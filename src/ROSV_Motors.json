@@ -1,38 +1,38 @@
 {
   "Motor" : ["FrontLeft", "FrontRight", "RearLeft", "RearRight", "Depth_FR", "Depth_FL", "Depth_RR", "Depth_RL" ],
   "FrontLeft" : {
-    "ch"  : 1,
-    "mul" : [1, 1, 0, 0, 0, 0]
+    "ch"  : 10,
+    "mul" : [  1,-1, 0, 0, 0,  1]
   },
   "FrontRight" : {
-    "ch"  : 1,
-    "mul" : [0, 1, 1, 0, 0, 0]
+    "ch"  : 6,
+    "mul" : [  1, 1, 0, 0, 0, -1]
   },
   "RearLeft" : {
-    "ch"  : 1,
-    "mul" : [0, 0, 1, 1, 0, 0]
+    "ch"  : 8,
+    "mul" : [-1, -1,  0,  1,  0, -1]
   },
   "RearRight" : {
-    "ch"  : 1,
-    "mul" : [0, 0, 0, 1, 1, 0]
+    "ch"  : 14,
+    "mul" : [-1,  1,  0,  1,  1,  1]
   },
   "Depth_FR" : {
-    "ch"  : 1,
-    "mul" : [0, 0, 0, 0, 1, 1]
+    "ch"  : 15,
+    "mul" : [ 0,  0,  1, -1, -1,  0]
   },
   "Depth_FL" : {
-    "ch"  : 1,
-    "mul" : [0, 0, 0, 0, 0, 0]
+    "ch"  : 11,
+    "mul" : [ 0,  0,  1,  1, -1,  0]
   },
   "Depth_RR" : {
-    "ch"  : 1,
-    "mul" : [0, 0, 0, 0, 0, 0]
+    "ch"  : 7,
+    "mul" : [ 0,  0,  1, -1,  1,  0]
   },
   "Depth_RL" : {
-    "ch"  : 1,
-    "mul" : [0, 0, 0, 0, 0, 0]
+    "ch"  : 9,
+    "mul" : [ 0,  0,  1,  1,  1,  0]
   },
   "CamStart" : "echo \"Cam Start\"",
   "CamStop" : "echo \"Cam Stop\"",
-  "LightCh" : 10
+  "LightCh" : 13
 }
