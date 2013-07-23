@@ -195,7 +195,6 @@ void SubProtocol::Run(const struct timeval *timeout)
 
     case LightToggle:		// Write
       Light->Toggle();
-      printf("Toggle Light\n");
       break;
 
     case CamStart:			// Write

@@ -37,7 +37,7 @@ const char ParName[] = "LightCh";
 //*******************************************************************************************
 LightManager::LightManager(const JSON_Object *settings)
 {
-  OnOff = 0;
+  OnOff = 1;
 
   if ( json_object_get_value(settings, ParName ) != NULL ) {
     Chanel = json_object_get_number(settings, ParName );
