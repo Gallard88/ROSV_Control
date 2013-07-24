@@ -87,22 +87,23 @@ SubControl::SubControl(const JSON_Object *settings)
  * Yaw
  *
  */
-//*******************************************************************************************
+// *******************************************************************************************
 void SubControl::Run(void)
 {
   float power[INS_AXES_SIZE];
-  memset( power, 0, sizeof(float) * INS_AXES_SIZE);
+  int i;
+#define MOT_SCALE	100.0
 
   switch ( Mode ) {
 
   case Vel:
     // run each Axes controller.
-    power[X] = Velocity.x;
-    power[Y] = Velocity.y;
-    power[Z] = Velocity.z;
-    power[ROLL] = Velocity.roll;
-    power[PITCH] = Velocity.pitch;
-    power[YAW] = Velocity.yaw;
+    power[X] = Velocity.x / MOT_SCALE;
+    power[Y] = Velocity.y / MOT_SCALE;
+    power[Z] = Velocity.z / MOT_SCALE;
+    power[ROLL] = Velocity.roll / MOT_SCALE;
+    power[PITCH] = Velocity.pitch / MOT_SCALE;
+    power[YAW] = Velocity.yaw / MOT_SCALE;
     break;
 
   case Pos:
@@ -110,10 +111,13 @@ void SubControl::Run(void)
 
   case Idle:
   default:
+    for ( int i = 0; i < INS_AXES_SIZE; i ++ ) {
+      power[i] = 0.0;
+    }
     break;
   }
   /* Update Motors */
-  for ( int i = 0; i < NumMotor; i ++ ) {
+  for ( i = 0; i < NumMotor; i ++ ) {
     float output = 0;
     for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
       output += MotorList[i].mult[j] * power[j];
