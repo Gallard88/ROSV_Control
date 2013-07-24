@@ -229,7 +229,7 @@ void SubProtocol::Run(const struct timeval *timeout)
       break;
 
     case GetVoltage:
-      sprintf(buf, "%s: %f\r\n", cmdPtr->cmd, PWM_GetVoltage());
+      sprintf(buf, "%s: %2.1f\r\n", cmdPtr->cmd, PWM_GetVoltage());
       ConProt->Write(fp, buf);
       break;
 
