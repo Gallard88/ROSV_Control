@@ -199,7 +199,6 @@ void SubProtocol::Run(const struct timeval *timeout)
 
     case CamStart:			// Write
       Cam->Start();
-      printf("Cam Start\n");
       break;
 
     case CamStop:			// Write
@@ -239,7 +238,7 @@ void SubProtocol::Run(const struct timeval *timeout)
       break;
 
     case GetDiveTime:
-      sprintf(buf, "%s: 0\r\n", cmdPtr->cmd);
+      sprintf(buf, "%s: %d\r\n", cmdPtr->cmd, (int)Cam->DiveTime() );
       ConProt->Write(fp, buf);
       break;
 

@@ -27,6 +27,8 @@
 //*******************************************************************************************
 using namespace std;
 
+#include <time.h>
+
 #include "parson.h"
 
 //*******************************************************************************************
@@ -36,11 +38,13 @@ public:
 
   void Start(void);
   void Stop(void);
+  long DiveTime(void);
 
 private:
 #define CAMMAN_SC_SIZE	4096
   char StartSc[CAMMAN_SC_SIZE];
   char StopSc[CAMMAN_SC_SIZE];
+  time_t StartTime;
 };
 
 //*******************************************************************************************
