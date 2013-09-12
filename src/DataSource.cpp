@@ -46,8 +46,8 @@ DataSource::DataSource(int fp, const char *name)
   this->Name = new char[length+1];
   strncpy(this->Name, name, length);
   this->Name[length] = 0;
-  printf("New DataSource, %d, %s\n", fp, name);
-  syslog(LOG_EMERG, "New DataSource, %d, %s", fp, name);
+  printf("New DataSource: %s\n", name);
+  syslog(LOG_EMERG, "New DataSource: %s", name);
 }
 
 //*******************************************************************************************
