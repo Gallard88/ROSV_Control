@@ -32,7 +32,7 @@
     "ch"  : 9,
     "mul" : [ 0,  0,  1,  1,  1,  0]
   },
-  "CamStart" : "echo \"Cam Start\"",
-  "CamStop" : "echo \"Cam Stop\"",
+  "CamStart" : "RPI_Cam_Start",
+  "CamStop" : "RPI_Stop_Cam",
   "LightCh" : 13
 }
