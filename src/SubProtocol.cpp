@@ -273,26 +273,27 @@ char *SkipChars(char *buf)
 INS_Bearings SubProtocol::ParseBearing(string data)
 {
   INS_Bearings bear;
-
+  int i;
+  float values[6];
   char *ptr = (char *)data.c_str();
 
-  ptr = SkipSpace(ptr);
-  bear.x = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  bear.y = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  bear.z = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  bear.roll = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  bear.pitch = ::atof(ptr);
-  ptr = SkipChars(ptr);
-  ptr = SkipSpace(ptr);
-  bear.yaw = ::atof(ptr);
+  memset(values, 0, sizeof(values));
+
+  for ( i = 0; i < 6; i ++ ) {
+    if ( ptr == NULL ) {
+      printf("NUll ptr: ParseBearings\n");
+      break;
+    }
+    ptr = SkipSpace(ptr);
+    values[i] = ::atof(ptr);
+    ptr = SkipChars(ptr);
+  }
+  bear.x     = values[0];
+  bear.y     = values[1];
+  bear.z     = values[2];
+  bear.roll  = values[3];
+  bear.pitch = values[4];
+  bear.yaw   = values[5];
   return bear;
 }
 
