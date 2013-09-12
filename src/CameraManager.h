@@ -36,7 +36,7 @@ class CameraManager {
 public:
   CameraManager(const JSON_Object *settings);
 
-  void Start(void);
+  void Start(const char *ip);
   void Stop(void);
   long DiveTime(void);
 

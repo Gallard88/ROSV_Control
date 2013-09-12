@@ -145,7 +145,7 @@ void SubProtocol::Run(const struct timeval *timeout)
 
       if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs)) {
         ConProt->GetControlData();
-			}
+      }
     } else {
 
       if ( FD_ISSET(Control_Server->GetFp(), &readfs)) {
@@ -153,7 +153,7 @@ void SubProtocol::Run(const struct timeval *timeout)
         src = Control_Server->Listen();
         if ( src != NULL )
           ConProt->AddControlSource(src);
-				return;
+          return;
       }
     }
 /*
@@ -198,7 +198,7 @@ void SubProtocol::Run(const struct timeval *timeout)
       break;
 
     case CamStart:			// Write
-      Cam->Start();
+//      Cam->Start();
       break;
 
     case CamStop:			// Write

@@ -48,7 +48,7 @@ CameraManager::CameraManager(const JSON_Object *settings)
 }
 
 // *******************************************************************************************
-void CameraManager::Start(void)
+void CameraManager::Start(const char *ip)
 {
 //  int i;
   StartTime = time(NULL);
@@ -69,6 +69,7 @@ long CameraManager::DiveTime(void)
 // *******************************************************************************************
 void CameraManager::Stop(void)
 {
+  StartTime = 0;
 //  int i ;
 /*
   if ( system(NULL)) {
