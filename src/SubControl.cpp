@@ -20,7 +20,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-//*******************************************************************************************
+// *******************************************************************************************
 using namespace std;
 
 #include <stdio.h>
@@ -29,7 +29,7 @@ using namespace std;
 
 #include "SubControl.h"
 
-//*******************************************************************************************
+// *******************************************************************************************
 SubControl::SubControl(const JSON_Object *settings)
 {
   JSON_Array *array;
@@ -77,7 +77,7 @@ SubControl::SubControl(const JSON_Object *settings)
   }
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 /*
  * X
  * Y
@@ -106,9 +106,7 @@ void SubControl::Run(void)
     power[YAW] = Velocity.yaw / MOT_SCALE;
     break;
 
-  case Pos:
-    break;
-
+  case Pos:	// not yet implemented
   case Idle:
   default:
     for ( int i = 0; i < INS_AXES_SIZE; i ++ ) {
@@ -116,11 +114,11 @@ void SubControl::Run(void)
     }
     break;
   }
-  /* Update Motors */
+  // Update Motors
   for ( i = 0; i < NumMotor; i ++ ) {
-    float output = 0;
+    float output = 0.0;
     for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
-      output += MotorList[i].mult[j] * power[j];
+      output = output + ((float)MotorList[i].mult[j] * power[j]);
     }
     PWM_SetPWM(MotorList[i].ch, output);
   }
