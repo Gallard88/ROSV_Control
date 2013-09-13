@@ -44,39 +44,29 @@ CameraManager::CameraManager(const JSON_Object *settings)
     strncpy(StopSc, ptr, CAMMAN_SC_SIZE);
   else
     syslog(LOG_EMERG, "\"CamStop\" script not found");
-  StartTime = time(NULL);
+  StartTime = 0;
 }
 
 // *******************************************************************************************
 void CameraManager::Start(const char *ip)
 {
-//  int i;
   StartTime = time(NULL);
-/*
-  if ( system(NULL)) {
-    i = system(StartSc);
-    syslog(LOG_EMERG, "Camera Start: %d", i);
-  }
-*/
 }
 
 // *******************************************************************************************
 long CameraManager::DiveTime(void)
 {
-  return time(NULL) - StartTime;
+  if ( StartTime ) {
+    return time(NULL) - StartTime;
+  } else {
+    return 0;
+  }
 }
 
 // *******************************************************************************************
 void CameraManager::Stop(void)
 {
   StartTime = 0;
-//  int i ;
-/*
-  if ( system(NULL)) {
-    i = system(StopSc);
-    syslog(LOG_EMERG, "Camera Stop: %d", i);
-  }
-*/
 }
 
 // *******************************************************************************************
