@@ -1,3 +1,4 @@
+
 /*
  CameraManager ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
@@ -25,6 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "CameraManager.h"
 
@@ -33,23 +35,38 @@ CameraManager::CameraManager(const JSON_Object *settings)
 {
   const char *ptr;
 
-  ptr = json_object_get_string (settings, "CamStop");
-  if ( ptr != NULL )
+  ptr = json_object_get_string (settings, "CamStart");
+  if ( ptr != NULL ) {
     strncpy(StartSc, ptr, CAMMAN_SC_SIZE);
-  else
+  } else {
     syslog(LOG_EMERG, "\"CamStart\" script not found");
+  }
 
   ptr = json_object_get_string (settings, "CamStop");
-  if ( ptr != NULL )
+  if ( ptr != NULL ) {
     strncpy(StopSc, ptr, CAMMAN_SC_SIZE);
-  else
+  } else {
     syslog(LOG_EMERG, "\"CamStop\" script not found");
+  }
   StartTime = 0;
 }
 
 // *******************************************************************************************
 void CameraManager::Start(const char *ip)
 {
+  char cmd[CAMMAN_SC_SIZE*2];
+  pid_t pid = fork();
+
+  if ( pid == 0 ) {
+    sprintf(cmd, "%s %s", StartSc, ip);
+    if ( system(cmd) < 0 ) {
+      syslog(LOG_EMERG,"CameraManager: exec failed");
+    }
+    exit(-1);
+  } else  if ( pid < 0 ) {
+    syslog(LOG_EMERG, "CameraManager: Failed to fork");
+    exit(-1);
+  }
   StartTime = time(NULL);
 }
 
