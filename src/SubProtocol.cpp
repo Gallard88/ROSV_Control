@@ -151,9 +151,11 @@ void SubProtocol::Run(const struct timeval *timeout)
       if ( FD_ISSET(Control_Server->GetFp(), &readfs)) {
 
         src = Control_Server->Listen();
-        if ( src != NULL )
+        if ( src != NULL ) {
           ConProt->AddControlSource(src);
+          Cam->Start(src->GetName());
           return;
+        }
       }
     }
 /*
