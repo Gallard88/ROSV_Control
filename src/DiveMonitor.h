@@ -40,6 +40,7 @@ class DiveMonitor {
 public:
   DiveMonitor(const JSON_Object *settings, SubControl *sub);
   void Run(void);
+	PWM_Con_t Pwm;
 
 private:
   void Rec_BearingTitle(DataLogger *log);
