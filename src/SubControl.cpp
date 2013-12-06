@@ -120,7 +120,7 @@ void SubControl::Run(void)
     for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
       output = output + ((float)MotorList[i].mult[j] * power[j]);
     }
-    PWM_SetPWM(MotorList[i].ch, output);
+    PWM_SetPWM(Pwm, MotorList[i].ch, output);
   }
 }
 

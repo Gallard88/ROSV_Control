@@ -38,6 +38,7 @@ const struct timeval system_time = { 0 , RUN_INTERVAL};
 volatile bool Run_Control;
 
 /* ======================== */
+PWM_Con_t PwmModule;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
 DiveMonitor      *DiveMon;
@@ -123,7 +124,8 @@ int main (int argc, char *argv[])
 
   /* --------------------------------------------- */
   // connect to other external systems
-  if ( PWM_Connect() < 0 ) {
+  PwmModule = PWM_Connect();
+  if ( PwmModule == NULL ) {
     printf("PWM_Connect() failed\n");
     syslog(LOG_EMERG, "PWM_Connect() failed\n");
     return -1;
@@ -151,12 +153,19 @@ int main (int argc, char *argv[])
   // open sub-modules
 
   MotorControl = new SubControl(settings);
+	MotorControl->Pwm = PwmModule;
 
   DiveMon = new DiveMonitor(settings, MotorControl);
+	DiveMon->Pwm = PwmModule;
+
   LightMan = new LightManager(settings);
+	LightMan->Pwm = PwmModule;
+
   CamMan = new CameraManager(settings);
 
   SubProt = new SubProtocol(8090, 8091);
+	SubProt->Pwm = PwmModule;
+
   SubProt->AddLightManager(LightMan);
   SubProt->AddCameraManager(CamMan);
   SubProt->AddSubControl(MotorControl);

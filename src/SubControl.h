@@ -53,6 +53,7 @@ public:
   int SetTargetPos(INS_Bearings pos);
   int SetTargetVel(INS_Bearings vel);
 
+	PWM_Con_t Pwm;
   INS_Bearings Position;
   INS_Bearings Velocity;
 

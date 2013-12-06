@@ -82,9 +82,9 @@ void DiveMonitor::Run(void)
 //*******************************************************************************************
 void DiveMonitor::Rec_Power(void)
 {
-  PowerLog->Add_Var(PWM_GetVoltage());
-  PowerLog->Add_Var(PWM_GetCurrent());
-  PowerLog->Add_Var(PWM_GetTemp());
+  PowerLog->Add_Var(PWM_GetVoltage(Pwm));
+  PowerLog->Add_Var(PWM_GetCurrent(Pwm));
+  PowerLog->Add_Var(PWM_GetTemp(Pwm));
   PowerLog->RecordLine();
 }
 

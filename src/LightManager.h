@@ -34,6 +34,7 @@ public:
   LightManager(const JSON_Object *settings);
   void Toggle(void);
   void Run(void);
+	PWM_Con_t Pwm;
 
 private:
   int Chanel;

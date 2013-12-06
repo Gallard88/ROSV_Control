@@ -51,9 +51,9 @@ LightManager::LightManager(const JSON_Object *settings)
 void LightManager::Run(void)
 {
   if ( OnOff ) {
-    PWM_SetPWM(Chanel, 1.0);
+    PWM_SetPWM(Pwm, Chanel, 1.0);
   } else {
-    PWM_SetPWM(Chanel, 0.0);
+    PWM_SetPWM(Pwm, Chanel, 0.0);
   }
 }
 

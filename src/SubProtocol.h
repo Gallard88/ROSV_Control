@@ -48,6 +48,7 @@ public:
   void AddCameraManager(CameraManager *cam);
   void AddSubControl(SubControl *scon);
   void Run(const struct timeval *timeout);
+	PWM_Con_t Pwm;
 
 protected:
 
