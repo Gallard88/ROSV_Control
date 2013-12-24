@@ -32,8 +32,8 @@ using namespace std;
 #define ALAM_INT      (50*1000)	//  50 ms
 
 /* ======================== */
-const char prop_file[] = "./ROSV_Motors.json";
-//const char prop_file[] = "/etc/ROSV_Motors.json";
+//const char prop_file[] = "./ROSV_Motors.json";
+const char prop_file[] = "/etc/ROSV_Motors.json";
 const struct timeval system_time = { 0 , RUN_INTERVAL};
 volatile bool Run_Control;
 
