@@ -17,7 +17,7 @@ using namespace std;
 #include <INS_Data.h>
 
 #include "DataSource.h"
-#include "DiveMonitor.h"
+//#include "DiveMonitor.h"
 #include "CameraManager.h"
 #include "LightManager.h"
 #include "ControlProtocol.h"
@@ -41,7 +41,7 @@ volatile bool Run_Control;
 PWM_Con_t PwmModule;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
-DiveMonitor      *DiveMon;
+//DiveMonitor      *DiveMon;
 LightManager     *LightMan;
 CameraManager    *CamMan;
 
@@ -83,8 +83,8 @@ void System_Shutdown(void)
 {
   if ( MotorControl )
     delete MotorControl;
-  if ( DiveMon )
-    delete DiveMon;
+//  if ( DiveMon )
+//    delete DiveMon;
   if ( LightMan )
     delete LightMan;
   if ( CamMan )
@@ -155,8 +155,8 @@ int main (int argc, char *argv[])
   MotorControl = new SubControl(settings);
 	MotorControl->Pwm = PwmModule;
 
-  DiveMon = new DiveMonitor(settings, MotorControl);
-	DiveMon->Pwm = PwmModule;
+ // DiveMon = new DiveMonitor(settings, MotorControl);
+//	DiveMon->Pwm = PwmModule;
 
   LightMan = new LightManager(settings);
 	LightMan->Pwm = PwmModule;
@@ -182,7 +182,7 @@ int main (int argc, char *argv[])
         Run_Control = false;
 
       MotorControl->Run();
-      DiveMon->Run();
+//      DiveMon->Run();
       LightMan->Run();
     }
   }
