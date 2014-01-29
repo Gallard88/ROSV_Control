@@ -54,6 +54,7 @@ CameraManager::CameraManager(const JSON_Object *settings)
 // *******************************************************************************************
 void CameraManager::Start(const char *ip)
 {
+/*
   char cmd[CAMMAN_SC_SIZE*2];
   pid_t pid = fork();
 
@@ -67,6 +68,7 @@ void CameraManager::Start(const char *ip)
     syslog(LOG_EMERG, "CameraManager: Failed to fork");
     exit(-1);
   }
+*/
   StartTime = time(NULL);
 }
 
