@@ -47,7 +47,7 @@ DataSource::DataSource(int fp, const char *name)
   strncpy(this->Name, name, length);
   this->Name[length] = 0;
   printf("New DataSource: %s\n", name);
-  syslog(LOG_EMERG, "New DataSource: %s", name);
+//  syslog(LOG_EMERG, "New DataSource: %s", name);
 }
 
 //*******************************************************************************************
@@ -82,6 +82,7 @@ int DataSource::ReadData(void)
 
   int n = read(File, buffer, sizeof(buffer)-1);
   if ( n <= 0 ) {
+		printf("Read Exception\n");
     throw DS_ReadEx;
     // throw expection.
   } else {
@@ -115,6 +116,7 @@ int DataSource::WriteData(const char *msg)
 {
   int n = write (File, msg, strlen(msg));
   if ( n <= 0 ) {
+		printf("Write Exception\n");
     throw DS_WriteEx;
   }
   return n;
