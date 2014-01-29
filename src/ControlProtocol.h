@@ -50,11 +50,6 @@ public:
   int GetControlFileDescriptor(void);
   void GetControlData(void);
 
-  void AddObserverSource(DataSource *src);
-  int GetNumberOfObservers(void);
-  int GetObserverFileDescriptor(void);
-  void GetObserverData(void);
-
 
   const struct Command *GetCmds(const struct Command *list, string *arg, int *fp);
 
@@ -63,7 +58,6 @@ public:
 
 private:
   DataSource *Controller;
-  DataSource *Observer;
 };
 
 /* ======================== */

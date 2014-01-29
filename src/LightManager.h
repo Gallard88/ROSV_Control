@@ -25,20 +25,37 @@
 #ifndef __LIGHT_MANAGER__
 #define __LIGHT_MANAGER__
 //*******************************************************************************************
-#include "parson.h"
+#include <string>
+#include <vector>
+
+#include <PWM_Controller.h>
+#include <ctime>
+
+//*******************************************************************************************
+//*******************************************************************************************
+typedef struct  {
+	string Name;
+	int Power;	// 0 - 100%
+	vector<int> Modules;
+
+} LightChanel;
 
 //*******************************************************************************************
 
 class  LightManager {
 public:
-  LightManager(const JSON_Object *settings);
-  void Toggle(void);
+  LightManager(const char * filename);
   void Run(void);
+
+	const string GetConfigData(void);
+	void Update(const string & msg);
+	const string GetData(void);
+
 	PWM_Con_t Pwm;
 
 private:
-  int Chanel;
-  int OnOff;
+	vector<LightChanel> Chanels;
+	time_t update;
 };
 
 //*******************************************************************************************

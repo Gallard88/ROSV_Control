@@ -57,13 +57,12 @@ using namespace std;
 #define	GetTemp					13
 
 // *******************************************************************************************
-const struct Command CmdList[] = {
+static const struct Command CmdList[] = {
   { "SetPos",         true, true,   SetPos         },
   { "SetVel",         true, true,   SetVel         },
   { "SetControlMode", true, true,   SetControlMode },
   { "CamStart",       true, true,   CamStart       },
   { "CamStop",        true, true,   CamStop        },
-  { "LightToggle",    true, true,   LightToggle    },
   { "GetRealPos",     true, false,  GetRealPos     },
   { "GetTargetPos",   true, false,  GetTargetPos   },
   { "GetRealVel",     true, false,  GetRealVel     },
@@ -76,14 +75,14 @@ const struct Command CmdList[] = {
 };
 
 // *******************************************************************************************
-SubProtocol::SubProtocol(int control_port, int observer_port)
+SubProtocol::SubProtocol(int control_port)
 {
   Control_Server = new TcpServer(control_port);
-//  Observe_Server = new TcpServer(observer_port);
   ConProt = new ControlProtocol();
   this->Cam = NULL;
   this->Light = NULL;
   this->SCon = NULL;
+	update = 0;
 }
 
 // *******************************************************************************************
@@ -91,7 +90,6 @@ SubProtocol::~SubProtocol()
 {
   delete ConProt;
   delete Control_Server;
-//  delete Observe_Server;
 }
 
 // *******************************************************************************************
@@ -128,19 +126,19 @@ void SubProtocol::Run(const struct timeval *timeout)
     fp  = Control_Server->GetFp();
   } else {
     fp = ConProt->GetControlFileDescriptor();
+		time_t current = time(NULL);
+		if ((current - update) > 2) {
+			update = current;
+			if ( fp >= 0 ) {
+				ConProt->Write(fp, Light->GetData());
+			}
+		}
   }
   FD_SET(fp, &readfs);
   MAX_FP(fp, max_fp);
-/*
-  if ( ConProt->GetNumberOfObservers() == false ) {
-    fp  = Observe_Server->GetFp();
-  } else {
-    fp = ConProt->GetControlFileDescriptor();
-  }
-  FD_SET(fp, &readfs);
-  MAX_FP(fp, max_fp);
-*/
-  if ( select(max_fp+1, &readfs, NULL, NULL, &to) > 0 ) {
+
+
+		if ( select(max_fp+1, &readfs, NULL, NULL, &to) > 0 ) {
     if ( ConProt->IsControlSourceConnected() == true ) {
 
       if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs)) {
@@ -154,25 +152,11 @@ void SubProtocol::Run(const struct timeval *timeout)
         if ( src != NULL ) {
           ConProt->AddControlSource(src);
           Cam->Start(src->GetName());
+					ConProt->Write(fp, Light->GetConfigData());
           return;
         }
       }
     }
-/*
-    if ( ConProt->GetNumberOfObservers() != 0 ) {
-
-      if ( FD_ISSET(ConProt->GetObserverFileDescriptor(), &readfs))
-        ConProt->GetObserverData();
-    } else {
-
-      if ( FD_ISSET(Observe_Server->GetFp(), &readfs)) {
-
-        src = Observe_Server->Listen();
-        if ( src != NULL )
-          ConProt->AddObserverSource(src);
-      }
-    }
-*/
   }
   else
     return;
@@ -193,10 +177,6 @@ void SubProtocol::Run(const struct timeval *timeout)
     case SetVel:
       SCon->SetTargetVel(ParseBearing(arg));
       //printf("SetVel\n");
-      break;
-
-    case LightToggle:		// Write
-      Light->Toggle();
       break;
 
     case CamStart:			// Write

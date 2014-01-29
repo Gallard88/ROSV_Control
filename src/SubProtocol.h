@@ -30,6 +30,7 @@ using namespace std;
 #include <sys/time.h>
 #include <INS_Data.h>
 #include <PWM_Controller.h>
+#include <ctime>
 
 #include "SubControl.h"
 #include "LightManager.h"
@@ -41,7 +42,7 @@ using namespace std;
 //*******************************************************************************************
 class SubProtocol {
 public:
-  SubProtocol(int control_port, int observer_port);
+  SubProtocol(int control_port);
   ~SubProtocol();
 
   void AddLightManager(LightManager *light);
@@ -63,6 +64,7 @@ private:
   INS_Bearings ParseBearing(string data);
   string ParseBearing(INS_Bearings data);
   void SendBearings(const struct Command *cmdPtr, int fd, INS_Bearings data);
+	time_t update;
 
 };
 

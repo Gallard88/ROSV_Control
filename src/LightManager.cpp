@@ -29,42 +29,125 @@ using namespace std;
 #include <stdio.h>
 #include <string.h>
 #include <string>
-#include <PWM_Controller.h>
 
 #include "LightManager.h"
+#include "parson.h"
 
-const char ParName[] = "LightCh";
 //*******************************************************************************************
-LightManager::LightManager(const JSON_Object *settings)
+LightManager::LightManager(const char * filename)
 {
-  OnOff = 1;
+  JSON_Value *val = json_parse_file(filename);
+  int rv = json_value_get_type(val);
 
-  if ( json_object_get_value(settings, ParName ) != NULL ) {
-    Chanel = json_object_get_number(settings, ParName );
-  } else {
-    Chanel = -1;
+  if ( rv != JSONObject ) {
+    syslog(LOG_EMERG, "Lighting: JSON Parse file failed\n");
+    return;
   }
-  printf("Light Chanel = %d\n", Chanel);
+
+  JSON_Object *settings = json_value_get_object(val);
+  if ( settings == NULL ) {
+    syslog(LOG_EMERG, "Lighting: Settings == NULL\n");
+    return;
+  }
+  JSON_Array *ch_array = json_object_get_array( settings, "Modules");
+  if ( ch_array == NULL ) {
+    syslog(LOG_EMERG,"Lighting: Failed to find \"Modules\" array in settings");
+    return ;
+  }
+
+  size_t number = json_array_get_count(ch_array);
+  if ( number != 0 ) {
+		for ( size_t i = 0; i < number; i ++) {
+			LightChanel ch;
+			ch.Power = 1;
+			ch.Modules.clear();
+
+			JSON_Object *object = json_array_get_object (ch_array, i);
+			if ( object == NULL ) {
+				return;
+			}
+			const char *name = json_object_get_string (object, "Name");
+			if ( name != NULL ) {
+				ch.Name = string(name);
+			}
+
+			JSON_Array *pwm_array = json_object_get_array( object, "Chanels");
+			if ( pwm_array != NULL ) {
+				for ( size_t j = 0; j < json_array_get_count(pwm_array); j++ ) {
+					int value = (int) json_array_get_number (pwm_array, j);
+					ch.Modules.push_back(value);
+				}
+			}
+			Chanels.push_back(ch);
+		}
+	}
+  json_value_free (val);
 }
 
 //*******************************************************************************************
 void LightManager::Run(void)
-{
-  if ( OnOff ) {
-    PWM_SetPWM(Pwm, Chanel, 1.0);
-  } else {
-    PWM_SetPWM(Pwm, Chanel, 0.0);
-  }
+{/* The PWM has a ~7 second watchdog.
+	*	If this function is run once per second it should be fast enough
+	*/
+	time_t current;
+	current = time(NULL);
+	if ((current - update) > 5) {
+		update = current;
+
+		for ( size_t i = 0; i < Chanels.size(); i ++ ) {
+			LightChanel ch = Chanels[i];
+			for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
+				PWM_SetPWM(Pwm, ch.Modules[j], ch.Power);
+			}
+		}
+	}
 }
 
 //*******************************************************************************************
-void LightManager::Toggle(void)
+void LightManager::Update(const string & msg)
 {
-  if ( Chanel < 0 )
-    return;
+}
 
-  OnOff ^= 1;
+//*******************************************************************************************
+const string LightManager::GetConfigData(void)
+{
+	string msg("{ \"RecordType\": \"LightCfg\", ");
 
+	msg += "\"Chanels\":[ ";
+	for ( size_t i = 0; i < Chanels.size(); i ++ ) {
+		msg += " \"";
+		msg += Chanels[i].Name;
+		msg += "\"";
+		if ( Chanels.size() > 1 ) {
+			msg += ", ";
+		}
+	}
+	msg += " ] ";
+	msg += "}\r\n";
+	return msg;
+}
+
+//*******************************************************************************************
+const string LightManager::GetData(void)
+{
+	char power[10];
+	string msg("{ \"RecordType\": \"LightData\", ");
+	msg += "\"Chanels\":[ ";
+	for ( size_t i = 0; i < Chanels.size(); i ++ ) {
+		msg += " {\"Name\": \"";
+		msg += Chanels[i].Name;
+		msg += "\", \"Power\": ";
+		sprintf(power, "%d", Chanels[i].Power);
+		msg += string(power);
+		msg += "}";
+		if ( Chanels.size() > 1 ) {
+			msg += ", ";
+		}
+	}
+	msg += " ] ";
+
+	msg += "}\r\n";
+	return msg;
 }
 
 //*******************************************************************************************

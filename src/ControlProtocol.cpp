@@ -34,16 +34,13 @@ using namespace std;
 ControlProtocol::ControlProtocol(void)
 {
   Controller = NULL;
-  Observer = NULL;
 }
 
 /* ======================== */
 ControlProtocol::~ControlProtocol(void)
 {
   delete Controller;
-  delete Observer;
   Controller = NULL;
-  Observer = NULL;
 }
 
 /* ======================== */
@@ -80,41 +77,6 @@ void ControlProtocol::GetControlData(void)
 }
 
 /* ======================== */
-void ControlProtocol::AddObserverSource(DataSource *src)
-{
-  Observer = src;
-}
-
-/* ======================== */
-int ControlProtocol::GetNumberOfObservers(void)
-{
-  if ( Observer == NULL )
-    return 0;
-  return 1;
-}
-
-/* ======================== */
-int ControlProtocol::GetObserverFileDescriptor(void)
-{
-  if ( Observer == NULL )
-    return -1;
-  return Observer->GetFd();
-}
-
-/* ======================== */
-void ControlProtocol::GetObserverData(void)
-{
-  if ( Observer == NULL )
-    return ;
-  try {
-    Observer->ReadData();
-  } catch (int ex) {
-    delete Observer;
-    Observer = NULL;
-  }
-}
-
-/* ======================== */
 void ControlProtocol::Write(int fd, string msg)
 {
   this->Write(fd, msg.c_str());
@@ -123,13 +85,8 @@ void ControlProtocol::Write(int fd, string msg)
 /* ======================== */
 void ControlProtocol::Write(int fd, const char *msg)
 {
-  if ( fd == Controller->GetFd() ) {
-    Controller->WriteData(msg);
-    Controller->WriteData("\r\n");
-  } else {
-    Observer->WriteData(msg);
-    Observer->WriteData("\r\n");
-  }
+	Controller->WriteData(msg);
+	Controller->WriteData("\r\n");
 }
 
 /* ======================== */

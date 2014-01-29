@@ -50,6 +50,7 @@ CameraManager    *CamMan;
 void Alarm_Wakeup (int i)
 {
   Run_Control = true;
+	LightMan->Run();
 }
 
 /* ======================== */
@@ -158,12 +159,12 @@ int main (int argc, char *argv[])
  // DiveMon = new DiveMonitor(settings, MotorControl);
 //	DiveMon->Pwm = PwmModule;
 
-  LightMan = new LightManager(settings);
+  LightMan = new LightManager("lighting.json");
 	LightMan->Pwm = PwmModule;
 
-  CamMan = new CameraManager(settings);
+	CamMan = new CameraManager(settings);
 
-  SubProt = new SubProtocol(8090, 8091);
+  SubProt = new SubProtocol(8090);
 	SubProt->Pwm = PwmModule;
 
   SubProt->AddLightManager(LightMan);

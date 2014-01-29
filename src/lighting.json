@@ -1,0 +1,9 @@
+{
+	"Modules" : 
+	[
+		{
+			"Name": "Camera",
+			"Chanels":[ 13 ]
+		}
+	]
+}
