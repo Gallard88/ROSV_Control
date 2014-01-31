@@ -41,17 +41,20 @@ LightManager::LightManager(const char * filename)
 
   if ( rv != JSONObject ) {
     syslog(LOG_EMERG, "Lighting: JSON Parse file failed\n");
+		json_value_free (val);
     return;
   }
 
   JSON_Object *settings = json_value_get_object(val);
   if ( settings == NULL ) {
     syslog(LOG_EMERG, "Lighting: Settings == NULL\n");
+		json_value_free (val);
     return;
   }
   JSON_Array *ch_array = json_object_get_array( settings, "Modules");
   if ( ch_array == NULL ) {
     syslog(LOG_EMERG,"Lighting: Failed to find \"Modules\" array in settings");
+		json_value_free (val);
     return ;
   }
 

@@ -167,7 +167,8 @@ int main (int argc, char *argv[])
   SubProt = new SubProtocol(8090);
 	SubProt->Pwm = PwmModule;
 
-  SubProt->AddLightManager(LightMan);
+	SubProt->AddModule("Light", (CmdModule *) LightMan);
+
   SubProt->AddCameraManager(CamMan);
   SubProt->AddSubControl(MotorControl);
 

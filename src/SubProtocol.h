@@ -31,13 +31,19 @@ using namespace std;
 #include <INS_Data.h>
 #include <PWM_Controller.h>
 #include <ctime>
+#include <vector>
 
+#include "CmdModule.h"
 #include "SubControl.h"
-#include "LightManager.h"
 #include "CameraManager.h"
 #include "DataSource.h"
 #include "TcpServer.h"
 #include "ControlProtocol.h"
+
+struct Modules {
+	string      Name;
+	CmdModule  *module;
+};
 
 //*******************************************************************************************
 class SubProtocol {
@@ -45,7 +51,8 @@ public:
   SubProtocol(int control_port);
   ~SubProtocol();
 
-  void AddLightManager(LightManager *light);
+	void AddModule(const string & name, CmdModule *mod);
+
   void AddCameraManager(CameraManager *cam);
   void AddSubControl(SubControl *scon);
   void Run(const struct timeval *timeout);
@@ -59,12 +66,13 @@ private:
   TcpServer                 *Observe_Server;
   SubControl                *SCon;
   CameraManager             *Cam;
-  LightManager              *Light;
 
   INS_Bearings ParseBearing(string data);
   string ParseBearing(INS_Bearings data);
   void SendBearings(const struct Command *cmdPtr, int fd, INS_Bearings data);
 	time_t update;
+
+	vector<struct Modules>		Modules;
 
 };
 

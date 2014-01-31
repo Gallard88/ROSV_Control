@@ -80,7 +80,6 @@ SubProtocol::SubProtocol(int control_port)
   Control_Server = new TcpServer(control_port);
   ConProt = new ControlProtocol();
   this->Cam = NULL;
-  this->Light = NULL;
   this->SCon = NULL;
 	update = 0;
 }
@@ -93,15 +92,20 @@ SubProtocol::~SubProtocol()
 }
 
 // *******************************************************************************************
-void SubProtocol::AddCameraManager(CameraManager *cam)
+void SubProtocol::AddModule(const string & name, CmdModule *mod)
 {
-  this->Cam = cam;
+	struct Modules new_module;
+
+	new_module.Name = name;
+	new_module.module = mod;
+	Modules.push_back(new_module);
+
 }
 
 // *******************************************************************************************
-void SubProtocol::AddLightManager(LightManager *light)
+void SubProtocol::AddCameraManager(CameraManager *cam)
 {
-  this->Light = light;
+  this->Cam = cam;
 }
 
 // *******************************************************************************************
@@ -130,7 +134,9 @@ void SubProtocol::Run(const struct timeval *timeout)
 		if ((current - update) > 2) {
 			update = current;
 			if ( fp >= 0 ) {
-				ConProt->Write(fp, Light->GetData());
+				for ( size_t i = 0; i < Modules.size(); i ++ ) {
+					ConProt->Write(fp, Modules[i].module->GetData());
+				}
 			}
 		}
   }
@@ -152,7 +158,9 @@ void SubProtocol::Run(const struct timeval *timeout)
         if ( src != NULL ) {
           ConProt->AddControlSource(src);
           Cam->Start(src->GetName());
-					ConProt->Write(fp, Light->GetConfigData());
+					for ( size_t i = 0; i < Modules.size(); i ++ ) {
+						ConProt->Write(fp, Modules[i].module->GetConfigData());
+					}
           return;
         }
       }

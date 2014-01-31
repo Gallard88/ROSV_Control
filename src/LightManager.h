@@ -31,6 +31,8 @@
 #include <PWM_Controller.h>
 #include <ctime>
 
+#include "CmdModule.h"
+
 //*******************************************************************************************
 //*******************************************************************************************
 typedef struct  {
@@ -42,7 +44,7 @@ typedef struct  {
 
 //*******************************************************************************************
 
-class  LightManager {
+class  LightManager: CmdModule {
 public:
   LightManager(const char * filename);
   void Run(void);

@@ -17,6 +17,7 @@ LDADD = \
 ROSV_Control_SOURCES = \
 	CameraManager.cpp \
 	CameraManager.h \
+	CmdModule.h \
 	ControlProtocol.cpp \
 	ControlProtocol.h \
 	DataLogger.cpp \
