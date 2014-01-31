@@ -30,51 +30,98 @@ using namespace std;
 #include "SubControl.h"
 
 // *******************************************************************************************
-SubControl::SubControl(const JSON_Object *settings)
+SubControl::SubControl(const char *filename)
 {
-  JSON_Array *array;
-  int i;
-
-//	Mode = Idle;
   Mode = Vel;
   memset(&Position, 0, sizeof(INS_Bearings));
   memset(&Velocity, 0, sizeof(INS_Bearings));
 
+	JSON_Value *val = json_parse_file(filename);
+  int rv = json_value_get_type(val);
+
+  if ( rv != JSONObject ) {
+    syslog(LOG_EMERG, "SubControl: JSON Parse file failed\n");
+		json_value_free (val);
+    return;
+  }
+
+  JSON_Object *settings = json_value_get_object(val);
+  if ( settings == NULL ) {
+    syslog(LOG_EMERG, "SubControl: Settings == NULL\n");
+		json_value_free (val);
+    return;
+	}
+
   // load motor data
-  array = json_object_get_array( settings, "Motor");
+  JSON_Array *array = json_object_get_array( settings, "Motors");
   if ( array == NULL ) {
     syslog(LOG_EMERG,"Failed to find \"Motor\" array in settings");
     printf("Failed to find \"Motor\" array in settings\n");
     return ;
   }
 
-  NumMotor = json_array_get_count(array);
-  if ( NumMotor == 0 )
-    return ;
+  for ( size_t i = 0; i < json_array_get_count(array); i ++ ) {
 
-  MotorList = new struct Motor[NumMotor];
-  memset(MotorList, 0, sizeof(struct Motor));
+		JSON_Object *j_motor = json_array_get_object (array, i);
+		if ( j_motor != NULL ) {
+			struct Motor motor = ParseJson(j_motor);
+			MotorList.push_back(motor);
+		}
+	}
+  json_value_free (val);
+}
 
-  for ( i = 0; i < NumMotor; i++) {
-    struct Motor *mptr = &MotorList[i];
+// *******************************************************************************************
+struct Motor SubControl::ParseJson(const JSON_Object *setting)
+{
+	struct Motor mot;
 
-    const char *ptr = json_array_get_string(array, i);
-    if ( ptr == NULL )
-      continue;
-    std::string name(ptr);
+	mot.Name = json_object_get_string(setting, "Name");
+	mot.ch = (int) json_object_get_number(setting, "ch");
 
-    string var_name = name + "." + "ch";
-    mptr->ch = (int)json_object_dotget_number(settings, var_name.c_str());
+	JSON_Array *mult_array = json_object_get_array( setting, "mul");
+	if ( mult_array != NULL ) {
+		for ( size_t i = 0; i < INS_AXES_SIZE; i ++ ) {
+			mot.mult[i] = json_array_get_number(mult_array, i);
+		}
+	}
+	mot.power = 0.0;
+	return mot;
+}
 
-    var_name = name + "." + "mul";
-    JSON_Array *scale = json_object_dotget_array(settings, var_name.c_str());
-    if ( scale == NULL ) {
-      continue;
-    }
-    for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
-      mptr->mult[j] = json_array_get_number(scale, j);
-    }
-  }
+// *******************************************************************************************
+const string SubControl::GetConfigData(void)
+{
+	return this->GetData();
+}
+
+// *******************************************************************************************
+void SubControl::Update(const string & msg)
+{
+}
+
+// *******************************************************************************************
+const string SubControl::GetData(void)
+{
+	char power[10];
+	string msg("{ \"RecordType\": \"MotorData\", ");
+	msg += "\"Motors\":[ ";
+	for ( size_t i = 0; i < MotorList.size(); i ++ ) {
+		msg += " {\"Name\": \"";
+		msg += MotorList[i].Name;
+		msg += "\", \"Power\": ";
+		sprintf(power, "%02.2f", MotorList[i].power);
+		msg += string(power);
+		msg += "}";
+		if (( MotorList.size() > 1 ) &&
+				( i != (MotorList.size()-1) )) {
+			msg += ", ";
+		}
+	}
+	msg += " ] ";
+
+	msg += "}\r\n";
+	return msg;
 }
 
 // *******************************************************************************************
@@ -88,11 +135,11 @@ SubControl::SubControl(const JSON_Object *settings)
  *
  */
 // *******************************************************************************************
+const float MOT_SCALE = 100.0;
+// *******************************************************************************************
 void SubControl::Run(void)
 {
   float power[INS_AXES_SIZE];
-  int i;
-#define MOT_SCALE	100.0
 
   switch ( Mode ) {
 
@@ -114,14 +161,15 @@ void SubControl::Run(void)
     }
     break;
   }
-  // Update Motors
-  for ( i = 0; i < NumMotor; i ++ ) {
+
+	for ( size_t i = 0; i < MotorList.size(); i ++ ) {
     float output = 0.0;
     for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
       output = output + ((float)MotorList[i].mult[j] * power[j]);
     }
+    MotorList[i].power = output;
     PWM_SetPWM(Pwm, MotorList[i].ch, output);
-  }
+	}
 }
 
 //*******************************************************************************************

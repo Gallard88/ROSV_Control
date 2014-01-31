@@ -29,7 +29,9 @@
 #include <string>
 #include <PWM_Controller.h>
 #include <INS_Data.h>
+#include <vector>
 
+#include "CmdModule.h"
 #include "parson.h"
 
 //*******************************************************************************************
@@ -41,14 +43,16 @@ enum SubMode {
 
 //*******************************************************************************************
 struct Motor {
+	string Name;
   int ch;
   int mult[INS_AXES_SIZE];
+	float power;
 };
 
 //*******************************************************************************************
-class SubControl {
+class SubControl: CmdModule {
 public:
-  SubControl(const JSON_Object *settings);
+  SubControl(const char *filename);
   void Run(void);
   int SetTargetPos(INS_Bearings pos);
   int SetTargetVel(INS_Bearings vel);
@@ -57,9 +61,14 @@ public:
   INS_Bearings Position;
   INS_Bearings Velocity;
 
+	struct Motor ParseJson(const JSON_Object *setting);
+
+	const string GetConfigData(void);
+	void Update(const string & msg);
+	const string GetData(void);
+
 private:
-  struct Motor *MotorList;
-  int NumMotor;
+  vector<struct Motor> MotorList;
 
   enum SubMode Mode;
 };

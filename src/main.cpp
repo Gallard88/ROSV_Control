@@ -154,25 +154,23 @@ int main (int argc, char *argv[])
   /* --------------------------------------------- */
   // open sub-modules
 
-  MotorControl = new SubControl(settings);
-	MotorControl->Pwm = PwmModule;
-
- // DiveMon = new DiveMonitor(settings, MotorControl);
-//	DiveMon->Pwm = PwmModule;
+  MotorControl = new SubControl("motors.json");
+  MotorControl->Pwm = PwmModule;
 
   LightMan = new LightManager("lighting.json");
-	LightMan->Pwm = PwmModule;
+  LightMan->Pwm = PwmModule;
 
-	Power = new PowerManager("power.json");
-	Power->Pwm = PwmModule;
+  Power = new PowerManager("power.json");
+  Power->Pwm = PwmModule;
 
-	CamMan = new CameraManager(settings);
+  CamMan = new CameraManager(settings);
 
   SubProt = new SubProtocol(8090);
 	SubProt->Pwm = PwmModule;
 
 	SubProt->AddModule("Light", (CmdModule *) LightMan);
 	SubProt->AddModule("Power", (CmdModule *) Power);
+	SubProt->AddModule("Motor", (CmdModule *) MotorControl);
 
   SubProt->AddCameraManager(CamMan);
   SubProt->AddSubControl(MotorControl);
