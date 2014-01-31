@@ -67,9 +67,9 @@ PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) \
 	ControlProtocol.$(OBJEXT) DataLogger.$(OBJEXT) \
 	DataSource.$(OBJEXT) DiveMonitor.$(OBJEXT) \
-	LightManager.$(OBJEXT) parson.$(OBJEXT) SubControl.$(OBJEXT) \
-	SubProtocol.$(OBJEXT) SysSettings.$(OBJEXT) \
-	TcpServer.$(OBJEXT) main.$(OBJEXT)
+	LightManager.$(OBJEXT) parson.$(OBJEXT) PowerManager.$(OBJEXT) \
+	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) \
+	SysSettings.$(OBJEXT) TcpServer.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -247,6 +247,8 @@ ROSV_Control_SOURCES = \
 	LightManager.h \
 	parson.c \
 	parson.h \
+	PowerManager.cpp \
+	PowerManager.h \
 	SubControl.cpp \
 	SubControl.h \
 	SubProtocol.cpp \
@@ -347,6 +349,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataSource.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DiveMonitor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubProtocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SysSettings.Po@am__quote@

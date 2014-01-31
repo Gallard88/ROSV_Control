@@ -17,7 +17,7 @@ using namespace std;
 #include <INS_Data.h>
 
 #include "DataSource.h"
-//#include "DiveMonitor.h"
+#include "PowerManager.h"
 #include "CameraManager.h"
 #include "LightManager.h"
 #include "ControlProtocol.h"
@@ -44,13 +44,14 @@ SubProtocol      *SubProt;
 //DiveMonitor      *DiveMon;
 LightManager     *LightMan;
 CameraManager    *CamMan;
-
+PowerManager     *Power;
 /* ======================== */
 /* ======================== */
 void Alarm_Wakeup (int i)
 {
   Run_Control = true;
 	LightMan->Run();
+	Power->Run();
 }
 
 /* ======================== */
@@ -162,12 +163,16 @@ int main (int argc, char *argv[])
   LightMan = new LightManager("lighting.json");
 	LightMan->Pwm = PwmModule;
 
+	Power = new PowerManager("power.json");
+	Power->Pwm = PwmModule;
+
 	CamMan = new CameraManager(settings);
 
   SubProt = new SubProtocol(8090);
 	SubProt->Pwm = PwmModule;
 
 	SubProt->AddModule("Light", (CmdModule *) LightMan);
+	SubProt->AddModule("Power", (CmdModule *) Power);
 
   SubProt->AddCameraManager(CamMan);
   SubProt->AddSubControl(MotorControl);

@@ -30,6 +30,8 @@ ROSV_Control_SOURCES = \
 	LightManager.h \
 	parson.c \
 	parson.h \
+	PowerManager.cpp \
+	PowerManager.h \
 	SubControl.cpp \
 	SubControl.h \
 	SubProtocol.cpp \
