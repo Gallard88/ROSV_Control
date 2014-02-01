@@ -24,7 +24,6 @@ using namespace std;
 #include "TcpServer.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
-#include "SysSettings.h"
 
 /* ======================== */
 /* ======================== */
@@ -32,8 +31,7 @@ using namespace std;
 #define ALAM_INT      (50*1000)	//  50 ms
 
 /* ======================== */
-//const char prop_file[] = "./ROSV_Motors.json";
-const char prop_file[] = "/etc/ROSV_Motors.json";
+static const char prop_file[] = "/etc/ROSV_Motors.json";
 const struct timeval system_time = { 0 , RUN_INTERVAL};
 volatile bool Run_Control;
 
@@ -41,10 +39,10 @@ volatile bool Run_Control;
 PWM_Con_t PwmModule;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
-//DiveMonitor      *DiveMon;
 LightManager     *LightMan;
 CameraManager    *CamMan;
 PowerManager     *Power;
+
 /* ======================== */
 /* ======================== */
 void Alarm_Wakeup (int i)
@@ -161,12 +159,9 @@ int main (int argc, char *argv[])
     // read data from connected clients.
     SubProt->Run(&system_time);
 
-      if ( Run_Control == true) {
-        Run_Control = false;
-
+    if ( Run_Control == true) {
+      Run_Control = false;
       MotorControl->Run();
-//      DiveMon->Run();
-      LightMan->Run();
     }
   }
   return 0;
