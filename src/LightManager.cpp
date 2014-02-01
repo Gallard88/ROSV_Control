@@ -125,8 +125,7 @@ const string LightManager::GetConfigData(void)
 			msg += ", ";
 		}
 	}
-	msg += " ] ";
-	msg += "}\r\n";
+	msg += " ]}";
 	return msg;
 }
 
@@ -134,7 +133,7 @@ const string LightManager::GetConfigData(void)
 const string LightManager::GetData(void)
 {
 	char power[10];
-	string msg("{ \"RecordType\": \"LightData\", ");
+	string msg("{ \"Module\": \"LightData\", ");
 	msg += "\"Chanels\":[ ";
 	for ( size_t i = 0; i < Chanels.size(); i ++ ) {
 		msg += " {\"Name\": \"";
@@ -147,9 +146,7 @@ const string LightManager::GetData(void)
 			msg += ", ";
 		}
 	}
-	msg += " ] ";
-
-	msg += "}\r\n";
+	msg += " ]}";
 	return msg;
 }
 

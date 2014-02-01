@@ -79,8 +79,6 @@ SubProtocol::SubProtocol(int control_port)
 {
   Control_Server = new TcpServer(control_port);
   ConProt = new ControlProtocol();
-  this->Cam = NULL;
-  this->SCon = NULL;
 	update = 0;
 }
 
@@ -99,19 +97,6 @@ void SubProtocol::AddModule(const string & name, CmdModule *mod)
 	new_module.Name = name;
 	new_module.module = mod;
 	Modules.push_back(new_module);
-
-}
-
-// *******************************************************************************************
-void SubProtocol::AddCameraManager(CameraManager *cam)
-{
-  this->Cam = cam;
-}
-
-// *******************************************************************************************
-void SubProtocol::AddSubControl(SubControl *scon)
-{
-  this->SCon = scon;
 }
 
 // *******************************************************************************************
@@ -157,7 +142,6 @@ void SubProtocol::Run(const struct timeval *timeout)
         src = Control_Server->Listen();
         if ( src != NULL ) {
           ConProt->AddControlSource(src);
-          Cam->Start(src->GetName());
 					for ( size_t i = 0; i < Modules.size(); i ++ ) {
 						ConProt->Write(fp, Modules[i].module->GetConfigData());
 					}
@@ -168,152 +152,16 @@ void SubProtocol::Run(const struct timeval *timeout)
   }
   else
     return;
-
+/*
   string arg;
   const struct Command *cmdPtr;
   while ( (cmdPtr = ConProt->GetCmds(CmdList, &arg, &fp)) != NULL ) {
     char buf[1024];
 
-    switch ( cmdPtr->func_number ) {
-      // ---------------------------------------------------------------
-// write commands
-    case SetPos:
-      SCon->SetTargetPos(ParseBearing(arg));
-      printf("SetPos\n");
-      break;
-
-    case SetVel:
-      SCon->SetTargetVel(ParseBearing(arg));
-      //printf("SetVel\n");
-      break;
-
-    case CamStart:			// Write
-//      Cam->Start();
-      break;
-
-    case CamStop:			// Write
-      Cam->Stop();
-      printf("Cam Stop\n");
-      break;
-
-      // ---------------------------------------------------------------
-// Read commands
-    case GetRealPos:
-      SendBearings(cmdPtr, fp, INS_GetPosition());
-      printf("GetRealPos\n");
-      break;
-
-    case GetRealVel:
-      SendBearings(cmdPtr, fp, INS_GetVelocity());
-      //printf("GetRealVel\n");
-      break;
-
-    case GetTargetPos:
-      SendBearings(cmdPtr, fp, SCon->Position );
-      printf("GetTargetPos\n");
-      break;
-
-    case GetTargetVel:
-      SendBearings(cmdPtr, fp, SCon->Velocity );
-      break;
-
-    case GetVoltage:
-      sprintf(buf, "%s: %2.1f\r\n", cmdPtr->cmd, PWM_GetVoltage(Pwm));
-      ConProt->Write(fp, buf);
-      break;
-
-    case GetTemp:
-      sprintf(buf, "%s: %f\r\n", cmdPtr->cmd, PWM_GetTemp(Pwm));
-      ConProt->Write(fp, buf);
-      break;
-
-    case GetDiveTime:
-      sprintf(buf, "%s: %d\r\n", cmdPtr->cmd, (int)Cam->DiveTime() );
-      ConProt->Write(fp, buf);
-      break;
-
-      // ---------------------------------------------------------------
-      // ---------------------------------------------------------------
-    case SetControlMode:	// Write
-    default :
-      if ( cmdPtr->cmd)
-        printf("Unknown Cmd: %s\n", cmdPtr->cmd);
-      break;
-    }
   }
+  */
 }
 
-// *******************************************************************************************
-char *SkipSpace(char *buf)
-{
-  while ( *buf && isspace(*buf))
-    buf++;
-  return buf;
-}
-
-// *******************************************************************************************
-char *SkipChars(char *buf)
-{
-  while ( *buf && !isspace(*buf))
-    buf++;
-  return buf;
-}
-
-// *******************************************************************************************
-INS_Bearings SubProtocol::ParseBearing(string data)
-{
-  INS_Bearings bear;
-  int i;
-  float values[6];
-  char *ptr = (char *)data.c_str();
-
-  memset(values, 0, sizeof(values));
-
-  for ( i = 0; i < 6; i ++ ) {
-    if ( ptr == NULL ) {
-      printf("NUll ptr: ParseBearings\n");
-      break;
-    }
-    ptr = SkipSpace(ptr);
-    values[i] = ::atof(ptr);
-    ptr = SkipChars(ptr);
-  }
-  bear.x     = values[0];
-  bear.y     = values[1];
-  bear.z     = values[2];
-  bear.roll  = values[3];
-  bear.pitch = values[4];
-  bear.yaw   = values[5];
-  return bear;
-}
-
-// *******************************************************************************************
-string SubProtocol::ParseBearing(INS_Bearings data)
-{
-  stringstream ss;
-
-  ss.clear();
-  ss << data.x << ", ";
-  ss << data.y << ", ";
-  ss << data.z << ", ";
-  ss << data.roll << ", ";
-  ss << data.pitch << ", ";
-  ss << data.yaw;
-
-  string msg(ss.str());
-  return msg;
-}
-
-//*******************************************************************************************
-void SubProtocol::SendBearings(const struct Command *cmdPtr, int fd, INS_Bearings data)
-{
-  string msg(cmdPtr->cmd);
-  msg += ": ";
-  msg += ParseBearing(data);
-  ConProt->Write(fd, msg);
-}
-
-//*******************************************************************************************
 //*******************************************************************************************
 //*******************************************************************************************
 

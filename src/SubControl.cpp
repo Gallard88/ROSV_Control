@@ -104,7 +104,7 @@ void SubControl::Update(const string & msg)
 const string SubControl::GetData(void)
 {
 	char power[10];
-	string msg("{ \"RecordType\": \"MotorData\", ");
+	string msg("{ \"Module\": \"MotorData\", ");
 	msg += "\"Motors\":[ ";
 	for ( size_t i = 0; i < MotorList.size(); i ++ ) {
 		msg += " {\"Name\": \"";
@@ -118,9 +118,7 @@ const string SubControl::GetData(void)
 			msg += ", ";
 		}
 	}
-	msg += " ] ";
-
-	msg += "}\r\n";
+	msg += " ]}";
 	return msg;
 }
 

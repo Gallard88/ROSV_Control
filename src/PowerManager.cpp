@@ -87,10 +87,10 @@ const string PowerManager::GetData(void)
 {
 	char power[30];
 
-	string msg("{ \"RecordType\": \"PowerData\", ");
+	string msg("{ \"Module\": \"PowerData\", ");
 	sprintf(power, "\"CurrentVoltage\": %f ", CurrentVoltage);
 	msg += string(power);
-	msg += "}\r\n";
+	msg += "}";
 	return msg;
 }
 

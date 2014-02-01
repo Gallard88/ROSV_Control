@@ -100,12 +100,6 @@ const struct Command *ControlProtocol::GetCmds(const struct Command *list, strin
     length = Controller->ReadLine(&line);
     *fp = Controller->GetFd();
   }
-/*
-  if (( length == 0 ) && ( Observer != NULL )) {
-    length = Observer->ReadLine(&line);
-    *fp = Observer->GetFd();
-  }
-*/
   const struct Command *ptr = NULL;
 
   if ( length > 0 ) {

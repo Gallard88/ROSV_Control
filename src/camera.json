@@ -1,0 +1,4 @@
+{
+  "Start" : "/usr/local/bin/RPI_Cam_Start",
+  "Stop" : "/usr/local/bin/RPI_Stop_Cam"
+}

@@ -100,29 +100,11 @@ void System_Shutdown(void)
 /* ======================== */
 int main (int argc, char *argv[])
 {
-  int rv;
-
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_EMERG, "Starting program");
 
   SignalHandler_Setup();
   atexit(System_Shutdown);
-
-  /* --------------------------------------------- */
-  // load paramaters
-  JSON_Value *val = json_parse_file(prop_file);
-  rv = json_value_get_type(val);
-  if ( rv != JSONObject ) {
-    printf("JSON Parse file failed\n");
-    syslog(LOG_EMERG, "JSON Parse file failed\n");
-    return -1;
-  }
-
-  JSON_Object *settings = json_value_get_object(val);
-  if ( settings == NULL ) {
-    printf("Settings == NULL\n");
-    return -1;
-  }
 
   /* --------------------------------------------- */
   // connect to other external systems
@@ -163,19 +145,15 @@ int main (int argc, char *argv[])
   Power = new PowerManager("power.json");
   Power->Pwm = PwmModule;
 
-  CamMan = new CameraManager(settings);
+  CamMan = new CameraManager("camera.json");
 
   SubProt = new SubProtocol(8090);
 	SubProt->Pwm = PwmModule;
 
 	SubProt->AddModule("Light", (CmdModule *) LightMan);
 	SubProt->AddModule("Power", (CmdModule *) Power);
+	SubProt->AddModule("Camera", (CmdModule *) CamMan);
 	SubProt->AddModule("Motor", (CmdModule *) MotorControl);
-
-  SubProt->AddCameraManager(CamMan);
-  SubProt->AddSubControl(MotorControl);
-
-  json_value_free(val);
 
   /* --------------------------------------------- */
   cout << "Starting Main Program" << endl;

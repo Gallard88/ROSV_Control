@@ -34,8 +34,6 @@ using namespace std;
 #include <vector>
 
 #include "CmdModule.h"
-#include "SubControl.h"
-#include "CameraManager.h"
 #include "DataSource.h"
 #include "TcpServer.h"
 #include "ControlProtocol.h"
@@ -52,9 +50,6 @@ public:
   ~SubProtocol();
 
 	void AddModule(const string & name, CmdModule *mod);
-
-  void AddCameraManager(CameraManager *cam);
-  void AddSubControl(SubControl *scon);
   void Run(const struct timeval *timeout);
 	PWM_Con_t Pwm;
 
@@ -64,16 +59,8 @@ private:
   ControlProtocol           *ConProt;
   TcpServer                 *Control_Server;
   TcpServer                 *Observe_Server;
-  SubControl                *SCon;
-  CameraManager             *Cam;
-
-  INS_Bearings ParseBearing(string data);
-  string ParseBearing(INS_Bearings data);
-  void SendBearings(const struct Command *cmdPtr, int fd, INS_Bearings data);
 	time_t update;
-
 	vector<struct Modules>		Modules;
-
 };
 
 //*******************************************************************************************

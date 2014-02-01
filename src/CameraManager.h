@@ -29,16 +29,21 @@ using namespace std;
 
 #include <time.h>
 
+#include "CmdModule.h"
 #include "parson.h"
 
 //*******************************************************************************************
-class CameraManager {
+class CameraManager: CmdModule {
 public:
-  CameraManager(const JSON_Object *settings);
+  CameraManager(const char *filename);
 
   void Start(const char *ip);
   void Stop(void);
   long DiveTime(void);
+
+	const string GetConfigData(void);
+	void Update(const string & msg);
+	const string GetData(void);
 
 private:
 #define CAMMAN_SC_SIZE	4096
