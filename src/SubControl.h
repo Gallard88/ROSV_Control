@@ -43,10 +43,10 @@ enum SubMode {
 
 //*******************************************************************************************
 struct Motor {
-	string Name;
+  string Name;
   int ch;
   int mult[INS_AXES_SIZE];
-	float power;
+  float power;
 };
 
 //*******************************************************************************************
@@ -57,15 +57,15 @@ public:
   int SetTargetPos(INS_Bearings pos);
   int SetTargetVel(INS_Bearings vel);
 
-	PWM_Con_t Pwm;
+  PWM_Con_t Pwm;
   INS_Bearings Position;
   INS_Bearings Velocity;
 
-	struct Motor ParseJson(const JSON_Object *setting);
+  struct Motor ParseJson(const JSON_Object *setting);
 
-	const string GetConfigData(void);
-	void Update(const string & msg);
-	const string GetData(void);
+  const string GetConfigData(void);
+  void Update(const string & msg);
+  const string GetData(void);
 
 private:
   vector<struct Motor> MotorList;

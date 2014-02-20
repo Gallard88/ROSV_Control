@@ -41,9 +41,9 @@ public:
   void Stop(void);
   long DiveTime(void);
 
-	const string GetConfigData(void);
-	void Update(const string & msg);
-	const string GetData(void);
+  const string GetConfigData(void);
+  void Update(const string & msg);
+  const string GetData(void);
 
 private:
 #define CAMMAN_SC_SIZE	4096

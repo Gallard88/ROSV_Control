@@ -36,9 +36,9 @@
 //*******************************************************************************************
 //*******************************************************************************************
 typedef struct  {
-	string Name;
-	int Power;	// 0 - 100%
-	vector<int> Modules;
+  string Name;
+  int Power;	// 0 - 100%
+  vector<int> Modules;
 
 } LightChanel;
 
@@ -49,15 +49,15 @@ public:
   LightManager(const char * filename);
   void Run(void);
 
-	const string GetConfigData(void);
-	void Update(const string & msg);
-	const string GetData(void);
+  const string GetConfigData(void);
+  void Update(const string & msg);
+  const string GetData(void);
 
-	PWM_Con_t Pwm;
+  PWM_Con_t Pwm;
 
 private:
-	vector<LightChanel> Chanels;
-	time_t update;
+  vector<LightChanel> Chanels;
+  time_t update;
 };
 
 //*******************************************************************************************

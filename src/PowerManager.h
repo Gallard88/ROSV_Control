@@ -41,19 +41,19 @@ public:
   PowerManager(const char * filename);
   void Run(void);
 
-	const string GetConfigData(void);
-	void Update(const string & msg);
-	const string GetData(void);
+  const string GetConfigData(void);
+  void Update(const string & msg);
+  const string GetData(void);
 
-	PWM_Con_t Pwm;
+  PWM_Con_t Pwm;
 
 private:
-	float AmpHour;
-	float WarningVoltage;
-	float AlarmVoltage;
-	float CurrentVoltage;
+  float AmpHour;
+  float WarningVoltage;
+  float AlarmVoltage;
+  float CurrentVoltage;
 
-	time_t update;
+  time_t update;
 };
 
 //*******************************************************************************************

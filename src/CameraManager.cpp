@@ -35,19 +35,19 @@ CameraManager::CameraManager(const char *filename)
 {
   StartTime = 0;
 
-	JSON_Value *val = json_parse_file(filename);
+  JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
   if ( rv != JSONObject ) {
     syslog(LOG_EMERG, "Camera: JSON Parse file failed\n");
-		json_value_free (val);
+    json_value_free (val);
     return;
   }
 
   JSON_Object *settings = json_value_get_object(val);
   if ( settings == NULL ) {
     syslog(LOG_EMERG, "Camera: Settings == NULL\n");
-		json_value_free (val);
+    json_value_free (val);
     return;
   }
 
@@ -70,21 +70,21 @@ CameraManager::CameraManager(const char *filename)
 // *******************************************************************************************
 void CameraManager::Start(const char *ip)
 {
-/*
-  char cmd[CAMMAN_SC_SIZE*2];
-  pid_t pid = fork();
+  /*
+    char cmd[CAMMAN_SC_SIZE*2];
+    pid_t pid = fork();
 
-  if ( pid == 0 ) {
-    sprintf(cmd, "%s %s", StartSc, ip);
-    if ( system(cmd) < 0 ) {
-      syslog(LOG_EMERG,"CameraManager: exec failed");
+    if ( pid == 0 ) {
+      sprintf(cmd, "%s %s", StartSc, ip);
+      if ( system(cmd) < 0 ) {
+        syslog(LOG_EMERG,"CameraManager: exec failed");
+      }
+      exit(-1);
+    } else  if ( pid < 0 ) {
+      syslog(LOG_EMERG, "CameraManager: Failed to fork");
+      exit(-1);
     }
-    exit(-1);
-  } else  if ( pid < 0 ) {
-    syslog(LOG_EMERG, "CameraManager: Failed to fork");
-    exit(-1);
-  }
-*/
+  */
   StartTime = time(NULL);
 }
 
@@ -107,7 +107,7 @@ void CameraManager::Stop(void)
 // *******************************************************************************************
 const string CameraManager::GetConfigData(void)
 {
-	return this->GetData();
+  return this->GetData();
 }
 // *******************************************************************************************
 void CameraManager::Update(const string & msg)
@@ -117,15 +117,15 @@ void CameraManager::Update(const string & msg)
 // *******************************************************************************************
 const string CameraManager::GetData(void)
 {
-	char msg[100];
-	int diff = 0;
+  char msg[100];
+  int diff = 0;
 
-	if ( StartTime != 0 ) {
-		diff = time(NULL) - StartTime;
-	}
+  if ( StartTime != 0 ) {
+    diff = time(NULL) - StartTime;
+  }
 
-	sprintf(msg,"{ \"Module\": \"CameraData\", \"Time\": %d }", diff);
-	return string(msg);
+  sprintf(msg,"{ \"Module\": \"CameraData\", \"Time\": %d }", diff);
+  return string(msg);
 }
 
 // *******************************************************************************************

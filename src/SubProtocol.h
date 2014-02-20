@@ -35,32 +35,29 @@ using namespace std;
 
 #include "CmdModule.h"
 #include "DataSource.h"
-#include "TcpServer.h"
-#include "ControlProtocol.h"
 
 struct Modules {
-	string      Name;
-	CmdModule  *module;
+  string      Name;
+  CmdModule  *module;
 };
 
 //*******************************************************************************************
 class SubProtocol {
 public:
-  SubProtocol(int control_port);
+  SubProtocol();
   ~SubProtocol();
 
-	void AddModule(const string & name, CmdModule *mod);
-  void Run(const struct timeval *timeout);
-	PWM_Con_t Pwm;
+  void AddModule(const string & name, CmdModule *mod);
+  void AddSource(DataSource *src);
+  void Run(struct timeval timeout);
+  PWM_Con_t Pwm;
 
 protected:
 
 private:
-  ControlProtocol           *ConProt;
-  TcpServer                 *Control_Server;
-  TcpServer                 *Observe_Server;
-	time_t update;
-	vector<struct Modules>		Modules;
+  time_t update;
+  vector<struct Modules>  Modules;
+  vector<DataSource *>    Sources;
 };
 
 //*******************************************************************************************

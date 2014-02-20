@@ -85,8 +85,8 @@ void ControlProtocol::Write(int fd, string msg)
 /* ======================== */
 void ControlProtocol::Write(int fd, const char *msg)
 {
-	Controller->WriteData(msg);
-	Controller->WriteData("\r\n");
+  Controller->WriteData(msg);
+  Controller->WriteData("\r\n");
 }
 
 /* ======================== */

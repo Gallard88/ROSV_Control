@@ -41,34 +41,35 @@ PowerManager::PowerManager(const char * filename)
 
   if ( rv != JSONObject ) {
     syslog(LOG_EMERG, "PowerManager: JSON Parse file failed\n");
-		json_value_free (val);
+    json_value_free (val);
     return;
   }
 
   JSON_Object *settings = json_value_get_object(val);
   if ( settings == NULL ) {
     syslog(LOG_EMERG, "PowerManager: Settings == NULL\n");
-		json_value_free (val);
+    json_value_free (val);
     return;
-	}
-	AmpHour         = (float)json_object_get_number (settings, "AmpHour");
-	WarningVoltage  = (float)json_object_get_number (settings, "WarningVoltage");
-	AlarmVoltage    = (float)json_object_get_number (settings, "AlarmVoltage");
+  }
+  AmpHour         = (float)json_object_get_number (settings, "AmpHour");
+  WarningVoltage  = (float)json_object_get_number (settings, "WarningVoltage");
+  AlarmVoltage    = (float)json_object_get_number (settings, "AlarmVoltage");
   json_value_free (val);
 }
 
 //*******************************************************************************************
 void PowerManager::Run(void)
-{/* The PWM has a ~7 second watchdog.
-	*	If this function is run once per second it should be fast enough
-	*/
-	time_t current;
-	current = time(NULL);
-	if ((current - update) > 1) {
-		update = current;
+{
+  /* The PWM has a ~7 second watchdog.
+  *	If this function is run once per second it should be fast enough
+  */
+  time_t current;
+  current = time(NULL);
+  if ((current - update) > 1) {
+    update = current;
 
-		CurrentVoltage = PWM_GetVoltage(Pwm);
-	}
+    CurrentVoltage = PWM_GetVoltage(Pwm);
+  }
 }
 
 //*******************************************************************************************
@@ -79,19 +80,19 @@ void PowerManager::Update(const string & msg)
 //*******************************************************************************************
 const string PowerManager::GetConfigData(void)
 {
-	return this->GetData();
+  return this->GetData();
 }
 
 //*******************************************************************************************
 const string PowerManager::GetData(void)
 {
-	char power[30];
+  char power[30];
 
-	string msg("{ \"Module\": \"PowerData\", ");
-	sprintf(power, "\"CurrentVoltage\": %f ", CurrentVoltage);
-	msg += string(power);
-	msg += "}";
-	return msg;
+  string msg("{ \"Module\": \"PowerData\", ");
+  sprintf(power, "\"CurrentVoltage\": %f ", CurrentVoltage);
+  msg += string(power);
+  msg += "}";
+  return msg;
 }
 
 //*******************************************************************************************

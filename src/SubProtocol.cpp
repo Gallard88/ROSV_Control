@@ -38,128 +38,88 @@
 using namespace std;
 
 // *******************************************************************************************
-// Protocol commands, version 0.01
-// Write Commands
-#define	SetPos					1
-#define	SetVel					2
-#define	SetControlMode	3
-#define	CamStart				4
-#define	CamStop					5
-#define	LightToggle			6
-
-// Read commands
-#define	GetRealPos			7
-#define	GetTargetPos		8
-#define	GetRealVel			9
-#define	GetTargetVel		10
-#define	GetDiveTime			11
-#define	GetVoltage			12
-#define	GetTemp					13
-
-// *******************************************************************************************
-static const struct Command CmdList[] = {
-  { "SetPos",         true, true,   SetPos         },
-  { "SetVel",         true, true,   SetVel         },
-  { "SetControlMode", true, true,   SetControlMode },
-  { "CamStart",       true, true,   CamStart       },
-  { "CamStop",        true, true,   CamStop        },
-  { "GetRealPos",     true, false,  GetRealPos     },
-  { "GetTargetPos",   true, false,  GetTargetPos   },
-  { "GetRealVel",     true, false,  GetRealVel     },
-  { "GetTargetVel",   true, false,  GetTargetVel   },
-  { "GetDiveTime",    true, false,  GetDiveTime    },
-  { "GetVoltage",     true, false,  GetVoltage     },
-  { "GetTemp",        true, false,  GetTemp        },
-  // indicates end of the list.
-  { NULL,             false, false, 0              }
-};
-
-// *******************************************************************************************
-SubProtocol::SubProtocol(int control_port)
+SubProtocol::SubProtocol()
 {
-  Control_Server = new TcpServer(control_port);
-  ConProt = new ControlProtocol();
-	update = 0;
+  update = 0;
 }
 
 // *******************************************************************************************
 SubProtocol::~SubProtocol()
 {
-  delete ConProt;
-  delete Control_Server;
 }
 
 // *******************************************************************************************
 void SubProtocol::AddModule(const string & name, CmdModule *mod)
 {
-	struct Modules new_module;
+  struct Modules new_module;
 
-	new_module.Name = name;
-	new_module.module = mod;
-	Modules.push_back(new_module);
+  new_module.Name = name;
+  new_module.module = mod;
+  Modules.push_back(new_module);
+}
+
+// *******************************************************************************************
+void SubProtocol::AddSource(DataSource *src)
+{
+  Sources.push_back(src);
+  for ( size_t i = 0; i < Modules.size(); i ++ ) {
+    src->WriteData(Modules[i].module->GetConfigData().c_str());
+    src->WriteData("\r\n");
+  }
 }
 
 // *******************************************************************************************
 #define MAX_FP(a, b)	b = (a > b)? a : b
 // *******************************************************************************************
-void SubProtocol::Run(const struct timeval *timeout)
+void SubProtocol::Run(struct timeval timeout)
 {
   DataSource *src;
   fd_set readfs;
-  int fp;
-  int max_fp = 0;
-  struct timeval to = *timeout;
+  int fd, max_fp = 0;
 
   FD_ZERO(&readfs);
-  if ( ConProt->IsControlSourceConnected() == false ) {
-    fp  = Control_Server->GetFp();
-  } else {
-    fp = ConProt->GetControlFileDescriptor();
-		time_t current = time(NULL);
-		if ((current - update) > 2) {
-			update = current;
-			if ( fp >= 0 ) {
-				for ( size_t i = 0; i < Modules.size(); i ++ ) {
-					ConProt->Write(fp, Modules[i].module->GetData());
-				}
-			}
-		}
+  for ( size_t i = 0; i < Sources.size(); i ++ ) {
+    src = Sources[i];
+
+    fd = src->GetFd();
+    FD_SET(fd, &readfs);
+    MAX_FP(fd, max_fp);
   }
-  FD_SET(fp, &readfs);
-  MAX_FP(fp, max_fp);
 
-
-		if ( select(max_fp+1, &readfs, NULL, NULL, &to) > 0 ) {
-    if ( ConProt->IsControlSourceConnected() == true ) {
-
-      if ( FD_ISSET(ConProt->GetControlFileDescriptor(), &readfs)) {
-        ConProt->GetControlData();
-      }
-    } else {
-
-      if ( FD_ISSET(Control_Server->GetFp(), &readfs)) {
-
-        src = Control_Server->Listen();
-        if ( src != NULL ) {
-          ConProt->AddControlSource(src);
-					for ( size_t i = 0; i < Modules.size(); i ++ ) {
-						ConProt->Write(fp, Modules[i].module->GetConfigData());
-					}
-          return;
-        }
+  if ( select(max_fp+1, &readfs, NULL, NULL, &timeout) > 0 ) {
+    for ( size_t i = 0; i < Sources.size(); i ++ ) {
+      src = Sources[i];
+      if ( FD_ISSET(src->GetFd(), &readfs)) {
+        src->ReadData();
       }
     }
   }
-  else
-    return;
-/*
-  string arg;
-  const struct Command *cmdPtr;
-  while ( (cmdPtr = ConProt->GetCmds(CmdList, &arg, &fp)) != NULL ) {
-    char buf[1024];
 
+  for ( size_t i = 0; i < Sources.size(); i ++ ) {
+    string line;
+    src = Sources[i];
+    if ( src->ReadLine(&line)) {
+      printf("Line: %s\r\n", line.c_str());
+    }
   }
-  */
+
+  /*
+   * Now, grab the data from each module,
+   * and send it to each DataSouce.
+   */
+  time_t current;
+  current = time(NULL);
+  if ((current - update) >= 1 ) {
+    update = current;
+    for ( size_t i = 0; i < Sources.size(); i ++ ) {
+      src = Sources[i];
+
+      for ( size_t j = 0; j < Modules.size(); j ++ ) {
+        src->WriteData(Modules[j].module->GetData().c_str());
+        src->WriteData("\r\n");
+      }
+    }
+  }
 }
 
 //*******************************************************************************************

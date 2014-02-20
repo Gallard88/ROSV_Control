@@ -82,7 +82,7 @@ int DataSource::ReadData(void)
 
   int n = read(File, buffer, sizeof(buffer)-1);
   if ( n <= 0 ) {
-		printf("Read Exception\n");
+    printf("Read Exception\n");
     throw DS_ReadEx;
     // throw expection.
   } else {
@@ -116,7 +116,7 @@ int DataSource::WriteData(const char *msg)
 {
   int n = write (File, msg, strlen(msg));
   if ( n <= 0 ) {
-		printf("Write Exception\n");
+    printf("Write Exception\n");
     throw DS_WriteEx;
   }
   return n;

@@ -32,9 +32,9 @@ using namespace std;
 //*******************************************************************************************
 class CmdModule {
 public:
-	virtual const string GetConfigData(void) = 0;
-	virtual void Update(const string & msg) = 0;
-	virtual const string GetData(void) = 0;
+  virtual const string GetConfigData(void) = 0;
+  virtual void Update(const string & msg) = 0;
+  virtual const string GetData(void) = 0;
 
 };
 

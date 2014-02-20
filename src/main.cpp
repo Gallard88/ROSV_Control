@@ -37,6 +37,7 @@ volatile bool Run_Control;
 
 /* ======================== */
 PWM_Con_t PwmModule;
+TcpServer        *Listner;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
 LightManager     *LightMan;
@@ -48,8 +49,8 @@ PowerManager     *Power;
 void Alarm_Wakeup (int i)
 {
   Run_Control = true;
-	LightMan->Run();
-	Power->Run();
+  LightMan->Run();
+  Power->Run();
 }
 
 /* ======================== */
@@ -133,6 +134,7 @@ int main (int argc, char *argv[])
 
   /* --------------------------------------------- */
   // open sub-modules
+  Listner = new TcpServer(8090);
 
   MotorControl = new SubControl("motors.json");
   MotorControl->Pwm = PwmModule;
@@ -145,19 +147,19 @@ int main (int argc, char *argv[])
 
   CamMan = new CameraManager("camera.json");
 
-  SubProt = new SubProtocol(8090);
-	SubProt->Pwm = PwmModule;
+  SubProt = new SubProtocol();
+  SubProt->Pwm = PwmModule;
 
-	SubProt->AddModule("Light", (CmdModule *) LightMan);
-	SubProt->AddModule("Power", (CmdModule *) Power);
-	SubProt->AddModule("Camera", (CmdModule *) CamMan);
-	SubProt->AddModule("Motor", (CmdModule *) MotorControl);
+  SubProt->AddModule("Light", (CmdModule *) LightMan);
+  SubProt->AddModule("Power", (CmdModule *) Power);
+  SubProt->AddModule("Camera", (CmdModule *) CamMan);
+  SubProt->AddModule("Motor", (CmdModule *) MotorControl);
 
   /* --------------------------------------------- */
   cout << "Starting Main Program" << endl;
   while (1) {
     // read data from connected clients.
-    SubProt->Run(&system_time);
+    SubProt->Run(system_time);
 
     if ( Run_Control == true) {
       Run_Control = false;
