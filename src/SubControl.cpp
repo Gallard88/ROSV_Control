@@ -33,8 +33,7 @@ using namespace std;
 SubControl::SubControl(const char *filename)
 {
   Mode = Vel;
-  memset(&Position, 0, sizeof(INS_Bearings));
-  memset(&Velocity, 0, sizeof(INS_Bearings));
+  memset(&Velocity, 0, sizeof(Velocity));
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
@@ -80,7 +79,7 @@ struct Motor SubControl::ParseJson(const JSON_Object *setting) {
 
   JSON_Array *mult_array = json_object_get_array( setting, "mul");
   if ( mult_array != NULL ) {
-    for ( size_t i = 0; i < INS_AXES_SIZE; i ++ ) {
+    for ( size_t i = 0; i < VECTOR_SIZE; i ++ ) {
       mot.mult[i] = json_array_get_number(mult_array, i);
     }
   }
@@ -133,27 +132,33 @@ const string SubControl::GetData(void)
  */
 // *******************************************************************************************
 const float MOT_SCALE = 100.0;
+#define VECTOR_X	0
+#define VECTOR_Y	1
+#define VECTOR_Z	2
+#define VECTOR_ROLL	3
+#define VECTOR_PITCH	4
+#define VECTOR_YAW	5
+
 // *******************************************************************************************
 void SubControl::Run(void)
 {
-  float power[INS_AXES_SIZE];
+  float power[VECTOR_SIZE];
 
   switch ( Mode ) {
 
   case Vel:
     // run each Axes controller.
-    power[X] = Velocity.x / MOT_SCALE;
-    power[Y] = Velocity.y / MOT_SCALE;
-    power[Z] = Velocity.z / MOT_SCALE;
-    power[ROLL] = Velocity.roll / MOT_SCALE;
-    power[PITCH] = Velocity.pitch / MOT_SCALE;
-    power[YAW] = Velocity.yaw / MOT_SCALE;
+    power[VECTOR_X]     = Velocity.x / MOT_SCALE;
+    power[VECTOR_Y]     = Velocity.y / MOT_SCALE;
+    power[VECTOR_Z]     = Velocity.z / MOT_SCALE;
+    power[VECTOR_ROLL]  = Velocity.roll / MOT_SCALE;
+    power[VECTOR_PITCH] = Velocity.pitch / MOT_SCALE;
+    power[VECTOR_YAW]   = Velocity.yaw / MOT_SCALE;
     break;
 
-  case Pos:	// not yet implemented
   case Idle:
   default:
-    for ( int i = 0; i < INS_AXES_SIZE; i ++ ) {
+    for ( int i = 0; i < VECTOR_SIZE; i ++ ) {
       power[i] = 0.0;
     }
     break;
@@ -161,26 +166,12 @@ void SubControl::Run(void)
 
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
     float output = 0.0;
-    for ( int j = 0; j < INS_AXES_SIZE; j ++ ) {
+    for ( int j = 0; j < VECTOR_SIZE; j ++ ) {
       output = output + ((float)MotorList[i].mult[j] * power[j]);
     }
     MotorList[i].power = output;
     PWM_SetPWM(Pwm, MotorList[i].ch, output);
   }
-}
-
-//*******************************************************************************************
-int SubControl::SetTargetPos(INS_Bearings pos)
-{
-  Position = pos;
-  return 0;
-}
-
-//*******************************************************************************************
-int SubControl::SetTargetVel(INS_Bearings vel)
-{
-  Velocity = vel;
-  return 0;
 }
 
 //*******************************************************************************************

@@ -71,8 +71,7 @@ am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) \
 	main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
-ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
-	/usr/local/lib/libINS.a
+ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -227,8 +226,7 @@ ROSV_Controldir = /usr/bin/
 ROSV_Control_Filesdir = /etc
 ROSV_Control_Files_DATA = ROSV_Motors.json
 LDADD = \
-	/usr/local/lib/libPWMControl.a \
-	/usr/local/lib/libINS.a
+	/usr/local/lib/libPWMControl.a 
 
 ROSV_Control_SOURCES = \
 	CameraManager.cpp \

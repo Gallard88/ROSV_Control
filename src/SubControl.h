@@ -28,7 +28,6 @@
 //*******************************************************************************************
 #include <string>
 #include <PWM_Controller.h>
-#include <INS_Data.h>
 #include <vector>
 
 #include "CmdModule.h"
@@ -41,25 +40,32 @@ enum SubMode {
   Pos
 };
 
+#define VECTOR_SIZE	6
 //*******************************************************************************************
 struct Motor {
   string Name;
   int ch;
-  int mult[INS_AXES_SIZE];
+  int mult[VECTOR_SIZE];
   float power;
 };
+
+typedef struct {
+  float x;
+  float y;
+  float z;
+  float yaw;
+  float roll;
+  float pitch;
+
+} ControlVector;
 
 //*******************************************************************************************
 class SubControl: CmdModule {
 public:
   SubControl(const char *filename);
   void Run(void);
-  int SetTargetPos(INS_Bearings pos);
-  int SetTargetVel(INS_Bearings vel);
 
   PWM_Con_t Pwm;
-  INS_Bearings Position;
-  INS_Bearings Velocity;
 
   struct Motor ParseJson(const JSON_Object *setting);
 
@@ -71,6 +77,7 @@ private:
   vector<struct Motor> MotorList;
 
   enum SubMode Mode;
+  ControlVector Velocity;
 };
 
 //*******************************************************************************************

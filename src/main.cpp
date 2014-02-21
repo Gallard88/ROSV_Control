@@ -14,7 +14,6 @@ using namespace std;
 #include <ctype.h>
 
 #include <PWM_Controller.h>
-#include <INS_Data.h>
 
 #include "DataSource.h"
 #include "PowerManager.h"
@@ -114,14 +113,7 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  if ( INS_Connect() < 0 ) {
-    printf("INS_Connect() failed\n");
-    syslog(LOG_EMERG, "INS_Connect() failed\n");
-    return -1;
-  }
-
   /* --------------------------------------------- */
-  string path;
   uid_t uid=getuid(), euid=geteuid();
 
   if ((uid <= 0 ) || ( uid != euid)) {

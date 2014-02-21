@@ -11,8 +11,7 @@ ROSV_Control_PROGRAMS = ROSV_Control
 ROSV_Control_Filesdir= /etc
 ROSV_Control_Files_DATA=ROSV_Motors.json
 LDADD = \
-	/usr/local/lib/libPWMControl.a \
-	/usr/local/lib/libINS.a
+	/usr/local/lib/libPWMControl.a 
 
 ROSV_Control_SOURCES = \
 	CameraManager.cpp \
