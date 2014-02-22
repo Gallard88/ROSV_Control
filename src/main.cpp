@@ -13,6 +13,8 @@ using namespace std;
 #include <syslog.h>
 #include <ctype.h>
 
+#include <thread>
+
 #include <PWM_Controller.h>
 
 #include "DataSource.h"
@@ -95,6 +97,21 @@ void System_Shutdown(void)
 }
 
 /* ======================== */
+static thread ListenThread;
+
+static void ListenFunc(void)
+{
+  DataSource *new_src;
+
+  printf("Listen Thread start\n");
+  while ( 1 ) {
+    new_src = Listner->Listen();
+    SubProt->AddSource(new_src);
+    printf("New source\n");
+  }
+  printf("Listen Thread close\n");
+}
+
 /* ======================== */
 int main (int argc, char *argv[])
 {
@@ -127,6 +144,7 @@ int main (int argc, char *argv[])
   /* --------------------------------------------- */
   // open sub-modules
   Listner = new TcpServer(8090);
+  std::thread ListenThread(ListenFunc);
 
   MotorControl = new SubControl("motors.json");
   MotorControl->Pwm = PwmModule;
@@ -142,10 +160,10 @@ int main (int argc, char *argv[])
   SubProt = new SubProtocol();
   SubProt->Pwm = PwmModule;
 
-  SubProt->AddModule("Light", (CmdModule *) LightMan);
-  SubProt->AddModule("Power", (CmdModule *) Power);
+  SubProt->AddModule("Light",  (CmdModule *) LightMan);
+  SubProt->AddModule("Power",  (CmdModule *) Power);
   SubProt->AddModule("Camera", (CmdModule *) CamMan);
-  SubProt->AddModule("Motor", (CmdModule *) MotorControl);
+  SubProt->AddModule("Motor",  (CmdModule *) MotorControl);
 
   /* --------------------------------------------- */
   cout << "Starting Main Program" << endl;

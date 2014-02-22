@@ -1,5 +1,5 @@
 # what flags you want to pass to the C compiler & linker
-AM_CXXFLAGS = --pedantic -Wall -std=gnu++0x
+AM_CXXFLAGS = --pedantic -Wall -std=gnu++0x -pthread
 AM_CFLAGS = --pedantic -Wall
 
 #LDFLAGS =
