@@ -76,6 +76,7 @@ void SubProtocol::Run(struct timeval timeout)
   DataSource *src;
   fd_set readfs;
   int fd, max_fp = 0;
+  size_t i;
 
   FD_ZERO(&readfs);
   for ( size_t i = 0; i < Sources.size(); i ++ ) {
@@ -86,16 +87,22 @@ void SubProtocol::Run(struct timeval timeout)
     MAX_FP(fd, max_fp);
   }
 
+  try {
   if ( select(max_fp+1, &readfs, NULL, NULL, &timeout) > 0 ) {
-    for ( size_t i = 0; i < Sources.size(); i ++ ) {
+    for ( i = 0; i < Sources.size(); i ++ ) {
       src = Sources[i];
       if ( FD_ISSET(src->GetFd(), &readfs)) {
         src->ReadData();
       }
     }
   }
+  } catch (int e) {
+    src = Sources[i];
+    Sources.erase(Sources.begin()+i);
+    delete src;
+  }
 
-  for ( size_t i = 0; i < Sources.size(); i ++ ) {
+  for ( i = 0; i < Sources.size(); i ++ ) {
     string line;
     src = Sources[i];
     if ( src->ReadLine(&line)) {
@@ -111,7 +118,7 @@ void SubProtocol::Run(struct timeval timeout)
   current = time(NULL);
   if ((current - update) >= 1 ) {
     update = current;
-    for ( size_t i = 0; i < Sources.size(); i ++ ) {
+    for ( i = 0; i < Sources.size(); i ++ ) {
       src = Sources[i];
 
       for ( size_t j = 0; j < Modules.size(); j ++ ) {
