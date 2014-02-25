@@ -64,8 +64,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 	"$(DESTDIR)$(ROSV_Control_Filesdir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) \
-	ControlProtocol.$(OBJEXT) DataSource.$(OBJEXT) \
+am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) DataSource.$(OBJEXT) \
 	LightManager.$(OBJEXT) parson.$(OBJEXT) PowerManager.$(OBJEXT) \
 	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
 	main.$(OBJEXT)
@@ -232,8 +231,6 @@ ROSV_Control_SOURCES = \
 	CameraManager.cpp \
 	CameraManager.h \
 	CmdModule.h \
-	ControlProtocol.cpp \
-	ControlProtocol.h \
 	DataSource.cpp \
 	DataSource.h \
 	LightManager.cpp \
@@ -335,7 +332,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraManager.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ControlProtocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataSource.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerManager.Po@am__quote@

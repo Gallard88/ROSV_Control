@@ -21,7 +21,6 @@ using namespace std;
 #include "PowerManager.h"
 #include "CameraManager.h"
 #include "LightManager.h"
-#include "ControlProtocol.h"
 #include "TcpServer.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
