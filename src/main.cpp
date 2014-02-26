@@ -91,7 +91,7 @@ void System_Shutdown(void)
   if ( CamMan )
     delete CamMan;
 
-  syslog(LOG_EMERG, "System shutting down");
+  syslog(LOG_NOTICE, "System shutting down");
   closelog();
 }
 
@@ -115,7 +115,7 @@ static void ListenFunc(void)
 int main (int argc, char *argv[])
 {
   openlog("ROSV_Control", LOG_PID, LOG_USER);
-  syslog(LOG_EMERG, "Starting program");
+  syslog(LOG_NOTICE, "Starting program");
 
   SignalHandler_Setup();
   atexit(System_Shutdown);
@@ -125,7 +125,7 @@ int main (int argc, char *argv[])
   PwmModule = PWM_Connect();
   if ( PwmModule == NULL ) {
     printf("PWM_Connect() failed\n");
-    syslog(LOG_EMERG, "PWM_Connect() failed\n");
+    syslog(LOG_ALERT, "PWM_Connect() failed\n");
     return -1;
   }
 

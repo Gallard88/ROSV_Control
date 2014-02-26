@@ -46,8 +46,7 @@ TcpServer::TcpServer(int port)
   listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (listen_fd < 0) {
     syslog(LOG_EMERG, "Socket() error, port %d", port);
-    // need to throw an expection here
-    return;
+    exit(-1);
   }
   bzero((char *) &serv_addr, sizeof(serv_addr));
 
@@ -56,10 +55,9 @@ TcpServer::TcpServer(int port)
   serv_addr.sin_port = htons(port);
   if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
     syslog(LOG_EMERG, "ERROR on binding to port %d", port);
-    // need to throw an expection here
-    return;
+    exit(-1);
   }
-  syslog(LOG_EMERG, "TcpServer setup, port: %d", port);
+  syslog(LOG_INFO, "TcpServer setup, port: %d", port);
   listen( listen_fd, 1);
 }
 
