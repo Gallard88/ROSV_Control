@@ -21,7 +21,7 @@
  THE SOFTWARE.
 */
 
-//*******************************************************************************************
+//  *******************************************************************************************
 using namespace std;
 
 #include <syslog.h>
@@ -33,7 +33,7 @@ using namespace std;
 #include "LightManager.h"
 #include "parson.h"
 
-//*******************************************************************************************
+//  *******************************************************************************************
 LightManager::LightManager(const char * filename)
 {
   JSON_Value *val = json_parse_file(filename);
@@ -87,7 +87,7 @@ LightManager::LightManager(const char * filename)
   json_value_free (val);
 }
 
-//*******************************************************************************************
+//  *******************************************************************************************
 void LightManager::Run(void)
 {
   /* The PWM has a ~7 second watchdog.
@@ -107,17 +107,17 @@ void LightManager::Run(void)
   }
 }
 
-//*******************************************************************************************
+//  *******************************************************************************************
 void LightManager::Update(const string & msg)
 {
 }
 
-//*******************************************************************************************
+//  *******************************************************************************************
 const string LightManager::GetConfigData(void)
 {
-  string msg("{ \"RecordType\": \"LightCfg\", ");
+  string msg;
 
-  msg += "\"Chanels\":[ ";
+  msg = "\"Chanels\":[ ";
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
     msg += " \"";
     msg += Chanels[i].Name;
@@ -126,7 +126,7 @@ const string LightManager::GetConfigData(void)
       msg += ", ";
     }
   }
-  msg += " ]}";
+  msg += " ] ";
   return msg;
 }
 
@@ -134,7 +134,7 @@ const string LightManager::GetConfigData(void)
 const string LightManager::GetData(void)
 {
   char power[10];
-  string msg("{ \"Module\": \"LightData\", ");
+  string msg("\"RecordType\": \"Update\", ");
   msg += "\"Chanels\":[ ";
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
     msg += " {\"Name\": \"";
@@ -147,7 +147,7 @@ const string LightManager::GetData(void)
       msg += ", ";
     }
   }
-  msg += " ]}";
+  msg += " ] ";
   return msg;
 }
 

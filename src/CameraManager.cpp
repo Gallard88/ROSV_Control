@@ -107,7 +107,7 @@ void CameraManager::Stop(void)
 // *******************************************************************************************
 const string CameraManager::GetConfigData(void)
 {
-  return this->GetData();
+  return "\"Chanels\": 1";
 }
 // *******************************************************************************************
 void CameraManager::Update(const string & msg)
@@ -124,7 +124,7 @@ const string CameraManager::GetData(void)
     diff = time(NULL) - StartTime;
   }
 
-  sprintf(msg,"{ \"Module\": \"CameraData\", \"Time\": %d }", diff);
+  sprintf(msg,"\"RecordType\": \"Update\", \"Time\": %d", diff);
   return string(msg);
 }
 

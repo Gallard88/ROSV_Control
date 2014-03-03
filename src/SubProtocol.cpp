@@ -62,9 +62,15 @@ void SubProtocol::AddModule(const string & name, CmdModule *mod)
 void SubProtocol::AddSource(DataSource *src)
 {
   Sources.push_back(src);
+
+  string msg;
+
   for ( size_t i = 0; i < Modules.size(); i ++ ) {
-    src->WriteData(Modules[i].module->GetConfigData().c_str());
-    src->WriteData("\r\n");
+    msg = "{ \"Module\": \"" + Modules[i].Name + "\", ";
+    msg += "\"RecordType\":\"Config\", ";
+    msg += Modules[i].module->GetConfigData();
+    msg += " }\r\n";
+    src->WriteData(msg.c_str());
   }
 }
 
@@ -118,12 +124,15 @@ void SubProtocol::Run(struct timeval timeout)
   current = time(NULL);
   if ((current - update) >= 1 ) {
     update = current;
-    for ( i = 0; i < Sources.size(); i ++ ) {
-      src = Sources[i];
+    for ( size_t j = 0; j < Modules.size(); j ++ ) {
+      string msg;
 
-      for ( size_t j = 0; j < Modules.size(); j ++ ) {
-        src->WriteData(Modules[j].module->GetData().c_str());
-        src->WriteData("\r\n");
+      msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
+      msg += Modules[j].module->GetData();
+      msg += " }\r\n";
+      for ( i = 0; i < Sources.size(); i ++ ) {
+        src = Sources[i];
+        src->WriteData(msg.c_str());
       }
     }
   }

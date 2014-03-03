@@ -21,7 +21,7 @@
  THE SOFTWARE.
 */
 
-//*******************************************************************************************
+//  *******************************************************************************************
 using namespace std;
 
 #include <syslog.h>
@@ -33,7 +33,7 @@ using namespace std;
 #include "PowerManager.h"
 #include "parson.h"
 
-//*******************************************************************************************
+//  *******************************************************************************************
 PowerManager::PowerManager(const char * filename)
 {
   JSON_Value *val = json_parse_file(filename);
@@ -57,7 +57,7 @@ PowerManager::PowerManager(const char * filename)
   json_value_free (val);
 }
 
-//*******************************************************************************************
+//  *******************************************************************************************
 void PowerManager::Run(void)
 {
   /* The PWM has a ~7 second watchdog.
@@ -72,24 +72,24 @@ void PowerManager::Run(void)
   }
 }
 
-//*******************************************************************************************
+//  *******************************************************************************************
 void PowerManager::Update(const string & msg)
 {
 }
 
-//*******************************************************************************************
+//  *******************************************************************************************
 const string PowerManager::GetConfigData(void)
 {
-  return this->GetData();
+  return "\"Measurements\":[ \"Voltage\" ] ";
 }
 
-//*******************************************************************************************
+//  *******************************************************************************************
 const string PowerManager::GetData(void)
 {
   char power[30];
 
-  string msg("{ \"Module\": \"PowerData\", ");
-  sprintf(power, "\"CurrentVoltage\": %f ", CurrentVoltage);
+  string msg("\"RecordType\": \"Update\", ");
+  sprintf(power, "\"Voltage\": %f ", CurrentVoltage);
   msg += string(power);
   msg += "}";
   return msg;

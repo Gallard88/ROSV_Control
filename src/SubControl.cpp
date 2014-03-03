@@ -90,7 +90,7 @@ struct Motor SubControl::ParseJson(const JSON_Object *setting) {
 // *******************************************************************************************
 const string SubControl::GetConfigData(void)
 {
-  return this->GetData();
+  return "\"Chanels\": 0";
 }
 
 // *******************************************************************************************
@@ -102,7 +102,7 @@ void SubControl::Update(const string & msg)
 const string SubControl::GetData(void)
 {
   char power[10];
-  string msg("{ \"Module\": \"MotorData\", ");
+  string msg("\"RecordType\": \"MotorData\", ");
   msg += "\"Motors\":[ ";
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
     msg += " {\"Name\": \"";
@@ -116,7 +116,7 @@ const string SubControl::GetData(void)
       msg += ", ";
     }
   }
-  msg += " ]}";
+  msg += " ] ";
   return msg;
 }
 
