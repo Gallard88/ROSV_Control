@@ -149,16 +149,16 @@ int main (int argc, char *argv[])
   Listner = new TcpServer(8090);
   std::thread ListenThread(ListenFunc);
 
-  MotorControl = new SubControl("motors.json");
+  MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
   MotorControl->Pwm = PwmModule;
 
-  LightMan = new LightManager("lighting.json");
+  LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;
 
-  Power = new PowerManager("power.json");
+  Power = new PowerManager("/etc/ROSV_Control/power.json");
   Power->Pwm = PwmModule;
 
-  CamMan = new CameraManager("camera.json");
+  CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
 
   SubProt = new SubProtocol();
   SubProt->Pwm = PwmModule;

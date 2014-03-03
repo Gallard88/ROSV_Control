@@ -8,8 +8,13 @@ AM_CFLAGS = --pedantic -Wall
 ROSV_Controldir = /usr/bin/
 ROSV_Control_PROGRAMS = ROSV_Control
 
-ROSV_Control_Filesdir= /etc
-ROSV_Control_Files_DATA=ROSV_Motors.json
+ROSV_Control_Filesdir= /etc/ROSV_Control
+ROSV_Control_Files_DATA= \
+	camera.json \
+	lighting.json \
+	motors.json \
+	power.json 
+	
 LDADD = \
 	/usr/local/lib/libPWMControl.a 
 
