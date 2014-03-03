@@ -42,7 +42,7 @@ public:
   long DiveTime(void);
 
   const string GetConfigData(void);
-  void Update(const string & msg);
+  void Update(JSON_Object *msg);
   const string GetData(void);
 
 private:

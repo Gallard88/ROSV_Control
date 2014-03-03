@@ -110,7 +110,7 @@ const string CameraManager::GetConfigData(void)
   return "\"Chanels\": 1";
 }
 // *******************************************************************************************
-void CameraManager::Update(const string & msg)
+void CameraManager::Update(JSON_Object *msg)
 {
 }
 

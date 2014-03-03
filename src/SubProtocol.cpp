@@ -91,7 +91,7 @@ void SubProtocol::ProcessLine(string line)
   if ( module != NULL ) {
     for ( size_t j = 0; j < Modules.size(); j ++ ) {
       if ( strcmp(module, Modules[j].Name.c_str()) == 0 ) {
-        Modules[j].module->Update(line);
+        Modules[j].module->Update(obj);
       }
     }
   }
@@ -121,14 +121,14 @@ void SubProtocol::Run(struct timeval timeout)
   }
 
   try {
-  if ( select(max_fp+1, &readfs, NULL, NULL, &timeout) > 0 ) {
-    for ( i = 0; i < Sources.size(); i ++ ) {
-      src = Sources[i];
-      if ( FD_ISSET(src->GetFd(), &readfs)) {
-        src->ReadData();
+    if ( select(max_fp+1, &readfs, NULL, NULL, &timeout) > 0 ) {
+      for ( i = 0; i < Sources.size(); i ++ ) {
+        src = Sources[i];
+        if ( FD_ISSET(src->GetFd(), &readfs)) {
+          src->ReadData();
+        }
       }
     }
-  }
   } catch (int e) {
     src = Sources[i];
     Sources.erase(Sources.begin()+i);

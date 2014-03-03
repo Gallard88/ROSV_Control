@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "CmdModule.h"
-#include "parson.h"
 
 //*******************************************************************************************
 enum SubMode {
@@ -70,7 +69,7 @@ public:
   struct Motor ParseJson(const JSON_Object *setting);
 
   const string GetConfigData(void);
-  void Update(const string & msg);
+  void Update(JSON_Object *msg);
   const string GetData(void);
 
 private:

@@ -94,8 +94,25 @@ const string SubControl::GetConfigData(void)
 }
 
 // *******************************************************************************************
-void SubControl::Update(const string & msg)
+void SubControl::Update(JSON_Object *msg)
 {
+  const char *rec_type = json_object_get_string(msg, "RecordType");
+  if ( rec_type == NULL ) {
+    return ;
+  }
+  if ( strcmp(rec_type, "Velocity") == 0 ) {
+    JSON_Array *vec = json_object_get_array(msg, "Vector");
+    if ( vec != NULL ) {
+      if ( json_array_get_count(vec) == 4 ) {
+        Velocity.x = json_array_get_number(vec, 0);
+        Velocity.y = json_array_get_number(vec, 1);
+        Velocity.z = json_array_get_number(vec, 2);
+        Velocity.yaw = json_array_get_number(vec, 3);
+      }
+    }
+  } else {
+    printf("Update: %s\n", rec_type);
+  }
 }
 
 // *******************************************************************************************
@@ -151,9 +168,9 @@ void SubControl::Run(void)
     power[VECTOR_X]     = Velocity.x / MOT_SCALE;
     power[VECTOR_Y]     = Velocity.y / MOT_SCALE;
     power[VECTOR_Z]     = Velocity.z / MOT_SCALE;
+    power[VECTOR_YAW]   = Velocity.yaw / MOT_SCALE;
     power[VECTOR_ROLL]  = Velocity.roll / MOT_SCALE;
     power[VECTOR_PITCH] = Velocity.pitch / MOT_SCALE;
-    power[VECTOR_YAW]   = Velocity.yaw / MOT_SCALE;
     break;
 
   case Idle:
