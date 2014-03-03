@@ -57,6 +57,8 @@ private:
   time_t update;
   vector<struct Modules>  Modules;
   vector<DataSource *>    Sources;
+
+  void ProcessLine(string line);
 };
 
 //*******************************************************************************************

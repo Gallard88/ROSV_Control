@@ -31,7 +31,7 @@
 #include <syslog.h>
 #include <ctype.h>
 
-
+#include "parson.h"
 #include "SubProtocol.h"
 
 // *******************************************************************************************
@@ -75,6 +75,33 @@ void SubProtocol::AddSource(DataSource *src)
 }
 
 // *******************************************************************************************
+void SubProtocol::ProcessLine(string line)
+{
+  printf("Line: %s\r\n", line.c_str());
+  JSON_Value *data = json_parse_string(line.c_str());
+
+  if ( data == NULL ) {
+    printf("Data == NULL\n");
+    return;
+  }
+
+  JSON_Object *obj = json_value_get_object(data);
+
+  const char *module = json_object_get_string(obj, "Module");
+  if ( module != NULL ) {
+    for ( size_t j = 0; j < Modules.size(); j ++ ) {
+      if ( strcmp(module, Modules[j].Name.c_str()) == 0 ) {
+        Modules[j].module->Update(line);
+      }
+    }
+  }
+
+  // release the data now that we are finished.
+  json_value_free(data);
+
+}
+
+// *******************************************************************************************
 #define MAX_FP(a, b)	b = (a > b)? a : b
 // *******************************************************************************************
 void SubProtocol::Run(struct timeval timeout)
@@ -112,7 +139,7 @@ void SubProtocol::Run(struct timeval timeout)
     string line;
     src = Sources[i];
     if ( src->ReadLine(&line)) {
-      printf("Line: %s\r\n", line.c_str());
+      ProcessLine(line);
     }
   }
 
