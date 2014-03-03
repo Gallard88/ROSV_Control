@@ -91,7 +91,6 @@ const string PowerManager::GetData(void)
   string msg("\"RecordType\": \"Update\", ");
   sprintf(power, "\"Voltage\": %f ", CurrentVoltage);
   msg += string(power);
-  msg += "}";
   return msg;
 }
 
