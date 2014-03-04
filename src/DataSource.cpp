@@ -46,16 +46,13 @@ DataSource::DataSource(int fp, const char *name)
   this->Name = new char[length+1];
   strncpy(this->Name, name, length);
   this->Name[length] = 0;
-  printf("New DataSource: %s\n", name);
-//  syslog(LOG_EMERG, "New DataSource: %s", name);
+  syslog(LOG_INFO, "Creating DataSource: %s", name);
 }
 
 //*******************************************************************************************
 DataSource::~DataSource(void)
 {
-
-  syslog(LOG_EMERG, "Del DataSource, %d, %s", File, this->Name);
-  printf("DataSource del , %d, %s\n", File, this->Name);
+  syslog(LOG_INFO, "Closing DataSource: %s", this->Name);
   if ( File >=0 ) {
     close(File);
     File = -1;
@@ -82,7 +79,6 @@ int DataSource::ReadData(void)
 
   int n = read(File, buffer, sizeof(buffer)-1);
   if ( n <= 0 ) {
-    printf("Read Exception\n");
     throw DS_ReadEx;
     // throw expection.
   } else {
@@ -116,7 +112,6 @@ int DataSource::WriteData(const char *msg)
 {
   int n = write (File, msg, strlen(msg));
   if ( n <= 0 ) {
-    printf("Write Exception\n");
     throw DS_WriteEx;
   }
   return n;
