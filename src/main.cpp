@@ -38,11 +38,14 @@ volatile bool Run_Control;
 /* ======================== */
 PWM_Con_t PwmModule;
 TcpServer        *Listner;
+volatile bool	 RunListner;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
 LightManager     *LightMan;
 CameraManager    *CamMan;
 PowerManager     *Power;
+
+static thread ListenThread;
 
 /* ======================== */
 /* ======================== */
@@ -82,37 +85,42 @@ void SignalHandler_Setup(void)
 /* ======================== */
 void System_Shutdown(void)
 {
-  if ( Listner != NULL )
-    delete Listner;
-  if ( Power != NULL )
+  RunListner = false;
+//  ListenThread.join();
+//  if ( Listner != NULL ) {
+//    delete Listner;
+//  }
+  if ( Power != NULL ) {
     delete Power;
-  if ( MotorControl != NULL )
+  }
+  if ( MotorControl != NULL ) {
     delete MotorControl;
-  if ( LightMan != NULL )
+  }
+  if ( LightMan != NULL ) {
     delete LightMan;
-  if ( CamMan != NULL )
+  }
+  if ( CamMan != NULL ) {
     delete CamMan;
-  if ( SubProt != NULL )
+  }
+  if ( SubProt != NULL ) {
     delete SubProt;
+  }
 
   syslog(LOG_NOTICE, "System shutting down");
   closelog();
 }
 
 /* ======================== */
-static thread ListenThread;
-
 static void ListenFunc(void)
 {
   DataSource *new_src;
 
-  printf("Listen Thread start\n");
-  while ( 1 ) {
+  while ( RunListner ) {
     new_src = Listner->Listen();
-    SubProt->AddSource(new_src);
-    printf("New source\n");
+    if ( new_src != NULL ) {
+      SubProt->AddSource(new_src);
+    }
   }
-  printf("Listen Thread close\n");
 }
 
 /* ======================== */
@@ -134,19 +142,9 @@ int main (int argc, char *argv[])
   }
 
   /* --------------------------------------------- */
-  uid_t uid=getuid(), euid=geteuid();
-
-  if ((uid <= 0 ) || ( uid != euid)) {
-    // We might have elevated privileges beyond that of the user who invoked
-    // the program, due to suid bit. Be very careful about trusting any data!
-    cout << "Operating as Root" << endl;
-  } else {
-    cout << "Operating as User " << uid << endl;
-  }
-
-  /* --------------------------------------------- */
   // open sub-modules
   Listner = new TcpServer(8090);
+  RunListner = true;
   std::thread ListenThread(ListenFunc);
 
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
@@ -169,7 +167,6 @@ int main (int argc, char *argv[])
   SubProt->AddModule("Motor",  (CmdModule *) MotorControl);
 
   /* --------------------------------------------- */
-  cout << "Starting Main Program" << endl;
   while (1) {
     // read data from connected clients.
     SubProt->Run(system_time);
