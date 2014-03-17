@@ -70,7 +70,6 @@ CameraManager::CameraManager(const char *filename)
 // *******************************************************************************************
 void CameraManager::Start(const char *ip)
 {
-  /*
     char cmd[CAMMAN_SC_SIZE*2];
     pid_t pid = fork();
 
@@ -84,7 +83,6 @@ void CameraManager::Start(const char *ip)
       syslog(LOG_EMERG, "CameraManager: Failed to fork");
       exit(-1);
     }
-  */
   StartTime = time(NULL);
 }
 
@@ -112,6 +110,17 @@ const string CameraManager::GetConfigData(void)
 // *******************************************************************************************
 void CameraManager::Update(JSON_Object *msg)
 {
+  printf("Msg\n");
+  const char *rec_type = json_object_get_string(msg, "RecordType");
+  if ( rec_type == NULL ) {
+    return;
+  }
+  if ( strcmp(rec_type, "Start") == 0 ) {
+    this->Start(json_object_get_string(msg, "IP"));
+    printf("Camera Start\n");
+  }  else {
+    printf("Cam record: %s\n", rec_type);
+  }
 }
 
 // *******************************************************************************************
