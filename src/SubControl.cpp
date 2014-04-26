@@ -90,9 +90,19 @@ struct Motor SubControl::ParseJson(const JSON_Object *setting) {
 // *******************************************************************************************
 const string SubControl::GetConfigData(void)
 {
-  char msg[100];
-  sprintf(msg, "\"Chanels\": %d", MotorList.size());
-  return string(msg);
+  string msg;
+
+  msg = "\"Chanels\":[ ";
+  for ( size_t i = 0; i < MotorList.size(); i ++ ) {
+    msg += " \"";
+    msg += MotorList[i].Name;
+    msg += "\"";
+    if (( MotorList.size() > 1 ) && ( i < (MotorList.size()-1))) {
+      msg += ", ";
+    }
+  }
+  msg += " ] ";
+  return msg;
 }
 
 // *******************************************************************************************
@@ -118,6 +128,7 @@ void SubControl::Update(JSON_Object *msg)
 }
 
 // *******************************************************************************************
+/*
 const string SubControl::GetData(void)
 {
   char power[10];
@@ -138,7 +149,27 @@ const string SubControl::GetData(void)
   msg += " ] ";
   return msg;
 }
-
+*/
+// *******************************************************************************************
+const string SubControl::GetData(void)
+{
+  char power[10];
+  string msg("\"RecordType\": \"Update\", ");
+  msg += "\"Chanels\":[ ";
+  for ( size_t i = 0; i < MotorList.size(); i ++ ) {
+    msg += " {\"Name\": \"";
+    msg += MotorList[i].Name;
+    msg += "\",\"Max\":100, \"Min\":0, \"Value\": ";
+    sprintf(power, "%f", MotorList[i].power * 100 );
+    msg += string(power);
+    msg += "}";
+    if (( MotorList.size() > 1 ) && ( i < (MotorList.size()-1))) {
+      msg += ", ";
+    }
+  }
+  msg += " ] ";
+  return msg;
+}
 // *******************************************************************************************
 /*
  * X

@@ -163,8 +163,8 @@ int main (int argc, char *argv[])
 
   SubProt->AddModule("Light",  (CmdModule *) LightMan);
   SubProt->AddModule("Power",  (CmdModule *) Power);
-  SubProt->AddModule("Camera", (CmdModule *) CamMan);
   SubProt->AddModule("Motor",  (CmdModule *) MotorControl);
+  SubProt->AddModule("Camera", (CmdModule *) CamMan);
 
   /* --------------------------------------------- */
   while (1) {

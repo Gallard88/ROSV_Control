@@ -80,21 +80,24 @@ void PowerManager::Update(JSON_Object *msg)
 //  *******************************************************************************************
 const string PowerManager::GetConfigData(void)
 {
-  return "\"Measurements\":[ \"Voltage\" ] ";
+  return "\"Chanels\":[ \"Voltage\" ] ";
 }
 
 //  *******************************************************************************************
 const string PowerManager::GetData(void)
 {
-  char power[30];
-
+  char power[10];
   string msg("\"RecordType\": \"Update\", ");
-  sprintf(power, "\"Voltage\": %f ", CurrentVoltage);
+
+  msg += "\"Chanels\":[ ";
+  msg += " {\"Name\": \"Voltage\",\"Max\":24, \"Min\":0, \"Value\": ";
+  sprintf(power, "%f", CurrentVoltage );
   msg += string(power);
+  msg += "}";
+  msg += " ] ";
   return msg;
 }
 
 //*******************************************************************************************
 //*******************************************************************************************
-
 

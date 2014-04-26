@@ -139,11 +139,11 @@ const string LightManager::GetData(void)
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
     msg += " {\"Name\": \"";
     msg += Chanels[i].Name;
-    msg += "\", \"Power\": ";
-    sprintf(power, "%d", Chanels[i].Power);
+    msg += "\",\"Max\":100, \"Min\":0, \"Value\": ";
+    sprintf(power, "%d", Chanels[i].Power * 100 );
     msg += string(power);
     msg += "}";
-    if ( Chanels.size() > 1 ) {
+    if (( Chanels.size() > 1 ) && ( i < (Chanels.size()-1))) {
       msg += ", ";
     }
   }

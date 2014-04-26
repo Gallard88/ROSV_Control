@@ -105,8 +105,9 @@ void CameraManager::Stop(void)
 // *******************************************************************************************
 const string CameraManager::GetConfigData(void)
 {
-  return "\"Chanels\": 1";
+  return "\"Chanels\":[ \"Primary\" ] ";
 }
+
 // *******************************************************************************************
 void CameraManager::Update(JSON_Object *msg)
 {
@@ -126,15 +127,23 @@ void CameraManager::Update(JSON_Object *msg)
 // *******************************************************************************************
 const string CameraManager::GetData(void)
 {
-  char msg[100];
+  char power[10];
+  string msg("\"RecordType\": \"Update\", ");
   int diff = 0;
 
   if ( StartTime != 0 ) {
     diff = time(NULL) - StartTime;
   }
 
-  sprintf(msg,"\"RecordType\": \"Update\", \"Time\": %d", diff);
-  return string(msg);
+
+  msg += "\"Chanels\":[ ";
+  msg += " {\"Name\": \"Primary\",\"Max\":100, \"Min\":0, \"Value\": ";
+  sprintf(power, "%d", diff );
+  msg += string(power);
+  msg += "}";
+  msg += " ] ";
+  return msg;
+
 }
 
 // *******************************************************************************************
