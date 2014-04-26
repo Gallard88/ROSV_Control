@@ -157,11 +157,27 @@ void SubProtocol::Run(struct timeval timeout)
       msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
       msg += Modules[j].module->GetData();
       msg += " }\r\n";
-      for ( i = 0; i < Sources.size(); i ++ ) {
-        src = Sources[i];
-        src->WriteData(msg.c_str());
-      }
+      SendMsg(&msg);
     }
+  }
+}
+
+//*******************************************************************************************
+void SubProtocol::SendMsg(const string *msg)
+{
+  size_t i;
+  DataSource *src;
+
+  try {
+    for ( i = 0; i < Sources.size(); i ++ ) {
+      src = Sources[i];
+      src->WriteData(msg->c_str());
+    }
+
+  } catch (int e) {
+    src = Sources[i];
+    Sources.erase(Sources.begin()+i);
+    delete src;
   }
 }
 

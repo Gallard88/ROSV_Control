@@ -58,6 +58,7 @@ private:
   vector<struct Modules>  Modules;
   vector<DataSource *>    Sources;
 
+  void SendMsg(const string *msg);
   void ProcessLine(string line);
 };
 

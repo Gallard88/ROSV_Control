@@ -128,29 +128,6 @@ void SubControl::Update(JSON_Object *msg)
 }
 
 // *******************************************************************************************
-/*
-const string SubControl::GetData(void)
-{
-  char power[10];
-  string msg("\"RecordType\": \"Update\", ");
-  msg += "\"Chanels\":[ ";
-  for ( size_t i = 0; i < MotorList.size(); i ++ ) {
-    msg += " {\"Name\": \"";
-    msg += MotorList[i].Name;
-    msg += "\", \"Power\": ";
-    sprintf(power, "%02.2f", MotorList[i].power);
-    msg += string(power);
-    msg += "}";
-    if (( MotorList.size() > 1 ) &&
-        ( i != (MotorList.size()-1) )) {
-      msg += ", ";
-    }
-  }
-  msg += " ] ";
-  return msg;
-}
-*/
-// *******************************************************************************************
 const string SubControl::GetData(void)
 {
   char power[10];
