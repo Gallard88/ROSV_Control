@@ -32,7 +32,7 @@ using namespace std;
 // *******************************************************************************************
 SubControl::SubControl(const char *filename)
 {
-  Mode = Vel;
+  Enable = false;
   memset(&Velocity, 0, sizeof(Velocity));
 
   JSON_Value *val = json_parse_file(filename);
@@ -147,6 +147,14 @@ const string SubControl::GetData(void)
   msg += " ] ";
   return msg;
 }
+
+// *******************************************************************************************
+void SubControl::EnableMotor(bool en)
+{
+  Enable = en;
+}
+
+
 // *******************************************************************************************
 /*
  * X
@@ -171,31 +179,24 @@ void SubControl::Run(void)
 {
   float power[VECTOR_SIZE];
 
-  switch ( Mode ) {
+  if ( Enable == false )
+    return;
 
-  case Vel:
-    // run each Axes controller.
-    power[VECTOR_X]     = Velocity.x / MOT_SCALE;
-    power[VECTOR_Y]     = Velocity.y / MOT_SCALE;
-    power[VECTOR_Z]     = Velocity.z / MOT_SCALE;
-    power[VECTOR_YAW]   = Velocity.yaw / MOT_SCALE;
-    power[VECTOR_ROLL]  = Velocity.roll / MOT_SCALE;
-    power[VECTOR_PITCH] = Velocity.pitch / MOT_SCALE;
-    break;
-
-  case Idle:
-  default:
-    for ( int i = 0; i < VECTOR_SIZE; i ++ ) {
-      power[i] = 0.0;
-    }
-    break;
-  }
+  // run each Axes controller.
+  power[VECTOR_X]     = Velocity.x / MOT_SCALE;
+  power[VECTOR_Y]     = Velocity.y / MOT_SCALE;
+  power[VECTOR_Z]     = Velocity.z / MOT_SCALE;
+  power[VECTOR_YAW]   = Velocity.yaw / MOT_SCALE;
+  power[VECTOR_ROLL]  = Velocity.roll / MOT_SCALE;
+  power[VECTOR_PITCH] = Velocity.pitch / MOT_SCALE;
 
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
     float output = 0.0;
+
     for ( int j = 0; j < VECTOR_SIZE; j ++ ) {
       output = output + ((float)MotorList[i].mult[j] * power[j]);
     }
+
     MotorList[i].power = output;
     PWM_SetPWM(Pwm, MotorList[i].ch, output);
   }

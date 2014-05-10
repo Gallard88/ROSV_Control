@@ -33,12 +33,6 @@
 #include "CmdModule.h"
 
 //*******************************************************************************************
-enum SubMode {
-  Idle = 0,
-  Vel,
-  Pos
-};
-
 #define VECTOR_SIZE	6
 //*******************************************************************************************
 struct Motor {
@@ -68,14 +62,15 @@ public:
 
   struct Motor ParseJson(const JSON_Object *setting);
 
+  void EnableMotor(bool en);
   const string GetConfigData(void);
   void Update(JSON_Object *msg);
   const string GetData(void);
 
 private:
   vector<struct Motor> MotorList;
+  bool Enable;
 
-  enum SubMode Mode;
   ControlVector Velocity;
 };
 

@@ -46,6 +46,7 @@ public:
   SubProtocol();
   ~SubProtocol();
 
+  int GetNumClients(void);
   void AddModule(const string & name, CmdModule *mod);
   void AddSource(DataSource *src);
   void Run(struct timeval timeout);

@@ -173,7 +173,12 @@ int main (int argc, char *argv[])
 
     if ( Run_Control == true) {
       Run_Control = false;
+
+      bool mot_en = ( SubProt->GetNumClients() != 0)? true: false;
+      MotorControl->EnableMotor(mot_en);
       MotorControl->Run();
+
+
     }
   }
   return 0;
