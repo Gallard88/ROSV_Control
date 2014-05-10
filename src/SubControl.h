@@ -40,6 +40,7 @@ struct Motor {
   int ch;
   int mult[VECTOR_SIZE];
   float power;
+  float target;
 };
 
 typedef struct {

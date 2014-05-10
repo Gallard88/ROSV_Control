@@ -27,8 +27,8 @@ using namespace std;
 
 /* ======================== */
 /* ======================== */
-#define RUN_INTERVAL  (100*1000)	//  10 ms
-#define ALAM_INT      (50*1000)	//  50 ms
+#define RUN_INTERVAL  (50*1000)    // us
+#define ALAM_INT      (50*1000)    // us
 
 /* ======================== */
 static const char prop_file[] = "/etc/ROSV_Motors.json";

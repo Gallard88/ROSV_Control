@@ -83,6 +83,7 @@ struct Motor SubControl::ParseJson(const JSON_Object *setting) {
       mot.mult[i] = json_array_get_number(mult_array, i);
     }
   }
+  mot.target = 0.0;
   mot.power = 0.0;
   return mot;
 }
@@ -173,6 +174,7 @@ const float MOT_SCALE = 100.0;
 #define VECTOR_ROLL	3
 #define VECTOR_PITCH	4
 #define VECTOR_YAW	5
+#define RAMP_LIMIT	0.05
 
 // *******************************************************************************************
 void SubControl::Run(void)
@@ -197,8 +199,36 @@ void SubControl::Run(void)
       output = output + ((float)MotorList[i].mult[j] * power[j]);
     }
 
-    MotorList[i].power = output;
-    PWM_SetPWM(Pwm, MotorList[i].ch, output);
+    MotorList[i].target = output;
+  }
+  for ( size_t i = 0; i < MotorList.size(); i ++ ) {
+    float target = MotorList[i].target;
+    float p = MotorList[i].power;
+
+    /* When the motors engage at full power there is often a HUGE surge of current
+     * which can cause the main rail to drop a volt or two. This glitch on the supply
+     * can often be seen in the more sensitive hardware, such as the light modules
+     * flicker a little, and it is sometimes possible for the PWM_Controller and other
+     * hardware to disconnect due to the electrical noise.
+     *
+     * This code is designed to stop the sudden surge on the system by limiting how hard
+     * the motors can turn on. Since this only affects the system when increasing the speed
+     * of the motors, we only run this code when the motors power is LESS than the target.
+     *
+     */
+
+    if ( p < target ) {
+      if  (( target - p ) > RAMP_LIMIT )
+        p += RAMP_LIMIT;
+      else
+        p = target;
+
+    } else {
+      p = target;
+    }
+
+    MotorList[i].power = p;
+    PWM_SetPWM(Pwm, MotorList[i].ch, p );
   }
 }
 
