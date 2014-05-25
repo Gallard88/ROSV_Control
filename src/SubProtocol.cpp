@@ -59,13 +59,36 @@ void SubProtocol::AddModule(const string & name, CmdModule *mod)
 }
 
 // *******************************************************************************************
+void SubProtocol::SendSourceData(void)
+{
+  string msg;
+  DataSource *src;
+
+  msg = "{ \"Module\": \"ClientList\", ";
+  msg += "\"RecordType\":\"Update\", ";
+  msg += "\"DataType\":\"Text\", ";
+  msg += "\"Values\":[ ";
+  for ( size_t i = 0; i < Sources.size(); i ++ ) {
+    src = Sources[i];
+    msg += "\"";
+    msg += string(src->GetName());
+    msg += "\"";
+
+    if ( Sources.size() > 1 ) {
+      msg += ", ";
+    }
+  }
+  msg += " ]}\r\n";
+  SendMsg(&msg);
+}
+
+// *******************************************************************************************
 void SubProtocol::AddSource(DataSource *src)
 {
   Sources.push_back(src);
 
-  string msg;
-
   for ( size_t i = 0; i < Modules.size(); i ++ ) {
+    string msg;
     msg = "{ \"Module\": \"" + Modules[i].Name + "\", ";
     msg += "\"RecordType\":\"Config\", ";
     msg += Modules[i].module->GetConfigData();
@@ -159,6 +182,7 @@ void SubProtocol::Run(struct timeval timeout)
       msg += " }\r\n";
       SendMsg(&msg);
     }
+    SendSourceData();
   }
 }
 
