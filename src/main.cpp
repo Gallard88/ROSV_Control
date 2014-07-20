@@ -24,6 +24,7 @@ using namespace std;
 #include "TcpServer.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
+#include "Logger.h"
 
 /* ======================== */
 /* ======================== */
@@ -44,6 +45,7 @@ SubProtocol      *SubProt;
 LightManager     *LightMan;
 CameraManager    *CamMan;
 PowerManager     *Power;
+Logger           *Log;
 
 static thread ListenThread;
 
@@ -106,6 +108,7 @@ void System_Shutdown(void)
     delete SubProt;
   }
 
+  Log->RecordValue("ROSV_Control", "Shutdown", 1);
   syslog(LOG_NOTICE, "System shutting down");
   closelog();
 }
@@ -143,6 +146,9 @@ int main (int argc, char *argv[])
 
   /* --------------------------------------------- */
   // open sub-modules
+  Log = Logger::Init();
+  Log->RecordValue("ROSV_Control","Start", 1);
+
   Listner = new TcpServer(8090);
   RunListner = true;
   std::thread ListenThread(ListenFunc);

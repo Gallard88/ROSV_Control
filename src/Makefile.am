@@ -16,7 +16,8 @@ ROSV_Control_Files_DATA= \
 	power.json 
 	
 LDADD = \
-	/usr/local/lib/libPWMControl.a 
+	/usr/local/lib/libPWMControl.a \
+	/usr/local/lib/libSnotra.a
 
 ROSV_Control_SOURCES = \
 	CameraManager.cpp \
@@ -26,6 +27,8 @@ ROSV_Control_SOURCES = \
 	DataSource.h \
 	LightManager.cpp \
 	LightManager.h \
+	Logger.cpp \
+	Logger.h \
 	parson.c \
 	parson.h \
 	PowerManager.cpp \

@@ -65,12 +65,13 @@ am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 	"$(DESTDIR)$(ROSV_Control_Filesdir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) DataSource.$(OBJEXT) \
-	LightManager.$(OBJEXT) parson.$(OBJEXT) PowerManager.$(OBJEXT) \
-	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
-	main.$(OBJEXT)
+	LightManager.$(OBJEXT) Logger.$(OBJEXT) parson.$(OBJEXT) \
+	PowerManager.$(OBJEXT) SubControl.$(OBJEXT) \
+	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
-ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a
+ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
+	/usr/local/lib/libSnotra.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -230,7 +231,8 @@ ROSV_Control_Files_DATA = \
 	power.json 
 
 LDADD = \
-	/usr/local/lib/libPWMControl.a 
+	/usr/local/lib/libPWMControl.a \
+	/usr/local/lib/libSnotra.a
 
 ROSV_Control_SOURCES = \
 	CameraManager.cpp \
@@ -240,6 +242,8 @@ ROSV_Control_SOURCES = \
 	DataSource.h \
 	LightManager.cpp \
 	LightManager.h \
+	Logger.cpp \
+	Logger.h \
 	parson.c \
 	parson.h \
 	PowerManager.cpp \
@@ -339,6 +343,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataSource.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubProtocol.Po@am__quote@
