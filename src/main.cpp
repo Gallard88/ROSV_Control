@@ -153,8 +153,7 @@ int main (int argc, char *argv[])
   RunListner = true;
   std::thread ListenThread(ListenFunc);
 
-  MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
-  MotorControl->Pwm = PwmModule;
+  MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
 
   LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;

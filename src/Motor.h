@@ -1,5 +1,5 @@
 /*
- SubControl ( http://www.github.com/Gallard88/ROSV_Control )
+ Motor ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,48 +21,44 @@
  THE SOFTWARE.
 */
 
-//  *******************************************************************************************
-#ifndef __SUB_CONTROL__
-#define __SUB_CONTROL__
+//*******************************************************************************************
+#ifndef __MOTOR__
+#define __MOTOR__
+//*******************************************************************************************
+#include "parson.h"
 
-//  *******************************************************************************************
-#include <string>
 #include <PWM_Controller.h>
-#include <vector>
+#include <ctime>
 
-#include "CmdModule.h"
-#include "Motor.h"
-
-//  *******************************************************************************************
-//  *******************************************************************************************
-
-typedef struct {
-  float x;
-  float y;
-  float z;
-  float yaw;
-  float roll;
-  float pitch;
-
-} ControlVector;
+#include "Logger.h"
 
 //*******************************************************************************************
-class SubControl: CmdModule {
-public:
-  SubControl(const char *filename, PWM_Con_t pwm);
-  void Run(void);
+#define VECTOR_SIZE     6
 
-  void EnableMotor(bool en);
-  const string GetConfigData(void);
-  void Update(JSON_Object *msg);
-  const string GetData(void);
+//*******************************************************************************************
+
+class  Motor {
+public:
+  Motor(const JSON_Object *setting, PWM_Con_t p);
+
+  void Run(float *power);
+  float GetPower(void);
+  string GetName(void);
+
+  PWM_Con_t Pwm;
 
 private:
-  vector<Motor *> MotorList;
-  bool Enable;
+  string Name;
+  int Chanel;
+  int mult[VECTOR_SIZE];
+  float Power;
+  float Target;
 
-  ControlVector Velocity;
+  time_t update;
+  Logger *Log;
 };
 
 //*******************************************************************************************
+//*******************************************************************************************
 #endif
+

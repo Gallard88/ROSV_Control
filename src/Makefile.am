@@ -29,6 +29,8 @@ ROSV_Control_SOURCES = \
 	LightManager.h \
 	Logger.cpp \
 	Logger.h \
+	Motor.cpp \
+	Motor.h \
 	parson.c \
 	parson.h \
 	PowerManager.cpp \
