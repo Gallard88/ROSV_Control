@@ -65,10 +65,11 @@ void PowerManager::Run(void)
   */
   time_t current;
   current = time(NULL);
-  if ((current - update) > 1) {
+  if ((current - update) >= 1) {
     update = current;
 
     CurrentVoltage = PWM_GetVoltage(Pwm);
+    Log->RecordValue("Power", "Voltage", CurrentVoltage);
   }
 }
 

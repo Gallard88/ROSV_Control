@@ -28,15 +28,18 @@
 using namespace std;
 
 #include <string>
+
+#include "Logger.h"
 #include "parson.h"
 
 //*******************************************************************************************
 class CmdModule {
 public:
+  CmdModule() {  Log = Logger::Init();  }
   virtual const string GetConfigData(void) = 0;
   virtual void Update(JSON_Object *msg) = 0;
   virtual const string GetData(void) = 0;
-
+  Logger *Log;
 };
 
 //*******************************************************************************************

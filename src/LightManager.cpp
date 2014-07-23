@@ -95,7 +95,7 @@ void LightManager::Run(void)
   */
   time_t current;
   current = time(NULL);
-  if ((current - update) > 1) {
+  if ((current - update) >= 1) {
     update = current;
 
     for ( size_t i = 0; i < Chanels.size(); i ++ ) {

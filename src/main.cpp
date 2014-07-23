@@ -32,7 +32,6 @@ using namespace std;
 #define ALAM_INT      (50*1000)    // us
 
 /* ======================== */
-static const char prop_file[] = "/etc/ROSV_Motors.json";
 const struct timeval system_time = { 0 , RUN_INTERVAL};
 volatile bool Run_Control;
 
@@ -54,8 +53,6 @@ static thread ListenThread;
 void Alarm_Wakeup (int i)
 {
   Run_Control = true;
-  LightMan->Run();
-  Power->Run();
 }
 
 /* ======================== */
@@ -183,7 +180,8 @@ int main (int argc, char *argv[])
       MotorControl->EnableMotor(mot_en);
       MotorControl->Run();
 
-
+      LightMan->Run();
+      Power->Run();
     }
   }
   return 0;
