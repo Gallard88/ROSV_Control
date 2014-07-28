@@ -28,8 +28,7 @@ using namespace std;
 
 /* ======================== */
 /* ======================== */
-#define RUN_INTERVAL  (50*1000)    // us
-#define ALAM_INT      (50*1000)    // us
+#define RUN_INTERVAL  (10*1000)    // us
 
 /* ======================== */
 const struct timeval system_time = { 0 , RUN_INTERVAL};
