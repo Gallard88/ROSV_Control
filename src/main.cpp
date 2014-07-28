@@ -33,12 +33,10 @@ using namespace std;
 
 /* ======================== */
 const struct timeval system_time = { 0 , RUN_INTERVAL};
-volatile bool Run_Control;
 
 /* ======================== */
 PWM_Con_t PwmModule;
 TcpServer        *Listner;
-volatile bool	 RunListner;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
 LightManager     *LightMan;
@@ -47,18 +45,12 @@ PowerManager     *Power;
 Logger           *Log;
 
 static thread ListenThread;
+volatile bool RunSystem;
 
 /* ======================== */
-/* ======================== */
-void Alarm_Wakeup (int i)
-{
-  Run_Control = true;
-}
-
 /* ======================== */
 void SignalHandler_Setup(void)
 {
-  struct itimerval timeout;
   struct sigaction sig;
 
   // Install timer_handler as the signal handler for SIGVTALRM.
@@ -67,24 +59,12 @@ void SignalHandler_Setup(void)
   sigaction (SIGINT , &sig, NULL);
   sigaction (SIGTERM , &sig, NULL);
   sigaction (SIGABRT , &sig, NULL);
-
-  memset (&sig, 0, sizeof (struct sigaction));
-  sig.sa_handler = &Alarm_Wakeup;
-  sigaction (SIGALRM , &sig, NULL);
-
-  timeout.it_interval.tv_sec = 0;
-  timeout.it_interval.tv_usec = ALAM_INT;
-  timeout.it_value.tv_sec = 0;
-  timeout.it_value.tv_usec = ALAM_INT;
-
-  setitimer(ITIMER_REAL, &timeout,0);
-  Run_Control = true;
 }
 
 /* ======================== */
 void System_Shutdown(void)
 {
-  RunListner = false;
+  RunSystem = false;
 //  ListenThread.join();
 //  if ( Listner != NULL ) {
 //    delete Listner;
@@ -115,7 +95,7 @@ static void ListenFunc(void)
 {
   DataSource *new_src;
 
-  while ( RunListner ) {
+  while ( RunSystem ) {
     new_src = Listner->Listen();
     if ( new_src != NULL ) {
       SubProt->AddSource(new_src);
@@ -147,7 +127,7 @@ int main (int argc, char *argv[])
   Log->RecordValue("ROSV_Control","Start", 1);
 
   Listner = new TcpServer(8090);
-  RunListner = true;
+  RunSystem = true;
   std::thread ListenThread(ListenFunc);
 
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
@@ -169,20 +149,16 @@ int main (int argc, char *argv[])
   SubProt->AddModule("Camera", (CmdModule *) CamMan);
 
   /* --------------------------------------------- */
-  while (1) {
+  while ( RunSystem ) {
     // read data from connected clients.
     SubProt->Run(system_time);
 
-    if ( Run_Control == true) {
-      Run_Control = false;
+    bool mot_en = ( SubProt->GetNumClients() != 0)? true: false;
+    MotorControl->EnableMotor(mot_en);
+    MotorControl->Run();
 
-      bool mot_en = ( SubProt->GetNumClients() != 0)? true: false;
-      MotorControl->EnableMotor(mot_en);
-      MotorControl->Run();
-
-      LightMan->Run();
-      Power->Run();
-    }
+    LightMan->Run();
+    Power->Run();
   }
   return 0;
 }

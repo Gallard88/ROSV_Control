@@ -29,7 +29,6 @@
 #include <vector>
 
 #include <PWM_Controller.h>
-#include <ctime>
 
 #include "CmdModule.h"
 
@@ -52,8 +51,6 @@ private:
   float WarningVoltage;
   float AlarmVoltage;
   float CurrentVoltage;
-
-  time_t update;
 };
 
 //*******************************************************************************************

@@ -26,6 +26,7 @@ using namespace std;
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
+#include <sys/time.h>
 
 #include "SubControl.h"
 
@@ -68,6 +69,7 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm)
     }
   }
   json_value_free (val);
+  SetCallPeriod(100);
 }
 
 // *******************************************************************************************
@@ -162,8 +164,10 @@ void SubControl::Run(void)
 {
   float power[VECTOR_SIZE];
 
-  if ( Enable == false )
-    return;
+  if (( Enable == false ) ||
+      ( RunModule() == false )) {
+    return ;
+  }
 
   // run each Axes controller.
   power[VECTOR_X]     = Velocity.x / MOT_SCALE;

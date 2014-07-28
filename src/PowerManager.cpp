@@ -39,6 +39,8 @@ PowerManager::PowerManager(const char * filename)
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
+  SetCallPeriod(1000);
+
   if ( rv != JSONObject ) {
     syslog(LOG_EMERG, "PowerManager: JSON Parse file failed\n");
     json_value_free (val);
@@ -63,10 +65,7 @@ void PowerManager::Run(void)
   /* The PWM has a ~7 second watchdog.
   *	If this function is run once per second it should be fast enough
   */
-  time_t current;
-  current = time(NULL);
-  if ((current - update) >= 1) {
-    update = current;
+  if ( RunModule() == true ) {
 
     CurrentVoltage = PWM_GetVoltage(Pwm);
     Log->RecordValue("Power", "Voltage", CurrentVoltage);

@@ -29,7 +29,6 @@
 #include <vector>
 
 #include <PWM_Controller.h>
-#include <ctime>
 
 #include "CmdModule.h"
 
@@ -57,7 +56,6 @@ public:
 
 private:
   vector<LightChanel> Chanels;
-  time_t update;
 };
 
 //*******************************************************************************************

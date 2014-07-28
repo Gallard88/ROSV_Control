@@ -39,6 +39,8 @@ LightManager::LightManager(const char * filename)
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
+  SetCallPeriod(1000);
+
   if ( rv != JSONObject ) {
     syslog(LOG_EMERG, "Lighting: JSON Parse file failed\n");
     json_value_free (val);
@@ -93,10 +95,7 @@ void LightManager::Run(void)
   /* The PWM has a ~7 second watchdog.
   *	If this function is run once per second it should be fast enough
   */
-  time_t current;
-  current = time(NULL);
-  if ((current - update) >= 1) {
-    update = current;
+  if ( RunModule() == true ) {
 
     for ( size_t i = 0; i < Chanels.size(); i ++ ) {
       LightChanel ch = Chanels[i];
