@@ -37,7 +37,6 @@ using namespace std;
 //  *******************************************************************************************
 Logger::Logger()
 {
-  printf("Connect to Snotra\n");
   if ( Snotra_Connect() < 0 ) {
     exit(-1);
   }
