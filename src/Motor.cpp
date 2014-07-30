@@ -30,10 +30,10 @@ using namespace std;
 
 #include "Motor.h"
 
+static float Ramp_ = 1.0;
 //  *******************************************************************************************
 Motor::Motor(const JSON_Object *setting, PWM_Con_t p)
 {
-  printf("new Motor()\n");
   this->update = 0;
   Pwm = p;
   Name = string(json_object_get_string(setting, "Name"));
@@ -48,6 +48,12 @@ Motor::Motor(const JSON_Object *setting, PWM_Con_t p)
   Target = 0.0;
   Power = 0.0;
   Log = Logger::Init();
+}
+
+//  *******************************************************************************************
+void Motor::SetRamp(float ramp)
+{
+  Ramp_ = ramp;
 }
 
 //  *******************************************************************************************
@@ -71,11 +77,10 @@ void Motor::Run(float *power)
    * of the motors, we only run this code when the motors power is LESS than the target.
    *
    */
-#define RAMP_LIMIT 0.05
 
   if ( Power < Target ) {
-    if  (( Target - Power ) > RAMP_LIMIT )
-      Power += RAMP_LIMIT;
+    if  (( Target - Power ) > Ramp_ )
+      Power += Ramp_;
     else
       Power = Target;
 

@@ -44,8 +44,7 @@ public:
   void Run(float *power);
   float GetPower(void);
   string GetName(void);
-
-  PWM_Con_t Pwm;
+  static void SetRamp(float ramp);
 
 private:
   string Name;
@@ -56,6 +55,7 @@ private:
 
   time_t update;
   Logger *Log;
+  PWM_Con_t Pwm;
 };
 
 //*******************************************************************************************
