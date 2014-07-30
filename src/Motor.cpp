@@ -32,10 +32,13 @@ using namespace std;
 
 static float Ramp_ = 1.0;
 //  *******************************************************************************************
-Motor::Motor(const JSON_Object *setting, PWM_Con_t p)
+Motor::Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max)
 {
   this->update = 0;
   Pwm = p;
+  Min = min;
+  Max = max;
+
   Name = string(json_object_get_string(setting, "Name"));
   Chanel = (int) json_object_get_number(setting, "ch");
 
@@ -48,6 +51,24 @@ Motor::Motor(const JSON_Object *setting, PWM_Con_t p)
   Target = 0.0;
   Power = 0.0;
   Log = Logger::Init();
+}
+
+//  *******************************************************************************************
+string Motor::GetJSON(void)
+{
+  string json;
+  char buf[100];
+
+  json = "{ \"Name\": \"" + Name +"\", ";
+  sprintf(buf, " \"Min\": %f, ", Min);
+  json += string(buf);
+  sprintf(buf, " \"Max\": %f, ", Max);
+  json += string(buf);
+  sprintf(buf, " \"Value\": %f ", Target);
+  json += string(buf);
+  json += "}";
+
+  return json;
 }
 
 //  *******************************************************************************************
@@ -64,7 +85,13 @@ void Motor::Run(float *power)
   for ( int j = 0; j < VECTOR_SIZE; j ++ ) {
     output = output + ((float)mult[j] * power[j]);
   }
-  this->Target = output;
+
+  if ( output > Max )
+    this->Target = Max;
+  else if ( output < Min )
+    this->Target = Min;
+  else
+    this->Target = output;
 
   /* When the motors engage at full power there is often a HUGE surge of current
    * which can cause the main rail to drop a volt or two. This glitch on the supply

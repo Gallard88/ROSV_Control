@@ -39,17 +39,19 @@
 
 class  Motor {
 public:
-  Motor(const JSON_Object *setting, PWM_Con_t p);
+  Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max);
 
   void Run(float *power);
   float GetPower(void);
   string GetName(void);
+  string GetJSON(void);
   static void SetRamp(float ramp);
 
 private:
   string Name;
   int Chanel;
   int mult[VECTOR_SIZE];
+  float Min, Max;
   float Power;
   float Target;
 

@@ -65,7 +65,7 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm)
 
     JSON_Object *j_motor = json_array_get_object (array, i);
     if ( j_motor != NULL ) {
-      Motor *motor = new Motor(j_motor, pwm);
+      Motor *motor = new Motor(j_motor, pwm, 0, 100);
       MotorList.push_back(motor);
     }
   }
@@ -116,16 +116,11 @@ void SubControl::Update(JSON_Object *msg)
 // *******************************************************************************************
 const string SubControl::GetData(void)
 {
-  char power[10];
   string msg("\"RecordType\": \"Update\", ");
   msg += "\"Chanels\":[ ";
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
-    msg += " {\"Name\": \"";
-    msg += MotorList[i]->GetName();
-    msg += "\",\"Max\":100, \"Min\":0, \"Value\": ";
-    sprintf(power, "%f", MotorList[i]->GetPower() * 100 );
-    msg += string(power);
-    msg += "}";
+    msg += MotorList[i]->GetJSON();
+
     if (( MotorList.size() > 1 ) && ( i < (MotorList.size()-1))) {
       msg += ", ";
     }
