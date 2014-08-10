@@ -108,6 +108,12 @@ int main (int argc, char *argv[])
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_NOTICE, "Starting program");
 
+  int rv = daemon( 0, 0 );
+  if ( rv < 0 ) {
+    syslog(LOG_EMERG, "Daemonise failed" );
+    exit(-1);
+  }
+
   SignalHandler_Setup();
   atexit(System_Shutdown);
 
