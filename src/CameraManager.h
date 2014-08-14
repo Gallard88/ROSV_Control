@@ -36,6 +36,7 @@ using namespace std;
 class CameraManager: CmdModule {
 public:
   CameraManager(const char *filename);
+  ~CameraManager();
 
   void Start(const char *ip);
   void Stop(void);
@@ -46,9 +47,8 @@ public:
   const string GetData(void);
 
 private:
-#define CAMMAN_SC_SIZE	4096
-  char StartSc[CAMMAN_SC_SIZE];
-  char StopSc[CAMMAN_SC_SIZE];
+  char *StartSc;
+  char *StopSc;
   time_t StartTime;
 };
 

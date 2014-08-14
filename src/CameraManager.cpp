@@ -30,6 +30,8 @@
 
 #include "CameraManager.h"
 
+#define CAMMAN_SC_SIZE 4096
+
 // *******************************************************************************************
 CameraManager::CameraManager(const char *filename)
 {
@@ -53,14 +55,14 @@ CameraManager::CameraManager(const char *filename)
 
   const char *ptr = json_object_get_string (settings, "Start");
   if ( ptr != NULL ) {
-    strncpy(StartSc, ptr, CAMMAN_SC_SIZE);
+    asprintf(&StartSc, "%s",  ptr);
   } else {
     syslog(LOG_EMERG, "\"Start\" script not found");
   }
 
   ptr = json_object_get_string (settings, "Stop");
   if ( ptr != NULL ) {
-    strncpy(StopSc, ptr, CAMMAN_SC_SIZE);
+    asprintf(&StopSc, "%s",  ptr);
   } else {
     syslog(LOG_EMERG, "\"Stop\" script not found");
   }
@@ -68,21 +70,32 @@ CameraManager::CameraManager(const char *filename)
 }
 
 // *******************************************************************************************
+CameraManager::~CameraManager()
+{
+  if ( StartSc != NULL )
+    free(StartSc);
+  if ( StopSc != NULL )
+    free(StopSc);
+}
+
+// *******************************************************************************************
 void CameraManager::Start(const char *ip)
 {
-  char cmd[CAMMAN_SC_SIZE*2];
-  pid_t pid = fork();
+//  pid_t pid = fork();
 
-  if ( pid == 0 ) {
-    sprintf(cmd, "%s %s", StartSc, ip);
-    if ( system(cmd) < 0 ) {
-      syslog(LOG_EMERG,"CameraManager: exec failed");
-    }
-    exit(-1);
-  } else  if ( pid < 0 ) {
-    syslog(LOG_EMERG, "CameraManager: Failed to fork");
-    exit(-1);
+//  if ( pid == 0 ) {
+  char *cmd;
+  asprintf(&cmd, "%s %s &", StartSc, ip);
+  syslog(LOG_EMERG, "Start Script:= %s", cmd);
+  if ( system(cmd) < 0 ) {
+    syslog(LOG_EMERG,"CameraManager: exec failed");
   }
+  free(cmd);
+//    exit(-1);
+//  } else  if ( pid < 0 ) {
+//    syslog(LOG_EMERG, "CameraManager: Failed to fork");
+//    exit(-1);
+//  }
   StartTime = time(NULL);
 }
 
@@ -111,16 +124,16 @@ const string CameraManager::GetConfigData(void)
 // *******************************************************************************************
 void CameraManager::Update(JSON_Object *msg)
 {
-  printf("Msg\n");
+  syslog(LOG_EMERG, "Msg\n");
   const char *rec_type = json_object_get_string(msg, "RecordType");
   if ( rec_type == NULL ) {
     return;
   }
   if ( strcmp(rec_type, "Start") == 0 ) {
     this->Start(json_object_get_string(msg, "IP"));
-    printf("Camera Start\n");
+    syslog(LOG_EMERG, "Camera Start\n");
   }  else {
-    printf("Cam record: %s\n", rec_type);
+    syslog(LOG_EMERG, "Cam record: %s\n", rec_type);
   }
 }
 
