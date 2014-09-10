@@ -1,5 +1,5 @@
 /*
- Power Manager ( http://www.github.com/Gallard88/ROSV_Control )
+ Voltage ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,33 +21,30 @@
  THE SOFTWARE.
 */
 
-//*******************************************************************************************
-#ifndef __POWER_MANAGER__
-#define __POWER_MANAGER__
-//*******************************************************************************************
+//  *******************************************************************************************
+#ifndef __VOLTAGE__
+#define __VOLTAGE__
+//  *******************************************************************************************
+#include "Value.h"
+
 #include <string>
 #include <PWM_Controller.h>
 
-#include "CmdModule.h"
-#include "Voltage.h"
+//  *******************************************************************************************
 
-//*******************************************************************************************
-//*******************************************************************************************
-
-class  PowerManager: CmdModule {
+class Voltage {
 public:
-  PowerManager(const char * filename, PWM_Con_t p);
-  void Run(void);
+  Voltage(PWM_Con_t p);
 
-  const string GetConfigData(void);
-  void Update(JSON_Object *msg);
-  const string GetData(void);
+  void Run(void);
+  float GetPower(void);
+  string GetName(void);
+  string GetJSON(void);
 
 private:
-  Voltage *PwmVolt;
 
-  float WarningVoltage;
-  float AlarmVoltage;
+  Value *Val;
+  PWM_Con_t Pwm;
 };
 
 //*******************************************************************************************
