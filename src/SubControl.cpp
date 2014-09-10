@@ -36,7 +36,6 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm)
   Enable = false;
   memset(&Velocity, 0, sizeof(Velocity));
 
-  Motor::SetRamp(0.05);
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
@@ -66,6 +65,7 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm)
     JSON_Object *j_motor = json_array_get_object (array, i);
     if ( j_motor != NULL ) {
       Motor *motor = new Motor(j_motor, pwm, 0, 100);
+      motor->SetRamp(0.05);
       MotorList.push_back(motor);
     }
   }

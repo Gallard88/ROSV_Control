@@ -26,11 +26,11 @@
 #define __MOTOR__
 //*******************************************************************************************
 #include "parson.h"
+#include "Value.h"
 
 #include <PWM_Controller.h>
 #include <ctime>
 
-#include "Logger.h"
 
 //*******************************************************************************************
 #define VECTOR_SIZE     6
@@ -45,18 +45,13 @@ public:
   float GetPower(void);
   string GetName(void);
   string GetJSON(void);
-  static void SetRamp(float ramp);
+  void SetRamp(float ramp);
 
 private:
-  string Name;
   int Chanel;
   int mult[VECTOR_SIZE];
-  float Min, Max;
-  float Power;
-  float Target;
 
-  time_t update;
-  Logger *Log;
+  Value *Val;
   PWM_Con_t Pwm;
 };
 
