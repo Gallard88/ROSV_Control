@@ -34,12 +34,13 @@ using namespace std;
 #include "parson.h"
 
 //  *******************************************************************************************
-PowerManager::PowerManager(const char * filename)
+PowerManager::PowerManager(const char * filename, PWM_Con_t p)
 {
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
   SetCallPeriod(1000);
+  PwmVolt = new Voltage(p);
 
   if ( rv != JSONObject ) {
     syslog(LOG_EMERG, "PowerManager: JSON Parse file failed\n");
@@ -53,7 +54,6 @@ PowerManager::PowerManager(const char * filename)
     json_value_free (val);
     return;
   }
-  AmpHour         = (float)json_object_get_number (settings, "AmpHour");
   WarningVoltage  = (float)json_object_get_number (settings, "WarningVoltage");
   AlarmVoltage    = (float)json_object_get_number (settings, "AlarmVoltage");
   json_value_free (val);
@@ -62,13 +62,10 @@ PowerManager::PowerManager(const char * filename)
 //  *******************************************************************************************
 void PowerManager::Run(void)
 {
-  /* The PWM has a ~7 second watchdog.
-  *	If this function is run once per second it should be fast enough
-  */
   if ( RunModule() == true ) {
 
-    CurrentVoltage = PWM_GetVoltage(Pwm);
-    Log->RecordValue("Power", "Voltage", CurrentVoltage);
+    PwmVolt->Run();
+    Log->RecordValue("Power", "Voltage", PwmVolt->GetPower());
   }
 }
 
@@ -91,7 +88,7 @@ const string PowerManager::GetData(void)
 
   msg += "\"Chanels\":[ ";
   msg += " {\"Name\": \"Voltage\",\"Max\":24, \"Min\":0, \"Value\": ";
-  sprintf(power, "%f", CurrentVoltage );
+  sprintf(power, "%f", PwmVolt->GetPower() );
   msg += string(power);
   msg += "}";
   msg += " ] ";

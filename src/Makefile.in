@@ -67,7 +67,8 @@ PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) DataSource.$(OBJEXT) \
 	LightManager.$(OBJEXT) Logger.$(OBJEXT) Motor.$(OBJEXT) \
 	parson.$(OBJEXT) PowerManager.$(OBJEXT) SubControl.$(OBJEXT) \
-	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) main.$(OBJEXT)
+	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) Value.$(OBJEXT) \
+	Voltage.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -256,6 +257,10 @@ ROSV_Control_SOURCES = \
 	SubProtocol.h \
 	TcpServer.cpp \
 	TcpServer.h \
+	Value.cpp \
+	Value.h \
+	Voltage.cpp \
+	Voltage.h \
 	main.cpp
 
 all: all-am
@@ -351,6 +356,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubProtocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Value.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Voltage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parson.Po@am__quote@
 

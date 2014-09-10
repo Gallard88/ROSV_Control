@@ -1,5 +1,5 @@
 /*
- Power Manager ( http://www.github.com/Gallard88/ROSV_Control )
+ Voltage ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,36 +21,41 @@
  THE SOFTWARE.
 */
 
-//*******************************************************************************************
-#ifndef __POWER_MANAGER__
-#define __POWER_MANAGER__
-//*******************************************************************************************
-#include <string>
-#include <PWM_Controller.h>
+//  *******************************************************************************************
+using namespace std;
 
-#include "CmdModule.h"
+#include <string>
+
 #include "Voltage.h"
 
+//  *******************************************************************************************
+Voltage::Voltage(PWM_Con_t p)
+{
+  Pwm = p;
+  Val = new Value("Voltage", 0.0, 24.0);
+}
+
+//  *******************************************************************************************
+string Voltage::GetJSON(void)
+{
+  return Val->GetJSON();
+}
+
+//  *******************************************************************************************
+void Voltage::Run(void)
+{
+  Val->Run(PWM_GetVoltage(Pwm));
+}
+
 //*******************************************************************************************
-//*******************************************************************************************
-
-class  PowerManager: CmdModule {
-public:
-  PowerManager(const char * filename, PWM_Con_t p);
-  void Run(void);
-
-  const string GetConfigData(void);
-  void Update(JSON_Object *msg);
-  const string GetData(void);
-
-private:
-  Voltage *PwmVolt;
-
-  float WarningVoltage;
-  float AlarmVoltage;
-};
+float Voltage::GetPower(void)
+{
+  return Val->GetPower();
+}
 
 //*******************************************************************************************
-//*******************************************************************************************
-#endif
+string Voltage::GetName(void)
+{
+  return Val->GetName();
+}
 

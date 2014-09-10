@@ -108,6 +108,12 @@ int main (int argc, char *argv[])
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_NOTICE, "Starting program");
 
+  int rv = daemon( 0, 0 );
+  if ( rv < 0 ) {
+    syslog(LOG_EMERG, "Daemonise failed" );
+    exit(-1);
+  }
+
   SignalHandler_Setup();
   atexit(System_Shutdown);
 
@@ -134,8 +140,7 @@ int main (int argc, char *argv[])
   LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;
 
-  Power = new PowerManager("/etc/ROSV_Control/power.json");
-  Power->Pwm = PwmModule;
+  Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
 
   CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
 
