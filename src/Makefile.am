@@ -17,6 +17,7 @@ ROSV_Control_Files_DATA= \
 	
 LDADD = \
 	/usr/local/lib/libPWMControl.a \
+        /usr/local/lib/libPowerMonitor.a \
 	/usr/local/lib/libSnotra.a
 
 ROSV_Control_SOURCES = \

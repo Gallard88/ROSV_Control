@@ -27,6 +27,7 @@
 //*******************************************************************************************
 #include <string>
 #include <PWM_Controller.h>
+#include <PowerMonitor.h>
 
 #include "CmdModule.h"
 #include "Voltage.h"
@@ -44,10 +45,13 @@ public:
   const string GetData(void);
 
 private:
+  float SysVoltage[ PMON_NUM_CHANELS];
+  float SysCurrent[ PMON_NUM_CHANELS];
+
   Voltage *PwmVolt;
 
-  float WarningVoltage;
-  float AlarmVoltage;
+  PMon_t PMon;
+
 };
 
 //*******************************************************************************************

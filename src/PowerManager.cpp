@@ -39,6 +39,12 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p)
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
+  PMon = PMon_Connect();
+  if ( PMon == NULL ) {
+    syslog(LOG_EMERG, "PowerManager: failed to open PowerMonitor");
+    exit(-1);
+  }
+
   SetCallPeriod(1000);
   PwmVolt = new Voltage(p);
 
@@ -54,8 +60,8 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p)
     json_value_free (val);
     return;
   }
-  WarningVoltage  = (float)json_object_get_number (settings, "WarningVoltage");
-  AlarmVoltage    = (float)json_object_get_number (settings, "AlarmVoltage");
+//  WarningVoltage  = (float)json_object_get_number (settings, "WarningVoltage");
+//  AlarmVoltage    = (float)json_object_get_number (settings, "AlarmVoltage");
   json_value_free (val);
 }
 
@@ -66,6 +72,16 @@ void PowerManager::Run(void)
 
     PwmVolt->Run();
     Log->RecordValue("Power", "Voltage", PwmVolt->GetPower());
+
+    if ( PMon_isConnected(PMon) ) {
+      SysVoltage[0] = PMon_GetVoltage(PMon, 0);
+      SysVoltage[1] = PMon_GetCurrent(PMon, 1);
+    } else {
+      SysVoltage[0] = -1.0;
+      SysVoltage[1] = -1.0;
+    }
+    Log->RecordValue("Power", "VoltPri", SysVoltage[0]);
+    Log->RecordValue("Power", "VoltSec", SysVoltage[1]);
   }
 }
 
