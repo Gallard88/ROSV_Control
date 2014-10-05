@@ -13,8 +13,8 @@ ROSV_Control_Files_DATA= \
 	camera.json \
 	lighting.json \
 	motors.json \
-	power.json 
-	
+	power.json
+
 LDADD = \
 	/usr/local/lib/libPWMControl.a \
         /usr/local/lib/libPowerMonitor.a \
@@ -36,6 +36,8 @@ ROSV_Control_SOURCES = \
 	parson.h \
 	PowerManager.cpp \
 	PowerManager.h \
+	Navigation.cpp \
+	Navigation.h \
 	SubControl.cpp \
 	SubControl.h \
 	SubProtocol.cpp \

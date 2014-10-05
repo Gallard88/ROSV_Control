@@ -21,6 +21,7 @@ using namespace std;
 #include "PowerManager.h"
 #include "CameraManager.h"
 #include "LightManager.h"
+#include "Navigation.h"
 #include "TcpServer.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
@@ -42,6 +43,7 @@ LightManager     *LightMan;
 CameraManager    *CamMan;
 PowerManager     *Power;
 Logger           *Log;
+Navigation       *Nav;
 
 static thread ListenThread;
 volatile bool RunSystem;
@@ -107,13 +109,13 @@ int main (int argc, char *argv[])
 {
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_NOTICE, "Starting program");
-
-  int rv = daemon( 0, 0 );
-  if ( rv < 0 ) {
-    syslog(LOG_EMERG, "Daemonise failed" );
-    exit(-1);
-  }
-
+  /*
+    int rv = daemon( 0, 0 );
+    if ( rv < 0 ) {
+      syslog(LOG_EMERG, "Daemonise failed" );
+      exit(-1);
+    }
+  */
   SignalHandler_Setup();
   atexit(System_Shutdown);
 
@@ -142,20 +144,29 @@ int main (int argc, char *argv[])
 
   Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
 
+  Nav = new Navigation("/etc/ROSV_Control/navigation.json");
+
   CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
 
   SubProt = new SubProtocol();
   SubProt->Pwm = PwmModule;
 
-  SubProt->AddModule("Light",  (CmdModule *) LightMan);
-  SubProt->AddModule("Power",  (CmdModule *) Power);
-  SubProt->AddModule("Motor",  (CmdModule *) MotorControl);
-  SubProt->AddModule("Camera", (CmdModule *) CamMan);
+  SubProt->AddModule("Light",      (CmdModule *) LightMan );
+  SubProt->AddModule("Power",      (CmdModule *) Power );
+  SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
+  SubProt->AddModule("Camera",     (CmdModule *) CamMan );
+  SubProt->AddModule("Navigation", (CmdModule *) Nav );
 
   /* --------------------------------------------- */
   while ( RunSystem ) {
     // read data from connected clients.
     SubProt->Run(system_time);
+
+    Nav->Run();
+    if ( Nav->NewVector() == true ) {
+      ControlVector vec = Nav->GetVector();
+      MotorControl->SetControlVector( &vec );
+    }
 
     bool mot_en = ( SubProt->GetNumClients() != 0)? true: false;
     MotorControl->EnableMotor(mot_en);
@@ -163,6 +174,7 @@ int main (int argc, char *argv[])
 
     LightMan->Run();
     Power->Run();
+
   }
   return 0;
 }

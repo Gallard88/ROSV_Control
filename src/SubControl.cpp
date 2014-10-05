@@ -94,23 +94,6 @@ const string SubControl::GetConfigData(void)
 // *******************************************************************************************
 void SubControl::Update(const char *packet, JSON_Object *msg)
 {
-  const char *rec_type = json_object_get_string(msg, "RecordType");
-  if ( rec_type == NULL ) {
-    return ;
-  }
-  if ( strcmp(rec_type, "Velocity") == 0 ) {
-    JSON_Array *vec = json_object_get_array(msg, "Vector");
-    if ( vec != NULL ) {
-      if ( json_array_get_count(vec) == 4 ) {
-        Velocity.x = json_array_get_number(vec, 0);
-        Velocity.y = json_array_get_number(vec, 1);
-        Velocity.z = json_array_get_number(vec, 2);
-        Velocity.yaw = json_array_get_number(vec, 3);
-      }
-    }
-  } else {
-    printf("Update: %s\n", rec_type);
-  }
 }
 
 // *******************************************************************************************
@@ -135,25 +118,20 @@ void SubControl::EnableMotor(bool en)
   Enable = en;
 }
 
-
-// *******************************************************************************************
-/*
- * X
- * Y
- * Z
- * Roll
- * Pitch
- * Yaw
- *
- */
 // *******************************************************************************************
 const float MOT_SCALE = 100.0;
-#define VECTOR_X	0
-#define VECTOR_Y	1
-#define VECTOR_Z	2
-#define VECTOR_ROLL	3
-#define VECTOR_PITCH	4
-#define VECTOR_YAW	5
+#define VECTOR_X      0
+#define VECTOR_Y      1
+#define VECTOR_Z      2
+#define VECTOR_ROLL   3
+#define VECTOR_PITCH  4
+#define VECTOR_YAW    5
+
+// *******************************************************************************************
+void SubControl::SetControlVector(const ControlVector *vec)
+{
+  Velocity = *vec;
+}
 
 // *******************************************************************************************
 void SubControl::Run(void)

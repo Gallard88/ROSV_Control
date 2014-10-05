@@ -118,11 +118,10 @@ void SubProtocol::AddSource(DataSource *src)
 // *******************************************************************************************
 void SubProtocol::ProcessLine(string line)
 {
-  printf("Line: %s\r\n", line.c_str());
+//  printf("Line: %s\r\n", line.c_str());
   JSON_Value *data = json_parse_string(line.c_str());
 
   if ( data == NULL ) {
-    printf("Data == NULL\n");
     return;
   }
 

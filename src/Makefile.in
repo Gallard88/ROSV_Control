@@ -66,9 +66,9 @@ am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) DataSource.$(OBJEXT) \
 	LightManager.$(OBJEXT) Logger.$(OBJEXT) Motor.$(OBJEXT) \
-	parson.$(OBJEXT) PowerManager.$(OBJEXT) SubControl.$(OBJEXT) \
-	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) Value.$(OBJEXT) \
-	Voltage.$(OBJEXT) main.$(OBJEXT)
+	parson.$(OBJEXT) PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
+	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
+	Value.$(OBJEXT) Voltage.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -229,7 +229,7 @@ ROSV_Control_Files_DATA = \
 	camera.json \
 	lighting.json \
 	motors.json \
-	power.json 
+	power.json
 
 LDADD = \
 	/usr/local/lib/libPWMControl.a \
@@ -252,6 +252,8 @@ ROSV_Control_SOURCES = \
 	parson.h \
 	PowerManager.cpp \
 	PowerManager.h \
+	Navigation.cpp \
+	Navigation.h \
 	SubControl.cpp \
 	SubControl.h \
 	SubProtocol.cpp \
@@ -353,6 +355,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Motor.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Navigation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubProtocol.Po@am__quote@
