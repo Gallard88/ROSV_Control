@@ -86,7 +86,7 @@ void PowerManager::Run(void)
 }
 
 //  *******************************************************************************************
-void PowerManager::Update(JSON_Object *msg)
+void PowerManager::Update(const char *packet, JSON_Object *msg)
 {
 }
 

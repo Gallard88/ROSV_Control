@@ -122,7 +122,7 @@ const string CameraManager::GetConfigData(void)
 }
 
 // *******************************************************************************************
-void CameraManager::Update(JSON_Object *msg)
+void CameraManager::Update(const char *packet, JSON_Object *msg)
 {
   syslog(LOG_EMERG, "Msg\n");
   const char *rec_type = json_object_get_string(msg, "RecordType");

@@ -37,6 +37,24 @@
 // *******************************************************************************************
 using namespace std;
 
+/*
+ * The ROSV Protocol is a general purpose protocol, that enables the various
+ * sub systems and controllers to communicate with the Sub.
+ * As such there are messages for many modules that can be passed through the same connection.
+ * Therefore a multiplexer system is needed to route the packets to the correct destination.
+ * The general purpose mux packet is as follows:
+ *
+ * {
+ *   "Module":"",
+ *   "Packet":"",
+ *   --- Packet Data ---
+ * }\r\n
+ *
+ * There are some limitations, namemly there cannot be any \r\n with in the packet itself, as this is used to dennote end of line.
+ *
+ *
+ */
+
 // *******************************************************************************************
 SubProtocol::SubProtocol()
 {
@@ -111,17 +129,16 @@ void SubProtocol::ProcessLine(string line)
   JSON_Object *obj = json_value_get_object(data);
 
   const char *module = json_object_get_string(obj, "Module");
+  const char *packet = json_object_get_string(obj, "Packet");
   if ( module != NULL ) {
     for ( size_t j = 0; j < Modules.size(); j ++ ) {
       if ( strcmp(module, Modules[j].Name.c_str()) == 0 ) {
-        Modules[j].module->Update(obj);
+        Modules[j].module->Update(packet, obj);
       }
     }
   }
-
   // release the data now that we are finished.
   json_value_free(data);
-
 }
 
 // *******************************************************************************************

@@ -92,7 +92,7 @@ const string SubControl::GetConfigData(void)
 }
 
 // *******************************************************************************************
-void SubControl::Update(JSON_Object *msg)
+void SubControl::Update(const char *packet, JSON_Object *msg)
 {
   const char *rec_type = json_object_get_string(msg, "RecordType");
   if ( rec_type == NULL ) {

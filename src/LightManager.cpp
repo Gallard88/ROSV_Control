@@ -107,7 +107,7 @@ void LightManager::Run(void)
 }
 
 //  *******************************************************************************************
-void LightManager::Update(JSON_Object *msg)
+void LightManager::Update(const char *packet, JSON_Object *msg)
 {
 }
 

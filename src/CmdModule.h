@@ -42,7 +42,7 @@ public:
     Log = Logger::Init();
   }
   virtual const string GetConfigData(void) = 0;
-  virtual void Update(JSON_Object *msg) = 0;
+  virtual void Update(const char *packet, JSON_Object *msg) = 0;
   virtual const string GetData(void) = 0;
   Logger *Log;
 
