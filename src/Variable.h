@@ -1,5 +1,5 @@
 /*
- Power Manager ( http://www.github.com/Gallard88/ROSV_Control )
+ Value ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,39 +21,34 @@
  THE SOFTWARE.
 */
 
-//*******************************************************************************************
-#ifndef __POWER_MANAGER__
-#define __POWER_MANAGER__
-//*******************************************************************************************
-#include <string>
-#include <PWM_Controller.h>
-#include <PowerMonitor.h>
+// *******************************************************************************************
+#ifndef __VARIABLE__
+#define __VARIABLE__
+// *******************************************************************************************
+#include <ctime>
+#include "Logger.h"
 
-#include "CmdModule.h"
-#include "Variable.h"
+// *******************************************************************************************
 
-//*******************************************************************************************
-//*******************************************************************************************
-class  PowerManager: CmdModule {
-
+class  Variable {
 public:
-  PowerManager(const char * filename, PWM_Con_t p);
-  void Run(void);
+  Variable();
 
-  const string GetConfigData(void);
-  void Update(const char *packet, JSON_Object *msg);
-  const string GetData(void);
+  void SetName(const char* name);
+  void Set(float value);
 
-private:
+  string GetName(void);
+  string GetJSON(void);
 
-  Variable Volts[3];
-  Variable Temp;
+protected:
+  string Name;
+  float Value;
 
-  PMon_t    PMon;
-  PWM_Con_t Pwm;
+  time_t update;
+  Logger *Log;
 };
 
-//*******************************************************************************************
-//*******************************************************************************************
+// *******************************************************************************************
+// *******************************************************************************************
 #endif
 

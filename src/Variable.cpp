@@ -1,5 +1,5 @@
 /*
- Power Manager ( http://www.github.com/Gallard88/ROSV_Control )
+ Value ( http://www.github.com/Gallard88/ROSV_Control )
  Copyright (c) 2013 Thomas BURNS
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,66 +24,49 @@
 //  *******************************************************************************************
 using namespace std;
 
-#include <syslog.h>
+#include <string>
 
-#include "PowerManager.h"
+#include "Variable.h"
 
 //  *******************************************************************************************
-PowerManager::PowerManager(const char * filename, PWM_Con_t p)
+Variable::Variable()
 {
-  PMon = PMon_Connect();
-  Pwm = p;
+  this->update = 0;
+  Value = 0.0;
+  Log = Logger::Init();
+}
 
-  if ( PMon == NULL ) {
-    syslog(LOG_EMERG, "PowerManager: failed to open PowerMonitor");
-    exit(-1);
+//  *******************************************************************************************
+string Variable::GetJSON(void)
+{
+  string json;
+  char buf[100];
+
+  json = "{ \"Name\": \"" + Name +"\", ";
+  sprintf(buf, " \"Value\": %f ", Value );
+  json += string(buf);
+  json += "}";
+
+  return json;
+}
+
+//  *******************************************************************************************
+void Variable::SetName(const char * name)
+{
+  Name = string(name);
+}
+
+//  *******************************************************************************************
+void Variable::Set(float value)
+{
+  Value = value;
+
+  time_t current = time(NULL);
+  if ((current - update) > 1) {
+    update = current;
+    Log->RecordValue("Var", Name.c_str(), Value);
   }
-
-  SetCallPeriod(1000);
-  Volts[0].SetName("Pwm_Volt");
-  Volts[1].SetName("PMon_Pri");
-  Volts[2].SetName("PMon_Sec");
-  Temp.SetName("Pwm_Temp");
 }
 
-//  *******************************************************************************************
-void PowerManager::Run(void)
-{
-  if ( RunModule() == true ) {
-
-    Volts[0].Set(PWM_GetVoltage(Pwm));
-    Volts[1].Set(PMon_GetVoltage(PMon, 0));
-    Volts[2].Set(PMon_GetVoltage(PMon, 1));
-
-    Temp.Set(PWM_GetTemp(Pwm));
-  }
-}
-
-//  *******************************************************************************************
-void PowerManager::Update(const char *packet, JSON_Object *msg)
-{
-}
-
-//  *******************************************************************************************
-const string PowerManager::GetConfigData(void)
-{
-  return "";
-}
-
-//  *******************************************************************************************
-const string PowerManager::GetData(void)
-{
-  string jVolt = "\"Volt\":[";
-  jVolt += Volts[0].GetJSON() + ", ";
-  jVolt += Volts[1].GetJSON() + ", ";
-  jVolt += Volts[2].GetJSON();
-  jVolt += "]";
-
-  string jTemp = "\"Temp\":[" + Temp.GetJSON() + "]";
-
-  return "\"RecordType\": \"Update\", " + jVolt + ", " + jTemp;
-}
-
-//*******************************************************************************************
-//*******************************************************************************************
-
+// *******************************************************************************************
+// *******************************************************************************************
