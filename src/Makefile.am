@@ -18,6 +18,7 @@ ROSV_Control_Files_DATA= \
 LDADD = \
 	/usr/local/lib/libPWMControl.a \
         /usr/local/lib/libPowerMonitor.a \
+	/usr/local/lib/libparson.a \
 	/usr/local/lib/libSnotra.a
 
 ROSV_Control_SOURCES = \
@@ -32,8 +33,6 @@ ROSV_Control_SOURCES = \
 	Logger.h \
 	Motor.cpp \
 	Motor.h \
-	parson.c \
-	parson.h \
 	PowerManager.cpp \
 	PowerManager.h \
 	Navigation.cpp \

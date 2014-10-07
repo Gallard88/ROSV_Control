@@ -66,26 +66,27 @@ am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) DataSource.$(OBJEXT) \
 	LightManager.$(OBJEXT) Logger.$(OBJEXT) Motor.$(OBJEXT) \
-	parson.$(OBJEXT) PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
+	PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
 	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
 	Value.$(OBJEXT) Voltage.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
-	/usr/local/lib/libPowerMonitor.a /usr/local/lib/libSnotra.a
+	/usr/local/lib/libPowerMonitor.a /usr/local/lib/libparson.a \
+	/usr/local/lib/libSnotra.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(ROSV_Control_SOURCES)
 DIST_SOURCES = $(ROSV_Control_SOURCES)
 am__can_run_installinfo = \
@@ -234,6 +235,7 @@ ROSV_Control_Files_DATA = \
 LDADD = \
 	/usr/local/lib/libPWMControl.a \
         /usr/local/lib/libPowerMonitor.a \
+	/usr/local/lib/libparson.a \
 	/usr/local/lib/libSnotra.a
 
 ROSV_Control_SOURCES = \
@@ -248,8 +250,6 @@ ROSV_Control_SOURCES = \
 	Logger.h \
 	Motor.cpp \
 	Motor.h \
-	parson.c \
-	parson.h \
 	PowerManager.cpp \
 	PowerManager.h \
 	Navigation.cpp \
@@ -269,7 +269,7 @@ ROSV_Control_SOURCES = \
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .o .obj
+.SUFFIXES: .cpp .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -363,21 +363,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Value.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Voltage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parson.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
