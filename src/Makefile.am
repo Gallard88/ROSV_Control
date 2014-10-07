@@ -47,7 +47,5 @@ ROSV_Control_SOURCES = \
 	Value.h \
 	Variable.cpp \
 	Variable.h \
-	Voltage.cpp \
-	Voltage.h \
 	main.cpp
 

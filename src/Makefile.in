@@ -68,8 +68,7 @@ am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) DataSource.$(OBJEXT) \
 	LightManager.$(OBJEXT) Logger.$(OBJEXT) Motor.$(OBJEXT) \
 	PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
 	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
-	Value.$(OBJEXT) Variable.$(OBJEXT) Voltage.$(OBJEXT) \
-	main.$(OBJEXT)
+	Value.$(OBJEXT) Variable.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -265,8 +264,6 @@ ROSV_Control_SOURCES = \
 	Value.h \
 	Variable.cpp \
 	Variable.h \
-	Voltage.cpp \
-	Voltage.h \
 	main.cpp
 
 all: all-am
@@ -365,7 +362,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Value.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Voltage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:
