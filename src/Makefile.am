@@ -43,8 +43,6 @@ ROSV_Control_SOURCES = \
 	SubProtocol.h \
 	TcpServer.cpp \
 	TcpServer.h \
-	Value.cpp \
-	Value.h \
 	Variable.cpp \
 	Variable.h \
 	main.cpp

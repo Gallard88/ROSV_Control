@@ -116,12 +116,6 @@ void CameraManager::Stop(void)
 }
 
 // *******************************************************************************************
-const string CameraManager::GetConfigData(void)
-{
-  return "\"Chanels\":[ \"Primary\" ] ";
-}
-
-// *******************************************************************************************
 void CameraManager::Update(const char *packet, JSON_Object *msg)
 {
   syslog(LOG_EMERG, "Msg\n");

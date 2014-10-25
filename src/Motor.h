@@ -26,7 +26,7 @@
 #define __MOTOR__
 //*******************************************************************************************
 #include "parson.h"
-#include "Value.h"
+#include "Variable.h"
 
 #include <PWM_Controller.h>
 #include <ctime>
@@ -43,15 +43,16 @@ public:
 
   void Run(float *power);
   float GetPower(void);
-  string GetName(void);
   string GetJSON(void);
   void SetRamp(float ramp);
 
 private:
   int Chanel;
   int mult[VECTOR_SIZE];
+  float Min, Max;
+  float Target, Ramp;
 
-  Value *Val;
+  Variable Val;
   PWM_Con_t Pwm;
 };
 

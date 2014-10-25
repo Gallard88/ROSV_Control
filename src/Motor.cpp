@@ -43,41 +43,63 @@ Motor::Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max)
       mult[i] = json_array_get_number(mult_array, i);
     }
   }
-  Val = new Value(name, min, max);
+  Val.SetName(name);
+  Min = min;
+  Max = max;
+  Ramp = max;
+  Target = 0.0;
 }
 
 //  *******************************************************************************************
 string Motor::GetJSON(void)
 {
-  return Val->GetJSON();
+  return Val.GetJSON();
 }
 
 //  *******************************************************************************************
 void Motor::SetRamp(float ramp)
 {
-  Val->SetRamp(ramp);
+  Ramp = ramp;
 }
 
 //  *******************************************************************************************
 void Motor::Run(float *power)
 {
-  float output = 0.0;
+  Target = 0.0;
 
   for ( int j = 0; j < VECTOR_SIZE; j ++ ) {
-    output = output + ((float)mult[j] * power[j]);
+    Target = Target + ((float)mult[j] * power[j]);
   }
-  PWM_SetPWM(Pwm, Chanel, Val->Run(output));
+
+  if ( Target > Max )
+    Target = Max;
+  else if ( Target < Min )
+    Target = Min;
+
+  /* When the motors engage at full power there is often a HUGE surge of current
+   * which can cause the main rail to drop a volt or two. This glitch on the supply
+   * can often be seen in the more sensitive hardware, such as the light modules
+   * flicker a little, and it is sometimes possible for the PWM_Controller and other
+   * hardware to disconnect due to the electrical noise.
+   *
+   * This code is designed to stop the sudden surge on the system by limiting how hard
+   * the motors can turn on. Since this only affects the system when increasing the speed
+   * of the motors, we only run this code when the motors power is LESS than the target.
+   *
+   */
+  float p = Val.Get();
+
+  if ( p < Target ) {
+    if  (( Target - p ) > Ramp )
+      p += Ramp;
+    else
+      p = Target;
+
+  } else {
+    p = Target;
+  }
+  Val.Set(p);
+  PWM_SetPWM(Pwm, Chanel, p);
 }
 
 //*******************************************************************************************
-float Motor::GetPower(void)
-{
-  return Val->GetPower();
-}
-
-//*******************************************************************************************
-string Motor::GetName(void)
-{
-  return Val->GetName();
-}
-

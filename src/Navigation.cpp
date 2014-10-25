@@ -29,11 +29,6 @@ void Navigation::Run(void)
 }
 
 //  *******************************************************************************************
-const string Navigation::GetConfigData(void)
-{
-  return " ";
-}
-
 void Navigation::Update(const char *packet, JSON_Object *msg)
 {
   if ( strcmp("SetVector", packet) == 0 ) {
@@ -61,9 +56,25 @@ void Navigation::Update(const char *packet, JSON_Object *msg)
   }
 }
 
+//  *******************************************************************************************
 const string Navigation::GetData(void)
 {
-  return " ";
+  string msg;
+  char vec[256];
+
+  msg = "\"RecordType\": \"ReportVectors\", ";
+  msg += "\"Vectors\":[";
+  sprintf(vec, "{ \"Ch\":\"Forward\", \"Mode\":\"Raw\", \"Target\": %2.2f }, ", CVec.x );
+  msg += string(vec);
+  sprintf(vec, "{ \"Ch\":\"Strafe\", \"Mode\":\"Raw\", \"Target\": %2.2f }, ", CVec.y );
+  msg += string(vec);
+  sprintf(vec, "{ \"Ch\":\"Dive\", \"Mode\":\"Raw\", \"Target\": %2.2f }, ", CVec.z );
+  msg += string(vec);
+  sprintf(vec, "{ \"Ch\":\"Turn\", \"Mode\":\"Raw\", \"Target\": %2.2f }", CVec.yaw );
+  msg += string(vec);
+
+  msg += " ]";
+  return msg;
 }
 
 //  *******************************************************************************************

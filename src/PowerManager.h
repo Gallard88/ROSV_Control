@@ -40,7 +40,6 @@ public:
   PowerManager(const char * filename, PWM_Con_t p);
   void Run(void);
 
-  const string GetConfigData(void);
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
 

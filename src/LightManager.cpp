@@ -64,7 +64,7 @@ LightManager::LightManager(const char * filename)
   if ( number != 0 ) {
     for ( size_t i = 0; i < number; i ++) {
       LightChanel ch;
-      ch.Power = 1;
+      ch.Power.Set(100.0);
       ch.Modules.clear();
 
       JSON_Object *object = json_array_get_object (ch_array, i);
@@ -73,7 +73,7 @@ LightManager::LightManager(const char * filename)
       }
       const char *name = json_object_get_string (object, "Name");
       if ( name != NULL ) {
-        ch.Name = string(name);
+        ch.Power.SetName(name);
       }
 
       JSON_Array *pwm_array = json_object_get_array( object, "Chanels");
@@ -100,7 +100,7 @@ void LightManager::Run(void)
     for ( size_t i = 0; i < Chanels.size(); i ++ ) {
       LightChanel ch = Chanels[i];
       for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
-        PWM_SetPWM(Pwm, ch.Modules[j], ch.Power);
+        PWM_SetPWM(Pwm, ch.Modules[j], ch.Power.Get());
       }
     }
   }
@@ -112,36 +112,14 @@ void LightManager::Update(const char *packet, JSON_Object *msg)
 }
 
 //  *******************************************************************************************
-const string LightManager::GetConfigData(void)
+const string LightManager::GetData(void)
 {
   string msg;
 
-  msg = "\"Chanels\":[ ";
+  msg = "\"RecordType\":\"LightChanels\", \"Chanels\":[ ";
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
-    msg += " \"";
-    msg += Chanels[i].Name;
-    msg += "\"";
-    if ( Chanels.size() > 1 ) {
-      msg += ", ";
-    }
-  }
-  msg += " ] ";
-  return msg;
-}
 
-//*******************************************************************************************
-const string LightManager::GetData(void)
-{
-  char power[10];
-  string msg("\"RecordType\": \"Update\", ");
-  msg += "\"Chanels\":[ ";
-  for ( size_t i = 0; i < Chanels.size(); i ++ ) {
-    msg += " {\"Name\": \"";
-    msg += Chanels[i].Name;
-    msg += "\",\"Max\":100, \"Min\":0, \"Value\": ";
-    sprintf(power, "%d", Chanels[i].Power * 100 );
-    msg += string(power);
-    msg += "}";
+    msg += Chanels[i].Power.GetJSON();
     if (( Chanels.size() > 1 ) && ( i < (Chanels.size()-1))) {
       msg += ", ";
     }

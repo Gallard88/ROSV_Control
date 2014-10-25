@@ -65,12 +65,6 @@ void PowerManager::Update(const char *packet, JSON_Object *msg)
 }
 
 //  *******************************************************************************************
-const string PowerManager::GetConfigData(void)
-{
-  return "";
-}
-
-//  *******************************************************************************************
 const string PowerManager::GetData(void)
 {
   string jVolt = "\"Volt\":[";
@@ -81,7 +75,7 @@ const string PowerManager::GetData(void)
 
   string jTemp = "\"Temp\":[" + Temp.GetJSON() + "]";
 
-  return "\"RecordType\": \"Update\", " + jVolt + ", " + jTemp;
+  return "\"RecordType\": \"PowerData\", " + jVolt + ", " + jTemp;
 }
 
 //*******************************************************************************************

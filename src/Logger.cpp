@@ -38,6 +38,7 @@ using namespace std;
 Logger::Logger()
 {
   if ( Snotra_Connect() < 0 ) {
+    syslog(LOG_ALERT, "Logger() failed\n");
     exit(-1);
   }
 }

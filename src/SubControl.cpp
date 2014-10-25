@@ -74,24 +74,6 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm)
 }
 
 // *******************************************************************************************
-const string SubControl::GetConfigData(void)
-{
-  string msg;
-
-  msg = "\"Chanels\":[ ";
-  for ( size_t i = 0; i < MotorList.size(); i ++ ) {
-    msg += " \"";
-    msg += MotorList[i]->GetName();
-    msg += "\"";
-    if (( MotorList.size() > 1 ) && ( i < (MotorList.size()-1))) {
-      msg += ", ";
-    }
-  }
-  msg += " ] ";
-  return msg;
-}
-
-// *******************************************************************************************
 void SubControl::Update(const char *packet, JSON_Object *msg)
 {
 }
@@ -99,9 +81,10 @@ void SubControl::Update(const char *packet, JSON_Object *msg)
 // *******************************************************************************************
 const string SubControl::GetData(void)
 {
-  string msg("\"RecordType\": \"Update\", ");
+  string msg("\"RecordType\": \"MotorData\", ");
   msg += "\"Chanels\":[ ";
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
+
     msg += MotorList[i]->GetJSON();
 
     if (( MotorList.size() > 1 ) && ( i < (MotorList.size()-1))) {

@@ -36,12 +36,12 @@ public:
 
   void SetName(const char* name);
   void Set(float value);
+  float Get(void);
 
-  string GetName(void);
   string GetJSON(void);
 
 protected:
-  string Name;
+  char * Name;
   float Value;
 
   time_t update;

@@ -77,22 +77,21 @@ void SubProtocol::AddModule(const string & name, CmdModule *mod)
 }
 
 // *******************************************************************************************
-void SubProtocol::SendSourceData(void)
+void SubProtocol::SendClientInfo(void)
 {
   string msg;
   DataSource *src;
 
   msg = "{ \"Module\": \"ClientList\", ";
-  msg += "\"RecordType\":\"Update\", ";
-  msg += "\"DataType\":\"Text\", ";
+  msg += "\"RecordType\":\"Clients\", ";
   msg += "\"Values\":[ ";
   for ( size_t i = 0; i < Sources.size(); i ++ ) {
     src = Sources[i];
-    msg += "\"";
+    msg += "{ \"ip\":\"";
     msg += string(src->GetName());
-    msg += "\"";
+    msg += "\"} ";
 
-    if ( Sources.size() > 1 ) {
+    if (( Sources.size() > 1 ) && ( i <  (Sources.size()-1))) {
       msg += ", ";
     }
   }
@@ -104,15 +103,6 @@ void SubProtocol::SendSourceData(void)
 void SubProtocol::AddSource(DataSource *src)
 {
   Sources.push_back(src);
-
-  for ( size_t i = 0; i < Modules.size(); i ++ ) {
-    string msg;
-    msg = "{ \"Module\": \"" + Modules[i].Name + "\", ";
-    msg += "\"RecordType\":\"Config\", ";
-    msg += Modules[i].module->GetConfigData();
-    msg += " }\r\n";
-    src->WriteData(msg.c_str());
-  }
 }
 
 // *******************************************************************************************
@@ -198,7 +188,7 @@ void SubProtocol::Run(struct timeval timeout)
       msg += " }\r\n";
       SendMsg(&msg);
     }
-    SendSourceData();
+    SendClientInfo();
   }
 }
 

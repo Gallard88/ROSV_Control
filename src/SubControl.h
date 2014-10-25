@@ -53,9 +53,10 @@ public:
   void Run(void);
 
   void EnableMotor(bool en);
-  const string GetConfigData(void);
+
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
+
   void SetControlVector(const ControlVector *vec);
 
 private:

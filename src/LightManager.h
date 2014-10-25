@@ -31,14 +31,13 @@
 #include <PWM_Controller.h>
 
 #include "CmdModule.h"
+#include "Variable.h"
 
 //*******************************************************************************************
 //*******************************************************************************************
 typedef struct  {
-  string Name;
-  int Power;	// 0 - 100%
+  Variable Power;
   vector<int> Modules;
-
 } LightChanel;
 
 //*******************************************************************************************
@@ -48,7 +47,6 @@ public:
   LightManager(const char * filename);
   void Run(void);
 
-  const string GetConfigData(void);
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
 

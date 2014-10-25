@@ -42,7 +42,6 @@ public:
   void Stop(void);
   long DiveTime(void);
 
-  const string GetConfigData(void);
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
 
