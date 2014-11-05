@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.50])
 AC_INIT(ROSV_Control, 1.0, thomasburns88@gmail.com)
-AC_CONFIG_SRCDIR([src/parson.h])
+AC_CONFIG_SRCDIR([src/main.cpp])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER([config.h])
 AC_CONFIG_FILES([Makefile
