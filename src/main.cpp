@@ -13,16 +13,12 @@ using namespace std;
 #include <syslog.h>
 #include <ctype.h>
 
-#include <thread>
-
 #include <PWM_Controller.h>
 
-#include "DataSource.h"
 #include "PowerManager.h"
 #include "CameraManager.h"
 #include "LightManager.h"
 #include "Navigation.h"
-#include "TcpServer.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
 #include "Logger.h"
@@ -36,7 +32,6 @@ const struct timeval system_time = { 0 , RUN_INTERVAL};
 
 /* ======================== */
 PWM_Con_t PwmModule;
-TcpServer        *Listner;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
 LightManager     *LightMan;
@@ -45,7 +40,7 @@ PowerManager     *Power;
 Logger           *Log;
 Navigation       *Nav;
 
-static thread ListenThread;
+//static thread ListenThread;
 volatile bool RunSystem;
 
 /* ======================== */
@@ -66,10 +61,6 @@ void SignalHandler_Setup(void)
 void System_Shutdown(void)
 {
   RunSystem = false;
-//  ListenThread.join();
-//  if ( Listner != NULL ) {
-//    delete Listner;
-//  }
   if ( Power != NULL ) {
     delete Power;
   }
@@ -89,19 +80,6 @@ void System_Shutdown(void)
   Log->RecordValue("ROSV_Control", "Shutdown", 1);
   syslog(LOG_NOTICE, "System shutting down");
   closelog();
-}
-
-/* ======================== */
-static void ListenFunc(void)
-{
-  DataSource *new_src;
-
-  while ( RunSystem ) {
-    new_src = Listner->Listen();
-    if ( new_src != NULL ) {
-      SubProt->AddSource(new_src);
-    }
-  }
 }
 
 /* ======================== */
@@ -133,9 +111,7 @@ int main (int argc, char *argv[])
   Log = Logger::Init();
   Log->RecordValue("ROSV_Control","Start", 1);
 
-  Listner = new TcpServer(8090);
   RunSystem = true;
-  std::thread ListenThread(ListenFunc);
 
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
 
@@ -174,7 +150,6 @@ int main (int argc, char *argv[])
 
     LightMan->Run();
     Power->Run();
-
   }
   return 0;
 }

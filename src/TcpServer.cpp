@@ -21,9 +21,8 @@
  THE SOFTWARE.
 */
 
-/* ======================== */
 using namespace std;
-/* ======================== */
+
 #include <iostream>
 
 #include <stdio.h>
@@ -33,19 +32,22 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <syslog.h>
 #include <arpa/inet.h>
 
 #include "TcpServer.h"
 
-/* ======================== */
+#define MAX_FP(a, b)  b = (a > b)? a : b
+
+const int TcpServer_WriteEx = 1;
+const int TcpServer_HandleNotFound = 2;
+
+
 TcpServer::TcpServer(int port)
 {
   struct sockaddr_in serv_addr;
 
   listen_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (listen_fd < 0) {
-    syslog(LOG_EMERG, "Socket() error, port %d", port);
     exit(-1);
   }
   bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -54,41 +56,147 @@ TcpServer::TcpServer(int port)
   serv_addr.sin_addr.s_addr = INADDR_ANY;
   serv_addr.sin_port = htons(port);
   if (bind(listen_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-    syslog(LOG_EMERG, "ERROR on binding to port %d", port);
     exit(-1);
   }
-  syslog(LOG_INFO, "TcpServer setup, port: %d", port);
   listen( listen_fd, 1);
 }
 
-/* ======================== */
 TcpServer::~TcpServer(void)
 {
   shutdown(listen_fd, 2);
   close(listen_fd);
-  listen_fd = -1;
-}
 
-/* ======================== */
-int TcpServer::GetFp(void)
-{
-  return listen_fd;
-}
-
-/* ======================== */
-DataSource *TcpServer::Listen(void)
-{
-  DataSource *src = NULL;
-  socklen_t clilen;
-  int fp;
-
-  clilen = sizeof(cli_addr);
-  fp = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
-  if ( fp >= 0 ) {
-    src = new DataSource(fp, inet_ntoa(cli_addr.sin_addr));
+for ( auto& c: Clients) {
+    if ( c.second.File >= 0 ) {
+      close(c.second.File);
+      c.second.File = -1;
+    }
   }
-  return src;
+  Clients.clear();
 }
+
+/* ======================== */
+int TcpServer::Listen(struct timeval timeout)
+{
+  fd_set readfs;
+  int fp, new_fp = -1;
+
+  // start by pruning old dead clients.
+  CleanMap();
+
+  FD_ZERO(&readfs);
+  FD_SET(listen_fd, &readfs);
+  int max_fp = listen_fd;
+
+for ( auto& c: Clients) {
+    fp = c.second.File;
+    FD_SET(fp, &readfs);
+    MAX_FP(fp, max_fp);
+  }
+
+  if ( select(max_fp+1, &readfs, NULL, NULL, &timeout) > 0 ) {
+    if ( FD_ISSET(listen_fd, &readfs)) {
+      socklen_t clilen = sizeof(cli_addr);
+      new_fp = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
+
+      if ( new_fp >= 0 ) {
+        struct TcpClient client;
+        client.Name = string(inet_ntoa(cli_addr.sin_addr));
+        client.File = new_fp;
+        Clients[new_fp] = client;
+
+        cout << __FILE__ << ": New Source: " << inet_ntoa(cli_addr.sin_addr) << endl;
+      }
+    }
+for ( auto& c: Clients) {
+      fp = c.second.File;
+      if ( FD_ISSET(fp, &readfs)) {
+        char data[8192];
+        int n = read(fp, data, sizeof(data)-1);
+
+        if ( n <= 0 ) {
+          cout << __FILE__ << ": Socket Error: " << fp << endl;
+          close(c.second.File);
+          c.second.File = -1;
+
+        } else {
+          data[n] = 0;
+          c.second.Buffer += string(data);
+        }
+      }
+    }
+  }
+
+  return new_fp;
+}
+
+/* ======================== */
+/* ======================== */
+
+void TcpServer::Write(int handle, const string & msg)
+{
+  if (( Clients.find(handle) == Clients.end()) ||
+      ( Clients[handle].File < 0 )) {
+    cout << __FILE__ << ": Write - nf: " << handle << endl;
+    throw TcpServer_HandleNotFound;
+  }
+
+  int n = write(Clients[handle].File, msg.c_str(), msg.size());
+  if ( n <= 0 ) {
+
+    cout << __FILE__ << ": Write_Close: " << handle << endl;
+    close(Clients[handle].File);
+    Clients[handle].File = 1;
+    throw TcpServer_WriteEx;
+  }
+}
+
+string TcpServer::Handle_ReadLine(int handle)
+{
+  string line = "";
+
+  if (( Clients.find(handle) == Clients.end()) ||
+      ( Clients[handle].File < 0 )) {
+    cout << __FILE__ << ": Handle_ReadLine - nf: " << handle << endl;
+    throw TcpServer_HandleNotFound;
+  }
+
+  while ( Clients[handle].Buffer.size() != 0 ) {
+    size_t found = Clients[handle].Buffer.find_first_of("\r\n");
+
+    if ( found != string::npos) {
+
+      line = Clients[handle].Buffer.substr(0, found);
+      Clients[handle].Buffer.erase(0, found+1);
+
+      if ( line.length())
+        break;
+    }
+  }
+  return line;
+}
+
+string TcpServer::GetHandleName(int handle)
+{
+  if ( Clients.find(handle) == Clients.end()) {
+    cout << __FILE__ << ": GetName - nf: " << handle << endl;
+    return "";
+  }
+  return Clients[handle].Name;
+}
+
+void TcpServer::CleanMap(void)
+{
+for ( auto& c: Clients) {
+    if ( c.second.File == -1 ) {
+      cout << __FILE__ << ": CleanMap " << c.first << endl;
+      c.second.Buffer.clear();
+      Clients.erase(c.first);
+      break;
+    }
+  }
+}
+
 
 /* ======================== */
 /* ======================== */

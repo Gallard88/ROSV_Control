@@ -33,7 +33,7 @@ using namespace std;
 #include <vector>
 
 #include "CmdModule.h"
-#include "DataSource.h"
+#include "TcpServer.h"
 
 struct Modules {
   string      Name;
@@ -46,10 +46,10 @@ public:
   SubProtocol();
   ~SubProtocol();
 
-  int GetNumClients(void);
   void AddModule(const string & name, CmdModule *mod);
-  void AddSource(DataSource *src);
   void Run(struct timeval timeout);
+
+  int GetNumClients(void);
   PWM_Con_t Pwm;
 
 protected:
@@ -57,10 +57,12 @@ protected:
 private:
   time_t update;
   vector<struct Modules>  Modules;
-  vector<DataSource *>    Sources;
+  vector<int>             Handles;
+  TcpServer               *Server;
 
+  void SendUpdatedData(void);
   void SendClientInfo(void);
-  void SendMsg(const string *msg);
+  void SendMsg(const string & msg);
   void ProcessLine(string line);
 };
 

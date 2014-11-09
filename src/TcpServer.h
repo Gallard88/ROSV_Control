@@ -27,25 +27,41 @@
 
 /* ======================== */
 #include <string>
+#include <map>
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "DataSource.h"
+
+struct TcpClient {
+  string Name;
+  int File;
+  string Buffer;
+};
+
+extern const int TcpServer_WriteEx;
+extern const int TcpServer_HandleNotFound;
 
 /* ======================== */
 class TcpServer {
+public:
+  TcpServer(int port);
+  ~TcpServer(void);
+
+  int Listen(struct timeval timeout);
+
+  string GetHandleName(int handle);
+  string Handle_ReadLine(int handle);
+  void Write(int handle, const string & msg);
+
 private:
   struct sockaddr_in cli_addr;
   int listen_fd;
 
-public:
+  map<int, struct TcpClient> Clients;
+  void CleanMap(void);
 
-  TcpServer(int port);
-  ~TcpServer(void);
-
-  int GetFp(void);
-  DataSource *Listen(void);
 };
 
 /* ======================== */

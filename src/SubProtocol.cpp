@@ -34,6 +34,8 @@
 #include "parson.h"
 #include "SubProtocol.h"
 
+#include <iostream>
+
 // *******************************************************************************************
 using namespace std;
 
@@ -59,6 +61,7 @@ using namespace std;
 SubProtocol::SubProtocol()
 {
   update = 0;
+  Server = new TcpServer(8090);
 }
 
 // *******************************************************************************************
@@ -77,32 +80,94 @@ void SubProtocol::AddModule(const string & name, CmdModule *mod)
 }
 
 // *******************************************************************************************
+#define MAX_FP(a, b)  b = (a > b)? a : b
+// *******************************************************************************************
+void SubProtocol::Run(struct timeval timeout)
+{
+  int fd;
+  size_t i;
+
+  fd = Server->Listen(timeout);
+  if ( fd >= 0 ) {
+    cout << "New Handle: " << fd << endl;
+    Handles.push_back(fd);
+  }
+
+  try {
+    for ( i = 0; i < Handles.size(); i ++ ) {
+      string l = Server->Handle_ReadLine(Handles[i]);
+      if ( l.size() != 0 ) {
+        ProcessLine(l);
+      }
+    }
+  } catch (int ex ) {
+    cout << __FILE__ << ": Handle_ReadLine: " << ex << endl;
+    Handles.erase (Handles.begin()+i);
+  }
+
+  SendUpdatedData();
+}
+
+//*******************************************************************************************
+void SubProtocol::SendUpdatedData(void)
+{
+  /*
+   * Now, grab the data from each module,
+   * and send it to each DataSouce.
+   */
+  time_t current;
+  current = time(NULL);
+  if ((current - update) >= 1 ) {
+    update = current;
+    for ( size_t j = 0; j < Modules.size(); j ++ ) {
+      string msg;
+
+      msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
+      msg += Modules[j].module->GetData();
+      msg += " }\r\n";
+      SendMsg(msg);
+    }
+    SendClientInfo();
+  }
+}
+
+//*******************************************************************************************
+void SubProtocol::SendMsg(const string & msg)
+{
+  size_t i;
+
+  try {
+
+    for ( i = 0; i < Handles.size(); i ++ ) {
+      Server->Write(Handles[i], msg);
+    }
+
+  } catch (int e) {
+    cout << __FILE__ << ": SendMsg: " << Handles[i] << endl;
+    cout << __FILE__ << ": Exception: " << e << endl;
+    Handles.erase(Handles.begin()+i);
+  }
+}
+
+// *******************************************************************************************
 void SubProtocol::SendClientInfo(void)
 {
   string msg;
-  DataSource *src;
 
   msg = "{ \"Module\": \"ClientList\", ";
   msg += "\"RecordType\":\"Clients\", ";
   msg += "\"Values\":[ ";
-  for ( size_t i = 0; i < Sources.size(); i ++ ) {
-    src = Sources[i];
+  for ( size_t i = 0; i < Handles.size(); i ++ ) {
     msg += "{ \"ip\":\"";
-    msg += string(src->GetName());
+    msg += string(Server->GetHandleName(Handles[i]));
     msg += "\"} ";
 
-    if (( Sources.size() > 1 ) && ( i <  (Sources.size()-1))) {
+    if (( Handles.size() > 1 ) && ( i <  (Handles.size()-1))) {
       msg += ", ";
     }
   }
   msg += " ]}\r\n";
-  SendMsg(&msg);
-}
-
-// *******************************************************************************************
-void SubProtocol::AddSource(DataSource *src)
-{
-  Sources.push_back(src);
+  SendMsg(msg);
 }
 
 // *******************************************************************************************
@@ -130,91 +195,10 @@ void SubProtocol::ProcessLine(string line)
   json_value_free(data);
 }
 
-// *******************************************************************************************
-#define MAX_FP(a, b)	b = (a > b)? a : b
-// *******************************************************************************************
-void SubProtocol::Run(struct timeval timeout)
-{
-  DataSource *src;
-  fd_set readfs;
-  int fd, max_fp = 0;
-  size_t i;
-
-  FD_ZERO(&readfs);
-  for ( size_t i = 0; i < Sources.size(); i ++ ) {
-    src = Sources[i];
-
-    fd = src->GetFd();
-    FD_SET(fd, &readfs);
-    MAX_FP(fd, max_fp);
-  }
-
-  try {
-    if ( select(max_fp+1, &readfs, NULL, NULL, &timeout) > 0 ) {
-      for ( i = 0; i < Sources.size(); i ++ ) {
-        src = Sources[i];
-        if ( FD_ISSET(src->GetFd(), &readfs)) {
-          src->ReadData();
-        }
-      }
-    }
-  } catch (int e) {
-    src = Sources[i];
-    Sources.erase(Sources.begin()+i);
-    delete src;
-  }
-
-  for ( i = 0; i < Sources.size(); i ++ ) {
-    string line;
-    src = Sources[i];
-    if ( src->ReadLine(&line)) {
-      ProcessLine(line);
-    }
-  }
-
-  /*
-   * Now, grab the data from each module,
-   * and send it to each DataSouce.
-   */
-  time_t current;
-  current = time(NULL);
-  if ((current - update) >= 1 ) {
-    update = current;
-    for ( size_t j = 0; j < Modules.size(); j ++ ) {
-      string msg;
-
-      msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
-      msg += Modules[j].module->GetData();
-      msg += " }\r\n";
-      SendMsg(&msg);
-    }
-    SendClientInfo();
-  }
-}
-
-//*******************************************************************************************
-void SubProtocol::SendMsg(const string *msg)
-{
-  size_t i;
-  DataSource *src;
-
-  try {
-    for ( i = 0; i < Sources.size(); i ++ ) {
-      src = Sources[i];
-      src->WriteData(msg->c_str());
-    }
-
-  } catch (int e) {
-    src = Sources[i];
-    Sources.erase(Sources.begin()+i);
-    delete src;
-  }
-}
-
 //*******************************************************************************************
 int SubProtocol::GetNumClients(void)
 {
-  return Sources.size();
+  return Handles.size();
 }
 
 //*******************************************************************************************
