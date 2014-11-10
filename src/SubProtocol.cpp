@@ -62,6 +62,7 @@ SubProtocol::SubProtocol()
 {
   update = 0;
   Server = new TcpServer(8090);
+  AddModule("Clients", this);
 }
 
 // *******************************************************************************************
@@ -127,7 +128,6 @@ void SubProtocol::SendUpdatedData(void)
       msg += " }\r\n";
       SendMsg(msg);
     }
-    SendClientInfo();
   }
 }
 
@@ -150,7 +150,12 @@ void SubProtocol::SendMsg(const string & msg)
 }
 
 // *******************************************************************************************
-void SubProtocol::SendClientInfo(void)
+void SubProtocol::Update(const char *packet, JSON_Object *msg)
+{
+}
+
+// *******************************************************************************************
+const string SubProtocol::GetData(void)
 {
   string msg;
 
@@ -167,7 +172,7 @@ void SubProtocol::SendClientInfo(void)
     }
   }
   msg += " ]}\r\n";
-  SendMsg(msg);
+  return msg;
 }
 
 // *******************************************************************************************

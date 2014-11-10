@@ -41,7 +41,7 @@ struct Modules {
 };
 
 //*******************************************************************************************
-class SubProtocol {
+class SubProtocol: CmdModule {
 public:
   SubProtocol();
   ~SubProtocol();
@@ -60,8 +60,9 @@ private:
   vector<int>             Handles;
   TcpServer               *Server;
 
+  void Update(const char *packet, JSON_Object *msg);
+  const string GetData(void);
   void SendUpdatedData(void);
-  void SendClientInfo(void);
   void SendMsg(const string & msg);
   void ProcessLine(string line);
 };
