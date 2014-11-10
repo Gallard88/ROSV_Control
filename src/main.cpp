@@ -1,18 +1,9 @@
 /* ======================== */
 using namespace std;
 
-#include <iostream>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <signal.h>
-#include <sys/time.h>
-#include <sstream>
+#include <cstring>
 #include <syslog.h>
-#include <ctype.h>
-
 #include <PWM_Controller.h>
 
 #include "PowerManager.h"

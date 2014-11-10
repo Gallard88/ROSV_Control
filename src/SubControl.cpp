@@ -23,10 +23,8 @@
 // *******************************************************************************************
 using namespace std;
 
-#include <stdio.h>
-#include <string.h>
 #include <syslog.h>
-#include <sys/time.h>
+#include <cstring>
 
 #include "SubControl.h"
 

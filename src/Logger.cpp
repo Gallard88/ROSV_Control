@@ -25,11 +25,7 @@
 using namespace std;
 
 #include <syslog.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <string>
-
+#include <cstdlib>  // for exit()
 #include <Snotra.h>
 
 #include "Logger.h"

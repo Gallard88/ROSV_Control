@@ -27,8 +27,6 @@
 //*******************************************************************************************
 using namespace std;
 
-#include <time.h>
-
 #include "CmdModule.h"
 #include "parson.h"
 

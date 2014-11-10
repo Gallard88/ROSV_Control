@@ -52,7 +52,6 @@ public:
 protected:
 
 private:
-  time_t update;
   vector<struct Modules>  Modules;
   vector<int>             Handles;
   TcpServer               *Server;

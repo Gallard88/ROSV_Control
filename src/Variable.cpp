@@ -24,9 +24,7 @@
 //  *******************************************************************************************
 using namespace std;
 
-#include <string>
-#include <cstring>
-
+#include <cstdio>
 #include "Variable.h"
 
 //  *******************************************************************************************
@@ -34,7 +32,7 @@ Variable::Variable()
 {
   this->update = 0;
   Value = 0.0;
-  Name = NULL;
+  Name = "";
   Log = Logger::Init();
 }
 
@@ -43,15 +41,14 @@ string Variable::GetJSON(void)
 {
   char buf[100];
 
-  sprintf(buf, "{ \"Name\": \"%s\", \"Value\": %f }", Name, Value );
+  sprintf(buf, "{ \"Name\": \"%s\", \"Value\": %f }", Name.c_str(), Value );
   return string(buf);
 }
 
 //  *******************************************************************************************
 void Variable::SetName(const char * name)
 {
-  Name = new char[strlen(name)+1];
-  strcpy(Name, name);
+  Name = string(name);
 }
 
 //  *******************************************************************************************
@@ -62,7 +59,7 @@ void Variable::Set(float value)
   time_t current = time(NULL);
   if ((current - update) > 1) {
     update = current;
-    Log->RecordValue("Var", Name, Value);
+    Log->RecordValue("Var", Name.c_str(), Value);
   }
 }
 

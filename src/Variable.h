@@ -26,6 +26,7 @@
 #define __VARIABLE__
 // *******************************************************************************************
 #include <ctime>
+#include <string>
 #include "Logger.h"
 
 // *******************************************************************************************
@@ -41,7 +42,7 @@ public:
   string GetJSON(void);
 
 protected:
-  char * Name;
+  string Name;
   float Value;
 
   time_t update;

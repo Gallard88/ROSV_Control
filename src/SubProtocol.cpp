@@ -21,16 +21,7 @@
  THE SOFTWARE.
 */
 // *******************************************************************************************
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/time.h>
-#include <sstream>
-#include <syslog.h>
-#include <ctype.h>
-
+#include <cstring>
 #include "parson.h"
 #include "SubProtocol.h"
 
@@ -60,7 +51,6 @@ using namespace std;
 // *******************************************************************************************
 SubProtocol::SubProtocol()
 {
-  update = 0;
   Server = new TcpServer(8090);
   AddModule("Clients", this);
 }
@@ -142,21 +132,6 @@ void SubProtocol::SendUpdatedData(void)
       SendMsg(msg);
     }
   }
-  /*
-    time_t current;
-    current = time(NULL);
-    if ((current - update) >= 1 ) {
-      update = current;
-      for ( size_t j = 0; j < Modules.size(); j ++ ) {
-        string msg;
-
-        msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
-        msg += Modules[j].module->GetData();
-        msg += " }\r\n";
-        SendMsg(msg);
-      }
-    }
-  */
 }
 
 //*******************************************************************************************
