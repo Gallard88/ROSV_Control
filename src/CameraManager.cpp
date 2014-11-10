@@ -67,6 +67,7 @@ CameraManager::CameraManager(const char *filename)
     syslog(LOG_EMERG, "\"Stop\" script not found");
   }
   json_value_free (val);
+  PacketTime = 1;
 }
 
 // *******************************************************************************************

@@ -125,7 +125,6 @@ int main (int argc, char *argv[])
   CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
 
   SubProt = new SubProtocol();
-  SubProt->Pwm = PwmModule;
 
   SubProt->AddModule("Light",      (CmdModule *) LightMan );
   SubProt->AddModule("Power",      (CmdModule *) Power );

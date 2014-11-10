@@ -40,7 +40,10 @@ public:
     CallPeriod = 1000;
     old_time = 0;
     Log = Logger::Init();
+    PacketTime = 1;
   }
+
+  time_t PacketTime;  // a var to record when the msg data was created.
   virtual void Update(const char *packet, JSON_Object *msg) = 0;
   virtual const string GetData(void) = 0;
   Logger *Log;

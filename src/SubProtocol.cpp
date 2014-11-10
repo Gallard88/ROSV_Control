@@ -76,6 +76,7 @@ void SubProtocol::AddModule(const string & name, CmdModule *mod)
   struct Modules new_module;
 
   new_module.Name = name;
+  new_module.PTime = 0;
   new_module.module = mod;
   Modules.push_back(new_module);
 }
@@ -92,6 +93,8 @@ void SubProtocol::Run(struct timeval timeout)
   if ( fd >= 0 ) {
     cout << "New Handle: " << fd << endl;
     Handles.push_back(fd);
+    ResetPacketTime();
+    PacketTime = time(NULL);
   }
 
   try {
@@ -104,10 +107,22 @@ void SubProtocol::Run(struct timeval timeout)
   } catch (int ex ) {
     cout << __FILE__ << ": Handle_ReadLine: " << ex << endl;
     Handles.erase (Handles.begin()+i);
+    PacketTime = time(NULL);
   }
 
-  SendUpdatedData();
+  if ( Handles.size() != 0 ) {
+    SendUpdatedData();
+  }
 }
+
+//*******************************************************************************************
+void SubProtocol::ResetPacketTime(void)
+{
+for ( auto& m: Modules) {
+    m.PTime = 0;
+  }
+}
+
 
 //*******************************************************************************************
 void SubProtocol::SendUpdatedData(void)
@@ -116,19 +131,32 @@ void SubProtocol::SendUpdatedData(void)
    * Now, grab the data from each module,
    * and send it to each DataSouce.
    */
-  time_t current;
-  current = time(NULL);
-  if ((current - update) >= 1 ) {
-    update = current;
-    for ( size_t j = 0; j < Modules.size(); j ++ ) {
-      string msg;
+  for ( size_t j = 0; j < Modules.size(); j ++ ) {
+    if ( Modules[j].PTime != Modules[j].module->PacketTime ) {
+      Modules[j].PTime = Modules[j].module->PacketTime;
 
+      string msg;
       msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
       msg += Modules[j].module->GetData();
       msg += " }\r\n";
       SendMsg(msg);
     }
   }
+  /*
+    time_t current;
+    current = time(NULL);
+    if ((current - update) >= 1 ) {
+      update = current;
+      for ( size_t j = 0; j < Modules.size(); j ++ ) {
+        string msg;
+
+        msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
+        msg += Modules[j].module->GetData();
+        msg += " }\r\n";
+        SendMsg(msg);
+      }
+    }
+  */
 }
 
 //*******************************************************************************************
@@ -145,6 +173,7 @@ void SubProtocol::SendMsg(const string & msg)
   } catch (int e) {
     cout << __FILE__ << ": SendMsg: " << Handles[i] << endl;
     cout << __FILE__ << ": Exception: " << e << endl;
+    PacketTime = time(NULL);
     Handles.erase(Handles.begin()+i);
   }
 }

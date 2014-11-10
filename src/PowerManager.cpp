@@ -51,6 +51,7 @@ void PowerManager::Run(void)
 {
   if ( RunModule() == true ) {
 
+    PacketTime = time(NULL);
     Volts[0].Set(PWM_GetVoltage(Pwm));
     Volts[1].Set(PMon_GetVoltage(PMon, 0));
     Volts[2].Set(PMon_GetVoltage(PMon, 1));

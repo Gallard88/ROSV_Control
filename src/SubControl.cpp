@@ -113,6 +113,7 @@ const float MOT_SCALE = 100.0;
 // *******************************************************************************************
 void SubControl::SetControlVector(const ControlVector *vec)
 {
+  PacketTime = time(NULL);
   Velocity = *vec;
 }
 

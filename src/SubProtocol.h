@@ -27,9 +27,6 @@
 using namespace std;
 
 //*******************************************************************************************
-#include <sys/time.h>
-#include <PWM_Controller.h>
-#include <ctime>
 #include <vector>
 
 #include "CmdModule.h"
@@ -37,6 +34,7 @@ using namespace std;
 
 struct Modules {
   string      Name;
+  time_t      PTime;
   CmdModule  *module;
 };
 
@@ -50,7 +48,6 @@ public:
   void Run(struct timeval timeout);
 
   int GetNumClients(void);
-  PWM_Con_t Pwm;
 
 protected:
 
@@ -60,6 +57,7 @@ private:
   vector<int>             Handles;
   TcpServer               *Server;
 
+  void ResetPacketTime(void);
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
   void SendUpdatedData(void);
