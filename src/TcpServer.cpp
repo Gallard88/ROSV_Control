@@ -23,8 +23,6 @@
 
 using namespace std;
 
-#include <iostream>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +37,7 @@ const int TcpServer_WriteEx = 1;
 const int TcpServer_HandleNotFound = 2;
 
 
-TcpServer::TcpServer(int port)
+TcpServer::TcpServer(int port): NextFd(0)
 {
   struct sockaddr_in serv_addr;
 
@@ -100,9 +98,9 @@ for ( auto& c: Clients) {
         struct TcpClient client;
         client.Name = string(inet_ntoa(cli_addr.sin_addr));
         client.File = new_fp;
-        Clients[new_fp] = client;
-
-        cout << __FILE__ << ": New Source: " << inet_ntoa(cli_addr.sin_addr) << endl;
+        Clients[NextFd] = client;
+        new_fp = NextFd;
+        NextFd++;
       }
     }
 for ( auto& c: Clients) {
@@ -112,7 +110,6 @@ for ( auto& c: Clients) {
         int n = read(fp, data, sizeof(data)-1);
 
         if ( n <= 0 ) {
-          cout << __FILE__ << ": Socket Error: " << fp << endl;
           close(c.second.File);
           c.second.File = -1;
 
@@ -134,14 +131,12 @@ void TcpServer::Write(int handle, const string & msg)
 {
   if (( Clients.find(handle) == Clients.end()) ||
       ( Clients[handle].File < 0 )) {
-    cout << __FILE__ << ": Write - nf: " << handle << endl;
     throw TcpServer_HandleNotFound;
   }
 
   int n = write(Clients[handle].File, msg.c_str(), msg.size());
   if ( n <= 0 ) {
 
-    cout << __FILE__ << ": Write_Close: " << handle << endl;
     close(Clients[handle].File);
     Clients[handle].File = 1;
     throw TcpServer_WriteEx;
@@ -154,7 +149,6 @@ string TcpServer::Handle_ReadLine(int handle)
 
   if (( Clients.find(handle) == Clients.end()) ||
       ( Clients[handle].File < 0 )) {
-    cout << __FILE__ << ": Handle_ReadLine - nf: " << handle << endl;
     throw TcpServer_HandleNotFound;
   }
 
@@ -176,7 +170,6 @@ string TcpServer::Handle_ReadLine(int handle)
 string TcpServer::GetHandleName(int handle)
 {
   if ( Clients.find(handle) == Clients.end()) {
-    cout << __FILE__ << ": GetName - nf: " << handle << endl;
     return "";
   }
   return Clients[handle].Name;
@@ -186,7 +179,6 @@ void TcpServer::CleanMap(void)
 {
 for ( auto& c: Clients) {
     if ( c.second.File == -1 ) {
-      cout << __FILE__ << ": CleanMap " << c.first << endl;
       c.second.Buffer.clear();
       Clients.erase(c.first);
       break;

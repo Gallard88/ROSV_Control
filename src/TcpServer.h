@@ -58,6 +58,7 @@ public:
 private:
   struct sockaddr_in cli_addr;
   int listen_fd;
+  int NextFd;
 
   map<int, struct TcpClient> Clients;
   void CleanMap(void);
