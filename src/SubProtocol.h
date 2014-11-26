@@ -39,6 +39,14 @@ struct Modules {
 };
 
 //*******************************************************************************************
+class SubProt_Interface
+{
+public:
+  virtual void Client_Added  (const string & name, int hande) = 0;
+  virtual void Client_Removed(int handle) = 0;
+};
+
+//*******************************************************************************************
 class SubProtocol: CmdModule {
 public:
   SubProtocol();
@@ -49,9 +57,12 @@ public:
 
   int GetNumClients(void);
 
+  void AddListener(SubProt_Interface *listen);
+
 protected:
 
 private:
+  SubProt_Interface      *IntListeners;
   vector<struct Modules>  Modules;
   vector<int>             Handles;
   TcpServer               *Server;

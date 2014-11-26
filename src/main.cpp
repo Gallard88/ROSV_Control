@@ -40,6 +40,32 @@ Navigation       *Nav;
 volatile bool RunSystem;
 
 /* ======================== */
+class Main_SubListen: SubProt_Interface {
+public:
+  Main_SubListen(): NumClients(0) {};
+  void Client_Added(const string & name, int handle);
+  void Client_Removed(int handle);
+
+  int NumClients;
+};
+
+void Main_SubListen::Client_Added(const string & name, int handle)
+{
+  NumClients++;
+  MotorControl->EnableMotor(true);
+  syslog(LOG_NOTICE, "Client %s added, handle = %d", name.c_str(), handle);
+}
+void Main_SubListen::Client_Removed(int handle)
+{
+  NumClients--;
+  if ( NumClients == 0 ) {
+    MotorControl->EnableMotor(false);
+  }
+  syslog(LOG_NOTICE, "Client removed, handle = %d", handle);
+}
+
+Main_SubListen SubListener;
+
 /* ======================== */
 void SignalHandler_Setup(void)
 {
@@ -84,6 +110,7 @@ static void Init_Modules(void)
   RealTimeTask *task;
 
   SubProt = new SubProtocol();
+  SubProt->AddListener((SubProt_Interface *) &SubListener);
 
   Nav = new Navigation("/etc/ROSV_Control/navigation.json");
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
@@ -93,6 +120,7 @@ static void Init_Modules(void)
 
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
+  MotorControl->EnableMotor(false);
   task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
   task->SetFrequency(10);
   TaskList.push_back(task);
@@ -158,8 +186,6 @@ int main (int argc, char *argv[])
       ControlVector vec = Nav->GetVector();
       MotorControl->SetControlVector( &vec );
     }
-    bool mot_en = ( SubProt->GetNumClients() != 0)? true: false;
-    MotorControl->EnableMotor(mot_en);
 
 for ( auto& t: TaskList ) {
       t->Run();

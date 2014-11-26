@@ -25,8 +25,6 @@
 #include "parson.h"
 #include "SubProtocol.h"
 
-#include <iostream>
-
 // *******************************************************************************************
 using namespace std;
 
@@ -81,7 +79,9 @@ void SubProtocol::Run(struct timeval timeout)
 
   fd = Server->Listen(timeout);
   if ( fd >= 0 ) {
-    cout << "New Handle: " << fd << endl;
+    if ( IntListeners != NULL ) {
+      IntListeners->Client_Added(Server->GetHandleName(fd), fd);
+    }
     Handles.push_back(fd);
     ResetPacketTime();
     PacketTime = time(NULL);
@@ -95,7 +95,9 @@ void SubProtocol::Run(struct timeval timeout)
       }
     }
   } catch (int ex ) {
-    cout << __FILE__ << ": Handle_ReadLine: " << ex << endl;
+    if ( IntListeners != NULL ) {
+      IntListeners->Client_Removed(Handles[i]);
+    }
     Handles.erase (Handles.begin()+i);
     PacketTime = time(NULL);
   }
@@ -105,7 +107,7 @@ void SubProtocol::Run(struct timeval timeout)
   }
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
 void SubProtocol::ResetPacketTime(void)
 {
 for ( auto& m: Modules) {
@@ -114,7 +116,7 @@ for ( auto& m: Modules) {
 }
 
 
-//*******************************************************************************************
+// *******************************************************************************************
 void SubProtocol::SendUpdatedData(void)
 {
   /*
@@ -146,8 +148,9 @@ void SubProtocol::SendMsg(const string & msg)
     }
 
   } catch (int e) {
-    cout << __FILE__ << ": SendMsg: " << Handles[i] << endl;
-    cout << __FILE__ << ": Exception: " << e << endl;
+    if ( IntListeners != NULL ) {
+      IntListeners->Client_Removed(Handles[i]);
+    }
     PacketTime = time(NULL);
     Handles.erase(Handles.begin()+i);
   }
@@ -204,12 +207,18 @@ void SubProtocol::ProcessLine(string line)
   json_value_free(data);
 }
 
-//*******************************************************************************************
+// *******************************************************************************************
+void SubProtocol::AddListener(SubProt_Interface *listen)
+{
+  IntListeners = listen;
+}
+
+// *******************************************************************************************
 int SubProtocol::GetNumClients(void)
 {
   return Handles.size();
 }
 
-//*******************************************************************************************
-//*******************************************************************************************
+// *******************************************************************************************
+// *******************************************************************************************
 
