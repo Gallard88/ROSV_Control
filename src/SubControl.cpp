@@ -63,7 +63,8 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm)
     JSON_Object *j_motor = json_array_get_object (array, i);
     if ( j_motor != NULL ) {
       Motor *motor = new Motor(j_motor, pwm, 0, 100);
-      motor->SetRamp(0.05);
+      motor->SetRamp(1);
+//      motor->SetRamp(0.05);
       MotorList.push_back(motor);
     }
   }
