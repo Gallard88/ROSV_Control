@@ -29,6 +29,8 @@ using namespace std;
 #include "SubControl.h"
 
 // *******************************************************************************************
+const ControlVector BlankVec = { 0, 0, 0, 0, 0, 0};
+// *******************************************************************************************
 SubControl::SubControl(const char *filename, PWM_Con_t pwm)
 {
   Enable = false;
@@ -97,6 +99,9 @@ const string SubControl::GetData(void)
 void SubControl::EnableMotor(bool en)
 {
   Enable = en;
+  if ( en == false ) {
+    Velocity = BlankVec;
+  }
 }
 
 // *******************************************************************************************
@@ -112,7 +117,9 @@ const float MOT_SCALE = 100.0;
 void SubControl::SetControlVector(const ControlVector *vec)
 {
   PacketTime = time(NULL);
-  Velocity = *vec;
+  if ( Enable == true ) {
+    Velocity = *vec;
+  }
 }
 
 // *******************************************************************************************
@@ -120,16 +127,13 @@ void SubControl::Run_Task(void)
 {
   float power[VECTOR_SIZE];
 
-  if ( Enable == false ) {
-    return ;
-  }
 
   // run each Axes controller.
   power[VECTOR_X]     = Velocity.x / MOT_SCALE;
   power[VECTOR_Y]     = Velocity.y / MOT_SCALE;
   power[VECTOR_Z]     = Velocity.z / MOT_SCALE;
-  power[VECTOR_YAW]   = Velocity.yaw / MOT_SCALE;
-  power[VECTOR_ROLL]  = Velocity.roll / MOT_SCALE;
+  power[VECTOR_YAW]   = Velocity.yaw   / MOT_SCALE;
+  power[VECTOR_ROLL]  = Velocity.roll  / MOT_SCALE;
   power[VECTOR_PITCH] = Velocity.pitch / MOT_SCALE;
 
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
