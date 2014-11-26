@@ -45,7 +45,6 @@ protected:
   string Name;
   float Value;
 
-  time_t update;
   Logger *Log;
 };
 
