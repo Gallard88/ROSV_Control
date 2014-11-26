@@ -30,6 +30,7 @@
 
 #include <PWM_Controller.h>
 
+#include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "Variable.h"
 
@@ -42,10 +43,10 @@ typedef struct  {
 
 //*******************************************************************************************
 
-class  LightManager: CmdModule {
+class  LightManager: CmdModule, RTT_Interface {
 public:
   LightManager(const char * filename);
-  void Run(void);
+  void Run_Task(void);
 
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);

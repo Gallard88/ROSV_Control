@@ -35,6 +35,9 @@ ROSV_Control_SOURCES = \
 	PowerManager.h \
 	Navigation.cpp \
 	Navigation.h \
+	RTT_Interface.h \
+	RealTimeTask.cpp \
+	RealTimeTask.h \
 	SubControl.cpp \
 	SubControl.h \
 	SubProtocol.cpp \

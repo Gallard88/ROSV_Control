@@ -39,7 +39,6 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p)
     exit(-1);
   }
 
-  SetCallPeriod(1000);
   Volts[0].SetName("Pwm_Volt");
   Volts[1].SetName("PMon_Pri");
   Volts[2].SetName("PMon_Sec");
@@ -47,17 +46,13 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p)
 }
 
 //  *******************************************************************************************
-void PowerManager::Run(void)
+void PowerManager::Run_Task(void)
 {
-  if ( RunModule() == true ) {
-
-    PacketTime = time(NULL);
-    Volts[0].Set(PWM_GetVoltage(Pwm));
-    Volts[1].Set(PMon_GetVoltage(PMon, 0));
-    Volts[2].Set(PMon_GetVoltage(PMon, 1));
-
-    Temp.Set(PWM_GetTemp(Pwm));
-  }
+  PacketTime = time(NULL);
+  Volts[0].Set(PWM_GetVoltage(Pwm));
+  Volts[1].Set(PMon_GetVoltage(PMon, 0));
+  Volts[2].Set(PMon_GetVoltage(PMon, 1));
+  Temp.Set(PWM_GetTemp(Pwm));
 }
 
 //  *******************************************************************************************

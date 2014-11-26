@@ -69,7 +69,6 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm)
     }
   }
   json_value_free (val);
-  SetCallPeriod(100);
 }
 
 // *******************************************************************************************
@@ -117,12 +116,11 @@ void SubControl::SetControlVector(const ControlVector *vec)
 }
 
 // *******************************************************************************************
-void SubControl::Run(void)
+void SubControl::Run_Task(void)
 {
   float power[VECTOR_SIZE];
 
-  if (( Enable == false ) ||
-      ( RunModule() == false )) {
+  if ( Enable == false ) {
     return ;
   }
 

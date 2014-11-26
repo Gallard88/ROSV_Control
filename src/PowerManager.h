@@ -30,15 +30,16 @@
 #include <PowerMonitor.h>
 
 #include "CmdModule.h"
+#include "RTT_Interface.h"
 #include "Variable.h"
 
 //*******************************************************************************************
 //*******************************************************************************************
-class  PowerManager: CmdModule {
+class  PowerManager: CmdModule, RTT_Interface {
 
 public:
   PowerManager(const char * filename, PWM_Con_t p);
-  void Run(void);
+  void Run_Task(void);
 
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);

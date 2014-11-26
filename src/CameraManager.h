@@ -27,11 +27,12 @@
 //*******************************************************************************************
 using namespace std;
 
+#include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "parson.h"
 
 //*******************************************************************************************
-class CameraManager: CmdModule {
+class CameraManager: CmdModule, RTT_Interface {
 public:
   CameraManager(const char *filename);
   ~CameraManager();
@@ -42,6 +43,8 @@ public:
 
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
+
+  void Run_Task(void);
 
 private:
   char *StartSc;

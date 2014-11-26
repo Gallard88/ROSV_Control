@@ -67,8 +67,9 @@ PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = CameraManager.$(OBJEXT) \
 	LightManager.$(OBJEXT) Logger.$(OBJEXT) Motor.$(OBJEXT) \
 	PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
-	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
-	Variable.$(OBJEXT) main.$(OBJEXT)
+	RealTimeTask.$(OBJEXT) SubControl.$(OBJEXT) \
+	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) Variable.$(OBJEXT) \
+	main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -252,6 +253,9 @@ ROSV_Control_SOURCES = \
 	PowerManager.h \
 	Navigation.cpp \
 	Navigation.h \
+	RTT_Interface.h \
+	RealTimeTask.cpp \
+	RealTimeTask.h \
 	SubControl.cpp \
 	SubControl.h \
 	SubProtocol.cpp \
@@ -352,6 +356,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Motor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Navigation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerManager.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RealTimeTask.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubProtocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@

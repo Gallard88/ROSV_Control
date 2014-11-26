@@ -37,8 +37,6 @@ using namespace std;
 class CmdModule {
 public:
   CmdModule() {
-    CallPeriod = 1000;
-    old_time = 0;
     Log = Logger::Init();
     PacketTime = 1;
   }
@@ -47,21 +45,6 @@ public:
   virtual void Update(const char *packet, JSON_Object *msg) = 0;
   virtual const string GetData(void) = 0;
   Logger *Log;
-
-  unsigned long CallPeriod, old_time;
-  void SetCallPeriod(unsigned long period) { CallPeriod = period; }
-
-  bool RunModule(void) {
-    struct timeval  tv;
-    gettimeofday(&tv, NULL);
-    long new_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ; // convert tv_sec & tv_usec to millisecond
-    if (( new_time - old_time) >= CallPeriod ) {
-      old_time = new_time;
-      return true;
-    }
-    return false;
-  }
-
 };
 
 //*******************************************************************************************

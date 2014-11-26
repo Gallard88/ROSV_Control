@@ -1,10 +1,14 @@
 /* ======================== */
 using namespace std;
 
+#include <vector>
 #include <signal.h>
 #include <cstring>
 #include <syslog.h>
 #include <PWM_Controller.h>
+
+#include "RealTimeTask.h"
+#include "RTT_Interface.h"
 
 #include "PowerManager.h"
 #include "CameraManager.h"
@@ -22,6 +26,7 @@ using namespace std;
 const struct timeval system_time = { 0 , RUN_INTERVAL};
 
 /* ======================== */
+vector<RealTimeTask *> TaskList;
 PWM_Con_t PwmModule;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
@@ -74,6 +79,45 @@ void System_Shutdown(void)
 }
 
 /* ======================== */
+static void Init_Modules(void)
+{
+  RealTimeTask *task;
+
+  SubProt = new SubProtocol();
+
+  Nav = new Navigation("/etc/ROSV_Control/navigation.json");
+  SubProt->AddModule("Navigation", (CmdModule *) Nav );
+  task = new RealTimeTask("Navigation", (RTT_Interface *) Nav);
+  task->SetFrequency(10);
+  TaskList.push_back(task);
+
+  MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
+  SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
+  task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
+  task->SetFrequency(10);
+  TaskList.push_back(task);
+
+  LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
+  LightMan->Pwm = PwmModule;
+  SubProt->AddModule("Light",      (CmdModule *) LightMan );
+  task = new RealTimeTask("Light", (RTT_Interface *) LightMan);
+  task->SetFrequency(1);
+  TaskList.push_back(task);
+
+  Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
+  SubProt->AddModule("Power",      (CmdModule *) Power );
+  task = new RealTimeTask("Power", (RTT_Interface *) Power);
+  task->SetFrequency(1);
+  TaskList.push_back(task);
+
+  CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
+  SubProt->AddModule("Camera",     (CmdModule *) CamMan );
+  task = new RealTimeTask("Camera", (RTT_Interface *) CamMan);
+  task->SetFrequency(1);
+  TaskList.push_back(task);
+}
+
+/* ======================== */
 int main (int argc, char *argv[])
 {
   openlog("ROSV_Control", LOG_PID, LOG_USER);
@@ -103,43 +147,26 @@ int main (int argc, char *argv[])
   Log->RecordValue("ROSV_Control","Start", 1);
 
   RunSystem = true;
-
-  MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
-
-  LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
-  LightMan->Pwm = PwmModule;
-
-  Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
-
-  Nav = new Navigation("/etc/ROSV_Control/navigation.json");
-
-  CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
-
-  SubProt = new SubProtocol();
-
-  SubProt->AddModule("Light",      (CmdModule *) LightMan );
-  SubProt->AddModule("Power",      (CmdModule *) Power );
-  SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
-  SubProt->AddModule("Camera",     (CmdModule *) CamMan );
-  SubProt->AddModule("Navigation", (CmdModule *) Nav );
+  Init_Modules();
 
   /* --------------------------------------------- */
   while ( RunSystem ) {
     // read data from connected clients.
     SubProt->Run(system_time);
 
-    Nav->Run();
     if ( Nav->NewVector() == true ) {
       ControlVector vec = Nav->GetVector();
       MotorControl->SetControlVector( &vec );
     }
-
     bool mot_en = ( SubProt->GetNumClients() != 0)? true: false;
     MotorControl->EnableMotor(mot_en);
-    MotorControl->Run();
 
-    LightMan->Run();
-    Power->Run();
+for ( auto& t: TaskList ) {
+      t->Run();
+      if ( t->DetectDeadlineEdge() ) {
+        printf("%s Deadline Missed\n", t->GetName().c_str());
+      }
+    }
   }
   return 0;
 }

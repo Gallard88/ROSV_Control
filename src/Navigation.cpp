@@ -13,18 +13,15 @@ Navigation::Navigation(const char *filename)
   // in time we will use this to parse a json file for system limits.
   memset(&CVec, 0, sizeof(ControlVector));
   newVec = true;
-  SetCallPeriod(100);
 }
 
 //  *******************************************************************************************
-void Navigation::Run(void)
+void Navigation::Run_Task(void)
 {
-  if ( RunModule() == true ) {
-    Log->RecordValue("Nav", "Forward", CVec.x);
-    Log->RecordValue("Nav", "Strafe",  CVec.y);
-    Log->RecordValue("Nav", "Dive",    CVec.z);
-    Log->RecordValue("Nav", "Turn",    CVec.yaw);
-  }
+  Log->RecordValue("Nav", "Forward", CVec.x);
+  Log->RecordValue("Nav", "Strafe",  CVec.y);
+  Log->RecordValue("Nav", "Dive",    CVec.z);
+  Log->RecordValue("Nav", "Turn",    CVec.yaw);
 }
 
 //  *******************************************************************************************

@@ -30,6 +30,7 @@
 #include <PWM_Controller.h>
 #include <vector>
 
+#include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "Motor.h"
 
@@ -47,10 +48,10 @@ typedef struct {
 } ControlVector;
 
 //*******************************************************************************************
-class SubControl: CmdModule {
+class SubControl: CmdModule, RTT_Interface {
 public:
   SubControl(const char *filename, PWM_Con_t pwm);
-  void Run(void);
+  void Run_Task(void);
 
   void EnableMotor(bool en);
 
