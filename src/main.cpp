@@ -190,7 +190,7 @@ int main (int argc, char *argv[])
 for ( auto& t: TaskList ) {
       t->Run();
       if ( t->DetectDeadlineEdge() ) {
-        printf("%s Deadline Missed\n", t->GetName().c_str());
+        syslog(LOG_EMERG, "%s Deadline Missed\n", t->GetName().c_str());
       }
     }
   }
