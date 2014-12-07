@@ -143,10 +143,8 @@ void TcpServer::Write(int handle, const string & msg)
   }
 }
 
-string TcpServer::Handle_ReadLine(int handle)
+bool TcpServer::Handle_ReadLine(int handle, string & line)
 {
-  string line = "";
-
   if (( Clients.find(handle) == Clients.end()) ||
       ( Clients[handle].File < 0 )) {
     throw TcpServer_HandleNotFound;
@@ -161,10 +159,10 @@ string TcpServer::Handle_ReadLine(int handle)
       Clients[handle].Buffer.erase(0, found+1);
 
       if ( line.length())
-        break;
+        return true;
     }
   }
-  return line;
+  return false;
 }
 
 string TcpServer::GetHandleName(int handle)

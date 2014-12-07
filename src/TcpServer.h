@@ -52,7 +52,7 @@ public:
   int Listen(struct timeval timeout);
 
   string GetHandleName(int handle);
-  string Handle_ReadLine(int handle);
+  bool Handle_ReadLine(int handle, string & line);
   void Write(int handle, const string & msg);
 
 private:

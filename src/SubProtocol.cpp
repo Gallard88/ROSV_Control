@@ -88,9 +88,9 @@ void SubProtocol::Run(struct timeval timeout)
   }
 
   try {
+    string l;
     for ( i = 0; i < Handles.size(); i ++ ) {
-      string l = Server->Handle_ReadLine(Handles[i]);
-      if ( l.size() != 0 ) {
+      while ( Server->Handle_ReadLine(Handles[i], l) == true ) {
         ProcessLine(l);
       }
     }
