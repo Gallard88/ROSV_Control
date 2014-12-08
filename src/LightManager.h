@@ -46,6 +46,7 @@ typedef struct  {
 class  LightManager: CmdModule, RTT_Interface {
 public:
   LightManager(const char * filename);
+  ~LightManager();
   void Run_Task(void);
 
   void Update(const char *packet, JSON_Object *msg);

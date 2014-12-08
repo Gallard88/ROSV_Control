@@ -88,6 +88,17 @@ LightManager::LightManager(const char * filename)
 }
 
 //  *******************************************************************************************
+LightManager::~LightManager()
+{
+  for ( size_t i = 0; i < Chanels.size(); i ++ ) {
+    LightChanel ch = Chanels[i];
+    for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
+      PWM_SetPWM(Pwm, ch.Modules[j], 0);
+    }
+  }
+}
+
+//  *******************************************************************************************
 void LightManager::Run_Task(void)
 {
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
