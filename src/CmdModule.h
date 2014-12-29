@@ -40,6 +40,7 @@ public:
     Log = Logger::Init();
     PacketTime = 1;
   }
+  virtual ~CmdModule() {}
 
   time_t PacketTime;  // a var to record when the msg data was created.
   virtual void Update(const char *packet, JSON_Object *msg) = 0;
