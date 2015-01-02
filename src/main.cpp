@@ -5,6 +5,7 @@ using namespace std;
 #include <signal.h>
 #include <cstring>
 #include <syslog.h>
+#include <unistd.h>
 #include <PWM_Controller.h>
 
 #include "RealTimeTask.h"
@@ -150,13 +151,27 @@ int main (int argc, char *argv[])
 {
   openlog("ROSV_Control", LOG_PID, LOG_USER);
   syslog(LOG_NOTICE, "Starting program");
-  /*
+
+  bool daemonise = false;
+  int opt;
+
+  while ((opt = getopt(argc, argv, "dD:")) != -1) {
+    switch(opt) {
+      case 'd':
+      daemonise = true;
+      break;
+    }
+  }
+
+  if ( daemonise == true ) {
+    syslog(LOG_ALERT, "Daemonising");
     int rv = daemon( 0, 0 );
     if ( rv < 0 ) {
       syslog(LOG_EMERG, "Daemonise failed" );
       exit(-1);
     }
-  */
+  }
+
   SignalHandler_Setup();
   atexit(System_Shutdown);
 
