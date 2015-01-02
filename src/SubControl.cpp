@@ -31,9 +31,9 @@ using namespace std;
 // *******************************************************************************************
 const ControlVector BlankVec = { 0, 0, 0, 0, 0, 0};
 // *******************************************************************************************
-SubControl::SubControl(const char *filename, PWM_Con_t pwm)
+SubControl::SubControl(const char *filename, PWM_Con_t pwm):
+  Enable(false)
 {
-  Enable = false;
   memset(&Velocity, 0, sizeof(Velocity));
 
   JSON_Value *val = json_parse_file(filename);

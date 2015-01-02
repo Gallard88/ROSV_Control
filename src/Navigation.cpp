@@ -8,11 +8,11 @@ using namespace std;
 
 //  *******************************************************************************************
 //  *******************************************************************************************
-Navigation::Navigation(const char *filename)
+Navigation::Navigation(const char *filename):
+  newVec(true)
 {
   // in time we will use this to parse a json file for system limits.
   memset(&CVec, 0, sizeof(ControlVector));
-  newVec = true;
 }
 
 //  *******************************************************************************************

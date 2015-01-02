@@ -30,9 +30,9 @@
 #define CAMMAN_SC_SIZE 4096
 
 // *******************************************************************************************
-CameraManager::CameraManager(const char *filename)
+CameraManager::CameraManager(const char *filename):
+  StartTime(0)
 {
-  StartTime = 0;
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
@@ -64,7 +64,6 @@ CameraManager::CameraManager(const char *filename)
     syslog(LOG_EMERG, "\"Stop\" script not found");
   }
   json_value_free (val);
-  PacketTime = 1;
 }
 
 // *******************************************************************************************

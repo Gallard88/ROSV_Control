@@ -29,10 +29,10 @@ using namespace std;
 #include "PowerManager.h"
 
 //  *******************************************************************************************
-PowerManager::PowerManager(const char * filename, PWM_Con_t p)
+PowerManager::PowerManager(const char * filename, PWM_Con_t p):
+  Pwm(p)
 {
   PMon = PMon_Connect();
-  Pwm = p;
 
   if ( PMon == NULL ) {
     syslog(LOG_EMERG, "PowerManager: failed to open PowerMonitor");

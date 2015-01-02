@@ -28,10 +28,9 @@ using namespace std;
 #include "Variable.h"
 
 //  *******************************************************************************************
-Variable::Variable()
+Variable::Variable():
+  Value(0.0)
 {
-  Value = 0.0;
-  Name = "";
   Log = Logger::Init();
 }
 

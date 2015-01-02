@@ -27,9 +27,9 @@ using namespace std;
 #include "Motor.h"
 
 //  *******************************************************************************************
-Motor::Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max)
+Motor::Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max):
+  Min(min), Max(max), Target(0.0), Ramp(max), Pwm(p)
 {
-  Pwm = p;
   const char *name = json_object_get_string(setting, "Name");
   Chanel = (int) json_object_get_number(setting, "ch");
 
@@ -40,10 +40,6 @@ Motor::Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max)
     }
   }
   Val.SetName(name);
-  Min = min;
-  Max = max;
-  Ramp = max;
-  Target = 0.0;
 }
 
 //  *******************************************************************************************
