@@ -340,7 +340,7 @@ uninstall-ROSV_ControlPROGRAMS:
 
 clean-ROSV_ControlPROGRAMS:
 	-test -z "$(ROSV_Control_PROGRAMS)" || rm -f $(ROSV_Control_PROGRAMS)
-ROSV_Control$(EXEEXT): $(ROSV_Control_OBJECTS) $(ROSV_Control_DEPENDENCIES) $(EXTRA_ROSV_Control_DEPENDENCIES) 
+ROSV_Control$(EXEEXT): $(ROSV_Control_OBJECTS) $(ROSV_Control_DEPENDENCIES) $(EXTRA_ROSV_Control_DEPENDENCIES)
 	@rm -f ROSV_Control$(EXEEXT)
 	$(CXXLINK) $(ROSV_Control_OBJECTS) $(ROSV_Control_LDADD) $(LIBS)
 

@@ -10,13 +10,32 @@
  *
  */
 //  *******************************************************************************************
+#ifndef __NAVIGATION__
+#define __NAVIGATION__
+//  *******************************************************************************************
 #include <string>
 
 #include "RTT_Interface.h"
 #include "CmdModule.h"
-#include "SubControl.h"
 
 //  *******************************************************************************************
+typedef struct {
+  float x;
+  float y;
+  float z;
+  float yaw;
+  float roll;
+  float pitch;
+
+} ControlVector;
+
+//  *******************************************************************************************
+class NavUpdate_Interface {
+
+public:
+  virtual void UpdateControlVector(const ControlVector & vec) = 0;
+};
+
 //  *******************************************************************************************
 
 class Navigation: CmdModule, RTT_Interface {
@@ -32,8 +51,12 @@ public:
   bool NewVector(void);
   ControlVector GetVector(void);
 
+	void SetUpdateInterface(NavUpdate_Interface *iface) { Interface = iface; }
+
 private:
   ControlVector CVec;
   bool newVec;
+	NavUpdate_Interface *Interface;
 };
 
+#endif

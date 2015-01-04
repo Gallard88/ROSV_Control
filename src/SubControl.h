@@ -33,22 +33,13 @@
 #include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "Motor.h"
+#include "Navigation.h"
 
 //  *******************************************************************************************
 //  *******************************************************************************************
-
-typedef struct {
-  float x;
-  float y;
-  float z;
-  float yaw;
-  float roll;
-  float pitch;
-
-} ControlVector;
 
 //*******************************************************************************************
-class SubControl: CmdModule, RTT_Interface {
+class SubControl: CmdModule, RTT_Interface, NavUpdate_Interface {
 public:
   SubControl(const char *filename, PWM_Con_t pwm);
   void Run_Task(void);
@@ -58,7 +49,7 @@ public:
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
 
-  void SetControlVector(const ControlVector *vec);
+  void UpdateControlVector(const ControlVector & vec);
 
 private:
   vector<Motor *> MotorList;

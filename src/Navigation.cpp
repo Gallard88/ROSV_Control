@@ -49,7 +49,10 @@ void Navigation::Update(const char *packet, JSON_Object *msg)
     } else {
       return;
     }
-    newVec = true;
+    if ( Interface != NULL ) {
+			Interface->UpdateControlVector(CVec);
+		}
+		newVec = true;
   }
 }
 

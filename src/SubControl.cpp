@@ -114,11 +114,11 @@ const float MOT_SCALE = 100.0;
 #define VECTOR_YAW    5
 
 // *******************************************************************************************
-void SubControl::SetControlVector(const ControlVector *vec)
+void SubControl::UpdateControlVector(const ControlVector & vec)
 {
   PacketTime = time(NULL);
   if ( Enable == true ) {
-    Velocity = *vec;
+    Velocity = vec;
   }
 }
 

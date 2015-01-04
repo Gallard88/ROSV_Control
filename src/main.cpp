@@ -113,16 +113,17 @@ static void Init_Modules(void)
   SubProt = new SubProtocol();
   SubProt->AddListener((SubProt_Interface *) &SubListener);
 
-  Nav = new Navigation("/etc/ROSV_Control/navigation.json");
-  SubProt->AddModule("Navigation", (CmdModule *) Nav );
-  task = new RealTimeTask("Navigation", (RTT_Interface *) Nav);
-  task->SetFrequency(10);
-  TaskList.push_back(task);
-
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
   MotorControl->EnableMotor(false);
   task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
+  task->SetFrequency(10);
+  TaskList.push_back(task);
+
+  Nav = new Navigation("/etc/ROSV_Control/navigation.json");
+  SubProt->AddModule("Navigation", (CmdModule *) Nav );
+	Nav->SetUpdateInterface((NavUpdate_Interface *) MotorControl);
+  task = new RealTimeTask("Navigation", (RTT_Interface *) Nav);
   task->SetFrequency(10);
   TaskList.push_back(task);
 
@@ -196,11 +197,6 @@ int main (int argc, char *argv[])
   while ( RunSystem ) {
     // read data from connected clients.
     SubProt->Run(system_time);
-
-    if ( Nav->NewVector() == true ) {
-      ControlVector vec = Nav->GetVector();
-      MotorControl->SetControlVector( &vec );
-    }
 
 for ( auto& t: TaskList ) {
       t->Run();
