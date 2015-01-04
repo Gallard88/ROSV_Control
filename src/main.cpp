@@ -1,15 +1,15 @@
 /* ======================== */
 using namespace std;
 
-#include <vector>
 #include <signal.h>
 #include <cstring>
 #include <syslog.h>
 #include <unistd.h>
 #include <PWM_Controller.h>
 
-#include "RealTimeTask.h"
-#include "RTT_Interface.h"
+#include <RealTimeTask.h>
+#include <RTT_Interface.h>
+#include <RT_TaskManager.h>
 
 #include "PowerManager.h"
 #include "CameraManager.h"
@@ -21,13 +21,9 @@ using namespace std;
 
 /* ======================== */
 /* ======================== */
-#define RUN_INTERVAL  (10*1000)    // us
 
 /* ======================== */
-const struct timeval system_time = { 0 , RUN_INTERVAL};
-
 /* ======================== */
-vector<RealTimeTask *> TaskList;
 PWM_Con_t PwmModule;
 SubControl       *MotorControl;
 SubProtocol      *SubProt;
@@ -36,9 +32,32 @@ CameraManager    *CamMan;
 PowerManager     *Power;
 Logger           *Log;
 Navigation       *Nav;
+RT_TaskManager    TaskMan;
 
 //static thread ListenThread;
 volatile bool RunSystem;
+
+/* ======================== */
+class MainCallBack: public RT_TaskMan_Interface {
+public:
+  void Deadline_Missed(const std::string & name)
+  {
+    syslog(LOG_NOTICE, "Task %s: Deadline missed\n", name.c_str());
+    printf("Task %s: Deadline missed\n", name.c_str());
+  }
+  void Deadline_Recovered(const std::string & name)
+  {
+    syslog(LOG_NOTICE, "Task %s: Deadline recovered\n", name.c_str());
+    printf("Task %s: Deadline recovered\n", name.c_str());
+  }
+  void Duration_Overrun(const std::string & name)
+  {
+    syslog(LOG_NOTICE, "Task %s: Duration overrun\n", name.c_str());
+    printf("Task %s: Duration overrun\n", name.c_str());
+  }
+};
+
+MainCallBack TaskCallback;
 
 /* ======================== */
 class Main_SubListen: SubProt_Interface {
@@ -110,6 +129,8 @@ static void Init_Modules(void)
 {
   RealTimeTask *task;
 
+	TaskMan.AddCallback((RT_TaskMan_Interface *)&TaskCallback);
+
   SubProt = new SubProtocol();
   SubProt->AddListener((SubProt_Interface *) &SubListener);
 
@@ -117,33 +138,39 @@ static void Init_Modules(void)
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
   task = new RealTimeTask("Navigation", (RTT_Interface *) Nav);
   task->SetFrequency(10);
-  TaskList.push_back(task);
+  task->SetMaxDuration(50);
+  TaskMan.AddTask(task);
 
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
   MotorControl->EnableMotor(false);
   task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
   task->SetFrequency(10);
-  TaskList.push_back(task);
+  task->SetMaxDuration(50);
+  TaskMan.AddTask(task);
 
   LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;
   SubProt->AddModule("Light",      (CmdModule *) LightMan );
   task = new RealTimeTask("Light", (RTT_Interface *) LightMan);
   task->SetFrequency(1);
-  TaskList.push_back(task);
+  task->SetMaxDuration(50);
+  TaskMan.AddTask(task);
 
   Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
   SubProt->AddModule("Power",      (CmdModule *) Power );
   task = new RealTimeTask("Power", (RTT_Interface *) Power);
   task->SetFrequency(1);
-  TaskList.push_back(task);
+  task->SetMaxDuration(50);
+  TaskMan.AddTask(task);
 
   CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
   SubProt->AddModule("Camera",     (CmdModule *) CamMan );
   task = new RealTimeTask("Camera", (RTT_Interface *) CamMan);
   task->SetFrequency(1);
-  TaskList.push_back(task);
+  task->SetMaxDuration(50);
+  TaskMan.AddTask(task);
+
 }
 
 /* ======================== */
@@ -192,22 +219,22 @@ int main (int argc, char *argv[])
   RunSystem = true;
   Init_Modules();
 
+  syslog(LOG_ALERT, "Main()");
   /* --------------------------------------------- */
   while ( RunSystem ) {
-    // read data from connected clients.
-    SubProt->Run(system_time);
 
     if ( Nav->NewVector() == true ) {
       ControlVector vec = Nav->GetVector();
       MotorControl->SetControlVector( &vec );
     }
 
-for ( auto& t: TaskList ) {
-      t->Run();
-      if ( t->DetectDeadlineEdge() ) {
-        syslog(LOG_EMERG, "%s Deadline Missed\n", t->GetName().c_str());
-      }
-    }
+    long time = TaskMan.RunTasks();
+
+    // read data from connected clients.
+    struct timeval system_time;
+    system_time.tv_sec = 0;
+    system_time.tv_usec = time * 1000;
+    SubProt->Run(system_time);
   }
   return 0;
 }

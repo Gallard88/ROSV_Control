@@ -19,6 +19,7 @@ LDADD = \
 	/usr/local/lib/libPWMControl.a \
         /usr/local/lib/libPowerMonitor.a \
 	/usr/local/lib/libparson.a \
+	/usr/local/lib/libRealTime.a \
 	/usr/local/lib/libSnotra.a
 
 ROSV_Control_SOURCES = \
@@ -35,9 +36,6 @@ ROSV_Control_SOURCES = \
 	PowerManager.h \
 	Navigation.cpp \
 	Navigation.h \
-	RTT_Interface.h \
-	RealTimeTask.cpp \
-	RealTimeTask.h \
 	SubControl.cpp \
 	SubControl.h \
 	SubProtocol.cpp \
