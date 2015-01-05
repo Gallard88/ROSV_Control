@@ -231,10 +231,12 @@ int main (int argc, char *argv[])
     long time = TaskMan.RunTasks();
 
     // read data from connected clients.
-    struct timeval system_time;
-    system_time.tv_sec = 0;
-    system_time.tv_usec = time * 1000;
-    SubProt->Run(system_time);
+    if ( time > 0 ) {
+      struct timeval system_time;
+      system_time.tv_sec = 0;
+      system_time.tv_usec = time;
+      SubProt->Run(system_time);
+    }
   }
   return 0;
 }
