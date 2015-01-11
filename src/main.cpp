@@ -40,18 +40,15 @@ volatile bool RunSystem;
 /* ======================== */
 class MainCallBack: public RT_TaskMan_Interface {
 public:
-  void Deadline_Missed(const std::string & name)
-  {
+  void Deadline_Missed(const std::string & name) {
     syslog(LOG_NOTICE, "Task %s: Deadline missed\n", name.c_str());
     printf("Task %s: Deadline missed\n", name.c_str());
   }
-  void Deadline_Recovered(const std::string & name)
-  {
+  void Deadline_Recovered(const std::string & name) {
     syslog(LOG_NOTICE, "Task %s: Deadline recovered\n", name.c_str());
     printf("Task %s: Deadline recovered\n", name.c_str());
   }
-  void Duration_Overrun(const std::string & name)
-  {
+  void Duration_Overrun(const std::string & name) {
     syslog(LOG_NOTICE, "Task %s: Duration overrun\n", name.c_str());
     printf("Task %s: Duration overrun\n", name.c_str());
   }
@@ -129,7 +126,7 @@ static void Init_Modules(void)
 {
   RealTimeTask *task;
 
-	TaskMan.AddCallback((RT_TaskMan_Interface *)&TaskCallback);
+  TaskMan.AddCallback((RT_TaskMan_Interface *)&TaskCallback);
 
   SubProt = new SubProtocol();
   SubProt->AddListener((SubProt_Interface *) &SubListener);
@@ -144,7 +141,7 @@ static void Init_Modules(void)
 
   Nav = new Navigation("/etc/ROSV_Control/navigation.json");
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
-	Nav->SetUpdateInterface((NavUpdate_Interface *) MotorControl);
+  Nav->SetUpdateInterface((NavUpdate_Interface *) MotorControl);
   task = new RealTimeTask("Navigation", (RTT_Interface *) Nav);
   task->SetFrequency(10);
   task->SetMaxDuration(50);
@@ -185,7 +182,7 @@ int main (int argc, char *argv[])
 
   while ((opt = getopt(argc, argv, "dD:")) != -1) {
     switch(opt) {
-      case 'd':
+    case 'd':
       daemonise = true;
       break;
     }

@@ -18,10 +18,14 @@ Navigation::Navigation(const char *filename):
 //  *******************************************************************************************
 void Navigation::Run_Task(void)
 {
-  Log->RecordValue("Nav", "Forward", CVec.x);
-  Log->RecordValue("Nav", "Strafe",  CVec.y);
-  Log->RecordValue("Nav", "Dive",    CVec.z);
-  Log->RecordValue("Nav", "Turn",    CVec.yaw);
+  time_t t = time(NULL);
+  if ( Record != t ) {
+    Record = t;
+    Log->RecordValue("Nav", "Forward", CVec.x);
+    Log->RecordValue("Nav", "Strafe",  CVec.y);
+    Log->RecordValue("Nav", "Dive",    CVec.z);
+    Log->RecordValue("Nav", "Turn",    CVec.yaw);
+  }
 }
 
 //  *******************************************************************************************
@@ -50,9 +54,9 @@ void Navigation::Update(const char *packet, JSON_Object *msg)
       return;
     }
     if ( Interface != NULL ) {
-			Interface->UpdateControlVector(CVec);
-		}
-		newVec = true;
+      Interface->UpdateControlVector(CVec);
+    }
+    newVec = true;
   }
 }
 

@@ -56,7 +56,8 @@ public:
 private:
   ControlVector CVec;
   bool newVec;
-	NavUpdate_Interface *Interface;
+  NavUpdate_Interface *Interface;
+  time_t Record;
 };
 
 #endif
