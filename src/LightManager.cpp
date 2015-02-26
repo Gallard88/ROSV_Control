@@ -34,7 +34,8 @@ using namespace std;
 #include "parson.h"
 
 //  *******************************************************************************************
-LightManager::LightManager(const char * filename)
+LightManager::LightManager(const char * filename):
+  Enabled(false)
 {
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
@@ -99,12 +100,19 @@ LightManager::~LightManager()
 }
 
 //  *******************************************************************************************
+void LightManager::Enable(bool en)
+{
+  Enabled = en;
+}
+
+//  *******************************************************************************************
 void LightManager::Run_Task(void)
 {
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
     LightChanel ch = Chanels[i];
     for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
-      PWM_SetPWM(Pwm, ch.Modules[j], ch.Power.Get());
+      bool en = (Enabled == true)? ch.Power.Get(): 0;
+      PWM_SetPWM(Pwm, ch.Modules[j], en);
     }
   }
 }

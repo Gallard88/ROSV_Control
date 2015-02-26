@@ -48,6 +48,7 @@ public:
   LightManager(const char * filename);
   ~LightManager();
   void Run_Task(void);
+  void Enable(bool en);
 
   void Update(const char *packet, JSON_Object *msg);
   const string GetData(void);
@@ -55,6 +56,7 @@ public:
   PWM_Con_t Pwm;
 
 private:
+  bool Enabled;
   vector<LightChanel> Chanels;
 };
 

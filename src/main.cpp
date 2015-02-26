@@ -70,12 +70,14 @@ void Main_SubListen::Client_Added(const string & name, int handle)
 {
   NumClients++;
   MotorControl->EnableMotor(true);
+  LightMan->Enable(true);
   syslog(LOG_NOTICE, "Client %s added, handle = %d", name.c_str(), handle);
 }
 void Main_SubListen::Client_Removed(int handle)
 {
   NumClients--;
   if ( NumClients == 0 ) {
+    LightMan->Enable(false);
     MotorControl->EnableMotor(false);
   }
   syslog(LOG_NOTICE, "Client removed, handle = %d", handle);
