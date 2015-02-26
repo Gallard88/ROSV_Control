@@ -1,20 +1,22 @@
 #!/bin/bash
+###  BEGIN INIT INFO
 # Provides:          ROSV_Control
-# Required-Start:    $syslog
+# Required-Start:    $syslog $SnotraDaemon
 # Required-Stop:     $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Example ROSV Control
-# Description:       Start/Stops ROSV Control program
+# Short-Description: Example ROSV Control /dev/ttyS1
+# Description:       Start/Stops ROSV Control daemon
+###  END INIT INFO
 
 start() {
-  # Start program
-  ROSV_Control -d
-  renice -15 $(pgrep ROSV_Control)
+  # Start daemon
+  /usr/bin/ROSV_Control -d
+  renice -n -5 $(pgrep ROSV_Control)
 }
 
 stop() {
-  # Stop program
+  # Stop daemon
   killall ROSV_Control
 }
 
