@@ -31,7 +31,10 @@ using namespace std;
 Variable::Variable():
   Value(0.0)
 {
-  Log = Logger::Init();
+}
+
+Variable::~Variable()
+{
 }
 
 //  *******************************************************************************************
@@ -53,7 +56,7 @@ void Variable::SetName(const char * name)
 void Variable::Set(float value)
 {
   Value = value;
-  Log->RecordValue("Var", Name.c_str(), Value);
+  Log.RecordValue("Var", Name.c_str(), Value);
 }
 
 float Variable::Get(void)

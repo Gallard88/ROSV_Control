@@ -19,8 +19,7 @@ LDADD = \
 	/usr/local/lib/libPWMControl.a \
         /usr/local/lib/libPowerMonitor.a \
 	/usr/local/lib/libparson.a \
-	/usr/local/lib/libRealTime.a \
-	/usr/local/lib/libSnotra.a
+	/usr/local/lib/libRealTime.a
 
 ROSV_Control_SOURCES = \
 	CameraManager.cpp \

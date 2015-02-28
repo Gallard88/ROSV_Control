@@ -34,18 +34,19 @@
 class  Variable {
 public:
   Variable();
+  virtual ~Variable();
 
   void SetName(const char* name);
   void Set(float value);
   float Get(void);
 
-  string GetJSON(void);
+  std::string GetJSON(void);
 
 protected:
-  string Name;
+  Logger Log;
+  std::string Name;
   float Value;
 
-  Logger *Log;
 };
 
 // *******************************************************************************************

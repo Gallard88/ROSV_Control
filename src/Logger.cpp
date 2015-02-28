@@ -21,39 +21,44 @@
  THE SOFTWARE.
 */
 
-//  *******************************************************************************************
-using namespace std;
-
-#include <syslog.h>
-#include <cstdlib>  // for exit()
-#include <Snotra.h>
+#include <cstdlib>
+#include <cstdio>
+#include <time.h>
+#include <sys/time.h>
 
 #include "Logger.h"
+
+using namespace std;
 
 //  *******************************************************************************************
 Logger::Logger()
 {
-  if ( Snotra_Connect() < 0 ) {
-    syslog(LOG_ALERT, "Logger() failed\n");
-    exit(-1);
-  }
+}
+
+Logger::~Logger()
+{
 }
 
 //  *******************************************************************************************
 void Logger::RecordValue(const char *module, const char *par, float value)
 {
-  Snotra_Send(module, par, value);
+  char filename[1024];
+  sprintf(filename, "/var/log/ROSV/%s.%s.log", module, par);
+
+  FILE *fp = fopen(filename, "a+");
+  if ( fp != NULL ) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    struct tm tm = *localtime(&tv.tv_sec);
+
+    fprintf(fp, "%04d-%02d-%02d, %02d:%02d:%02d.%03d, %f\r",
+            tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+            tm.tm_hour, tm.tm_min, tm.tm_sec, (int)(tv.tv_usec / 1000),
+            value);
+    fclose(fp);
+  }
 }
 
 //*******************************************************************************************
-Logger *Logger::Init(void)
-{
-  static Logger *l;
-  if ( l == NULL ) {
-    l = new Logger;
-  }
-  return l;
-}
-
 //*******************************************************************************************
 

@@ -42,7 +42,7 @@ public:
   void Run_Task(void);
 
   void Update(const char *packet, JSON_Object *msg);
-  const string GetData(void);
+  const std::string GetData(void);
 
 private:
 

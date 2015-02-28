@@ -1,6 +1,4 @@
 /* ======================== */
-using namespace std;
-
 #include <signal.h>
 #include <cstring>
 #include <syslog.h>
@@ -19,6 +17,8 @@ using namespace std;
 #include "SubProtocol.h"
 #include "Logger.h"
 
+using namespace std;
+
 /* ======================== */
 /* ======================== */
 
@@ -30,7 +30,7 @@ SubProtocol      *SubProt;
 LightManager     *LightMan;
 CameraManager    *CamMan;
 PowerManager     *Power;
-Logger           *Log;
+Logger            Log;
 Navigation       *Nav;
 RT_TaskManager    TaskMan;
 
@@ -118,7 +118,7 @@ void System_Shutdown(void)
     delete SubProt;
   }
 
-  Log->RecordValue("ROSV_Control", "Shutdown", 1);
+  Log.RecordValue("ROSV_Control", "Shutdown", 1);
   syslog(LOG_NOTICE, "System shutting down");
   closelog();
 }
@@ -213,8 +213,7 @@ int main (int argc, char *argv[])
 
   /* --------------------------------------------- */
   // open sub-modules
-  Log = Logger::Init();
-  Log->RecordValue("ROSV_Control","Start", 1);
+  Log.RecordValue("ROSV_Control","Start", 1);
 
   RunSystem = true;
   Init_Modules();

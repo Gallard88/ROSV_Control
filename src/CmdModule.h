@@ -25,8 +25,6 @@
 #ifndef __CMD_MODULE__
 #define __CMD_MODULE__
 //*******************************************************************************************
-using namespace std;
-
 #include <string>
 #include <sys/time.h>
 
@@ -37,14 +35,16 @@ using namespace std;
 class CmdModule {
 public:
   CmdModule() {
-    Log = Logger::Init();
+    Log = new Logger();
     PacketTime = 1;
   }
-  virtual ~CmdModule() {}
+  virtual ~CmdModule() {
+    delete Log;
+  }
 
   time_t PacketTime;  // a var to record when the msg data was created.
   virtual void Update(const char *packet, JSON_Object *msg) = 0;
-  virtual const string GetData(void) = 0;
+  virtual const std::string GetData(void) = 0;
   Logger *Log;
 };
 
