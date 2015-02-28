@@ -22,11 +22,11 @@
 */
 
 //  *******************************************************************************************
-using namespace std;
-
 #include <syslog.h>
-
+#include <math.h>
 #include "PowerManager.h"
+
+using namespace std;
 
 //  *******************************************************************************************
 PowerManager::PowerManager(const char * filename, PWM_Con_t p):
@@ -50,8 +50,16 @@ void PowerManager::Run_Task(void)
 {
   PacketTime = time(NULL);
   Volts[0].Set(PWM_GetVoltage(Pwm));
-  Volts[1].Set(PMon_GetVoltage(PMon, 0));
-  Volts[2].Set(PMon_GetVoltage(PMon, 1));
+
+  float v = PMon_GetVoltage(PMon, 0);
+  if ( fabsf(Volts[1].Get() - v) > 0.1 ) {
+    Volts[1].Set(v);
+  }
+
+  v = PMon_GetVoltage(PMon, 1);
+  if ( fabsf(Volts[2].Get() - v) > 0.1 ) {
+    Volts[2].Set(v);
+  }
   Temp.Set(PWM_GetTemp(Pwm));
 }
 
