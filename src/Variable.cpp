@@ -29,7 +29,7 @@ using namespace std;
 
 //  *******************************************************************************************
 Variable::Variable():
-  Value(0.0)
+  Value(0.0), Written(0)
 {
 }
 
@@ -56,7 +56,11 @@ void Variable::SetName(const char * name)
 void Variable::Set(float value)
 {
   Value = value;
-  Log.RecordValue("Var", Name.c_str(), Value);
+  time_t t = time(NULL);
+  if ( t != Written ) {
+    Log.RecordValue("Var", Name.c_str(), Value);
+    Written = t;
+  }
 }
 
 float Variable::Get(void)

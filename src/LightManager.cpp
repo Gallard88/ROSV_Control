@@ -21,17 +21,15 @@
  THE SOFTWARE.
 */
 
-//  *******************************************************************************************
-using namespace std;
-
 #include <syslog.h>
-
 #include <stdio.h>
 #include <string.h>
 #include <string>
 
 #include "LightManager.h"
 #include "parson.h"
+
+using namespace std;
 
 //  *******************************************************************************************
 LightManager::LightManager(const char * filename):
@@ -63,7 +61,6 @@ LightManager::LightManager(const char * filename):
   if ( number != 0 ) {
     for ( size_t i = 0; i < number; i ++) {
       LightChanel ch;
-      ch.Power.Set(100.0);
       ch.Modules.clear();
 
       JSON_Object *object = json_array_get_object (ch_array, i);

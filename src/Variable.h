@@ -46,6 +46,7 @@ protected:
   Logger Log;
   std::string Name;
   float Value;
+  time_t Written;
 
 };
 

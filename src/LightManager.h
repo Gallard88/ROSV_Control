@@ -38,7 +38,7 @@
 //*******************************************************************************************
 typedef struct  {
   Variable Power;
-  vector<int> Modules;
+  std::vector<int> Modules;
 } LightChanel;
 
 //*******************************************************************************************
@@ -51,13 +51,13 @@ public:
   void Enable(bool en);
 
   void Update(const char *packet, JSON_Object *msg);
-  const string GetData(void);
+  const std::string GetData(void);
 
   PWM_Con_t Pwm;
 
 private:
   bool Enabled;
-  vector<LightChanel> Chanels;
+  std::vector<LightChanel> Chanels;
 };
 
 //*******************************************************************************************
