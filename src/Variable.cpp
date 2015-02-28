@@ -53,13 +53,13 @@ void Variable::SetName(const char * name)
 }
 
 //  *******************************************************************************************
-void Variable::Set(float value)
+void Variable::Set(float v)
 {
-  Value = value;
   time_t t = time(NULL);
-  if ( t != Written ) {
-    Log.RecordValue("Var", Name.c_str(), Value);
+  if (( t != Written ) && ( Value != v)) {
+    Value = v;
     Written = t;
+    Log.RecordValue("Var", Name.c_str(), Value);
   }
 }
 

@@ -37,7 +37,7 @@ public:
   virtual ~Variable();
 
   void SetName(const char* name);
-  void Set(float value);
+  void Set(float v);
   float Get(void);
 
   std::string GetJSON(void);

@@ -1,21 +1,10 @@
-/*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
 //  *******************************************************************************************
 #ifndef __NAVIGATION__
 #define __NAVIGATION__
 //  *******************************************************************************************
 #include <string>
 
-#include "RTT_Interface.h"
+#include <RTT_Interface.h>
 #include "CmdModule.h"
 #include "Logger.h"
 
@@ -55,7 +44,7 @@ public:
 	void SetUpdateInterface(NavUpdate_Interface *iface) { Interface = iface; }
 
 private:
-  ControlVector CVec;
+  ControlVector CVec, OldVec;
   bool newVec;
   NavUpdate_Interface *Interface;
   time_t Record;

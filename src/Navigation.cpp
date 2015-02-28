@@ -21,10 +21,19 @@ void Navigation::Run_Task(void)
   time_t t = time(NULL);
   if ( Record != t ) {
     Record = t;
-    Log.RecordValue("Nav", "Forward", CVec.x);
-    Log.RecordValue("Nav", "Strafe",  CVec.y);
-    Log.RecordValue("Nav", "Dive",    CVec.z);
-    Log.RecordValue("Nav", "Turn",    CVec.yaw);
+    if ( OldVec.x != CVec.x ) {
+      Log.RecordValue("Nav", "Forward", CVec.x);
+    }
+    if ( OldVec.y != CVec.y ) {
+      Log.RecordValue("Nav", "Strafe",  CVec.y);
+    }
+    if ( OldVec.z != CVec.z ) {
+      Log.RecordValue("Nav", "Dive",    CVec.z);
+    }
+    if ( OldVec.yaw != CVec.yaw ) {
+      Log.RecordValue("Nav", "Turn",    CVec.yaw);
+    }
+    OldVec = CVec;
   }
 }
 
