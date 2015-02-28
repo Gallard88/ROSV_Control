@@ -17,6 +17,7 @@
 
 #include "RTT_Interface.h"
 #include "CmdModule.h"
+#include "Logger.h"
 
 //  *******************************************************************************************
 typedef struct {
@@ -58,6 +59,7 @@ private:
   bool newVec;
   NavUpdate_Interface *Interface;
   time_t Record;
+  Logger Log;
 };
 
 #endif

@@ -28,24 +28,20 @@
 #include <string>
 #include <sys/time.h>
 
-#include "Logger.h"
 #include "parson.h"
 
 //*******************************************************************************************
 class CmdModule {
 public:
   CmdModule() {
-    Log = new Logger();
     PacketTime = 1;
   }
   virtual ~CmdModule() {
-    delete Log;
   }
 
   time_t PacketTime;  // a var to record when the msg data was created.
   virtual void Update(const char *packet, JSON_Object *msg) = 0;
   virtual const std::string GetData(void) = 0;
-  Logger *Log;
 };
 
 //*******************************************************************************************
