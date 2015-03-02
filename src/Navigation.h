@@ -34,14 +34,14 @@ public:
   Navigation(const char *filename);
   void Run_Task(void);
 
-  const string GetConfigData(void);
+  const std::string GetConfigData(void);
   void Update(const char *packet, JSON_Object *msg);
-  const string GetData(void);
+  const std::string GetData(void);
 
   bool NewVector(void);
   ControlVector GetVector(void);
 
-	void SetUpdateInterface(NavUpdate_Interface *iface) { Interface = iface; }
+  void SetUpdateInterface(NavUpdate_Interface *iface) { Interface = iface; }
 
 private:
   ControlVector CVec, OldVec;

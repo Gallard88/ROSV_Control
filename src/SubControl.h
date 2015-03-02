@@ -27,7 +27,6 @@
 
 //  *******************************************************************************************
 #include <string>
-#include <PWM_Controller.h>
 #include <vector>
 
 #include "RTT_Interface.h"
@@ -35,24 +34,22 @@
 #include "Motor.h"
 #include "Navigation.h"
 
-//  *******************************************************************************************
-//  *******************************************************************************************
-
-//*******************************************************************************************
 class SubControl: CmdModule, RTT_Interface, NavUpdate_Interface {
 public:
-  SubControl(const char *filename, PWM_Con_t pwm);
+  SubControl(const char *filename);
+  ~SubControl();
+
   void Run_Task(void);
 
   void EnableMotor(bool en);
 
   void Update(const char *packet, JSON_Object *msg);
-  const string GetData(void);
+  const std::string GetData(void);
 
   void UpdateControlVector(const ControlVector & vec);
 
 private:
-  vector<Motor *> MotorList;
+  std::vector<Motor> MotorList;
   bool Enable;
 
   ControlVector Velocity;

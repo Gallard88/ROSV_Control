@@ -25,6 +25,8 @@
 #include "parson.h"
 #include "SubProtocol.h"
 
+using namespace std;
+
 // *******************************************************************************************
 using namespace std;
 

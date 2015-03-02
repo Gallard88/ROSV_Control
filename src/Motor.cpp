@@ -22,15 +22,21 @@
 */
 
 //  *******************************************************************************************
-using namespace std;
-
 #include "Motor.h"
 
+using namespace std;
+
+float Motor::Ramp = 100.0;
+static PWM_Con_t Pwm;
+
+
 //  *******************************************************************************************
-Motor::Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max):
-  Min(min), Max(max), Target(0.0), Ramp(max), Pwm(p)
+Motor::Motor(const JSON_Object *setting):
+  Target(0.0), Value(0.0)
 {
   const char *name = json_object_get_string(setting, "Name");
+  Name = string(name);
+
   Chanel = (int) json_object_get_number(setting, "ch");
 
   JSON_Array *mult_array = json_object_get_array( setting, "mul");
@@ -39,24 +45,42 @@ Motor::Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max):
       mult[i] = json_array_get_number(mult_array, i);
     }
   }
-  Val.SetName(name);
 }
 
-//  *******************************************************************************************
-string Motor::GetJSON(void)
+Motor::~Motor()
 {
-  return Val.GetJSON();
 }
 
 //  *******************************************************************************************
+void Motor_Set(PWM_Con_t p)
+{
+  Pwm = p;
+}
+
 void Motor::SetRamp(float ramp)
 {
   Ramp = ramp;
 }
 
 //  *******************************************************************************************
-void Motor::Run(float *power)
+string Motor::GetJSON(void)
 {
+  char buf[100];
+
+  sprintf(buf, "{ \"Name\": \"%s\", \"Value\": %f }", Name.c_str(), Value );
+  return string(buf);
+}
+
+//  *******************************************************************************************
+static const float Max = 100.0;
+static const float Min = 0.0;
+//  *******************************************************************************************
+void Motor::Run(const float *power)
+{
+  if ( Pwm == NULL ) {
+    return;
+  }
+
   Target = 0.0;
 
   for ( int j = 0; j < VECTOR_SIZE; j ++ ) {
@@ -79,19 +103,16 @@ void Motor::Run(float *power)
    * of the motors, we only run this code when the motors power is LESS than the target.
    *
    */
-  float p = Val.Get();
-
-  if ( p < Target ) {
-    if  (( Target - p ) > Ramp )
-      p += Ramp;
+  if ( Value < Target ) {
+    if  (( Target - Value ) > Ramp )
+      Value += Ramp;
     else
-      p = Target;
+      Value = Target;
 
   } else {
-    p = Target;
+    Value = Target;
   }
-  Val.Set(p);
-  PWM_SetPWM(Pwm, Chanel, p);
+  PWM_SetPWM(Pwm, Chanel, Value);
 }
 
 //*******************************************************************************************

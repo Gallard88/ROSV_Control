@@ -21,17 +21,17 @@
  THE SOFTWARE.
 */
 // *******************************************************************************************
-using namespace std;
-
 #include <syslog.h>
 #include <cstring>
 
 #include "SubControl.h"
 
+using namespace std;
+
 // *******************************************************************************************
 const ControlVector BlankVec = { 0, 0, 0, 0, 0, 0};
 // *******************************************************************************************
-SubControl::SubControl(const char *filename, PWM_Con_t pwm):
+SubControl::SubControl(const char *filename):
   Enable(false)
 {
   memset(&Velocity, 0, sizeof(Velocity));
@@ -64,13 +64,15 @@ SubControl::SubControl(const char *filename, PWM_Con_t pwm):
 
     JSON_Object *j_motor = json_array_get_object (array, i);
     if ( j_motor != NULL ) {
-      Motor *motor = new Motor(j_motor, pwm, 0, 100);
-      motor->SetRamp(1);
-//      motor->SetRamp(0.05);
+      Motor motor(j_motor);
       MotorList.push_back(motor);
     }
   }
   json_value_free (val);
+}
+
+SubControl::~SubControl()
+{
 }
 
 // *******************************************************************************************
@@ -85,7 +87,7 @@ const string SubControl::GetData(void)
   msg += "\"Chanels\":[ ";
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
 
-    msg += MotorList[i]->GetJSON();
+    msg += MotorList[i].GetJSON();
 
     if (( MotorList.size() > 1 ) && ( i < (MotorList.size()-1))) {
       msg += ", ";
@@ -138,7 +140,7 @@ void SubControl::Run_Task(void)
 
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
 
-    MotorList[i]->Run(power);
+    MotorList[i].Run(power);
   }
 }
 

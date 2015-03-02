@@ -25,8 +25,6 @@
 #ifndef __CAMERA_MANAGER__
 #define __CAMERA_MANAGER__
 //*******************************************************************************************
-using namespace std;
-
 #include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "parson.h"
@@ -35,14 +33,14 @@ using namespace std;
 class CameraManager: CmdModule, RTT_Interface {
 public:
   CameraManager(const char *filename);
-  ~CameraManager();
+  virtual ~CameraManager();
 
   void Start(const char *ip);
   void Stop(void);
   long DiveTime(void);
 
   void Update(const char *packet, JSON_Object *msg);
-  const string GetData(void);
+  const std::string GetData(void);
 
   void Run_Task(void);
 

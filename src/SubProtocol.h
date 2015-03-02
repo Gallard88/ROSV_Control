@@ -24,16 +24,13 @@
 #ifndef __SUBPROTOCOL__
 #define __SUBPROTOCOL__
 //*******************************************************************************************
-using namespace std;
-
-//*******************************************************************************************
 #include <vector>
 
 #include "CmdModule.h"
 #include "TcpServer.h"
 
 struct Modules {
-  string      Name;
+  std::string Name;
   time_t      PTime;
   CmdModule  *module;
 };
@@ -42,7 +39,7 @@ struct Modules {
 class SubProt_Interface
 {
 public:
-  virtual void Client_Added  (const string & name, int hande) = 0;
+  virtual void Client_Added  (const std::string & name, int hande) = 0;
   virtual void Client_Removed(int handle) = 0;
 };
 
@@ -50,29 +47,27 @@ public:
 class SubProtocol: CmdModule {
 public:
   SubProtocol();
-  ~SubProtocol();
+  virtual ~SubProtocol();
 
-  void AddModule(const string & name, CmdModule *mod);
+  void AddModule(const std::string & name, CmdModule *mod);
   void Run(struct timeval timeout);
-
   int GetNumClients(void);
-
   void AddListener(SubProt_Interface *listen);
 
 protected:
 
 private:
-  SubProt_Interface      *IntListeners;
-  vector<struct Modules>  Modules;
-  vector<int>             Handles;
-  TcpServer               *Server;
+  SubProt_Interface           *IntListeners;
+  std::vector<struct Modules>  Modules;
+  std::vector<int>             Handles;
+  TcpServer                    *Server;
 
   void ResetPacketTime(void);
   void Update(const char *packet, JSON_Object *msg);
-  const string GetData(void);
+  const std::string GetData(void);
   void SendUpdatedData(void);
-  void SendMsg(const string & msg);
-  void ProcessLine(string line);
+  void SendMsg(const std::string & msg);
+  void ProcessLine(std::string line);
 };
 
 //*******************************************************************************************

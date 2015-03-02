@@ -26,10 +26,8 @@
 #define __MOTOR__
 //*******************************************************************************************
 #include "parson.h"
-#include "Variable.h"
 
 #include <PWM_Controller.h>
-#include <ctime>
 #include <string>
 
 
@@ -40,22 +38,25 @@
 
 class  Motor {
 public:
-  Motor(const JSON_Object *setting, PWM_Con_t p, float min, float max);
+  Motor(const JSON_Object *setting);
+  virtual ~Motor();
 
-  void Run(float *power);
+  void Run(const float *power);
   float GetPower(void);
-  string GetJSON(void);
-  void SetRamp(float ramp);
+  std::string GetJSON(void);
+
+  static void SetRamp(float ramp);
 
 private:
   int Chanel;
   int mult[VECTOR_SIZE];
-  float Min, Max;
-  float Target, Ramp;
+  float Target, Value;
+  std::string Name;
 
-  Variable Val;
-  PWM_Con_t Pwm;
+  static float Ramp;
 };
+
+void Motor_Set(PWM_Con_t p);
 
 //*******************************************************************************************
 //*******************************************************************************************

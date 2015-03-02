@@ -35,9 +35,9 @@
 
 
 struct TcpClient {
-  string Name;
+  std::string Name;
   int File;
-  string Buffer;
+  std::string Buffer;
 };
 
 extern const int TcpServer_WriteEx;
@@ -47,20 +47,20 @@ extern const int TcpServer_HandleNotFound;
 class TcpServer {
 public:
   TcpServer(int port);
-  ~TcpServer(void);
+  virtual ~TcpServer(void);
 
   int Listen(struct timeval timeout);
 
-  string GetHandleName(int handle);
-  bool Handle_ReadLine(int handle, string & line);
-  void Write(int handle, const string & msg);
+  std::string GetHandleName(int handle);
+  bool Handle_ReadLine(int handle, std::string & line);
+  void Write(int handle, const std::string & msg);
 
 private:
   struct sockaddr_in cli_addr;
   int listen_fd;
   int NextFd;
 
-  map<int, struct TcpClient> Clients;
+  std::map<int, struct TcpClient> Clients;
   void CleanMap(void);
 
 };

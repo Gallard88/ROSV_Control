@@ -13,6 +13,7 @@
 #include "CameraManager.h"
 #include "LightManager.h"
 #include "Navigation.h"
+#include "Motor.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
 #include "Logger.h"
@@ -54,35 +55,31 @@ public:
   }
 };
 
-MainCallBack TaskCallback;
-
 /* ======================== */
 class Main_SubListen: SubProt_Interface {
 public:
-  Main_SubListen(): NumClients(0) {};
-  void Client_Added(const string & name, int handle);
-  void Client_Removed(int handle);
+  Main_SubListen(): NumClients(0) {
+  };
+  void Client_Added(const string & name, int handle) {
+    NumClients++;
+    MotorControl->EnableMotor(true);
+    LightMan->Enable(true);
+    syslog(LOG_NOTICE, "Client %s added, handle = %d", name.c_str(), handle);
+  }
+  void Client_Removed(int handle) {
+    NumClients--;
+    if ( NumClients == 0 ) {
+      LightMan->Enable(false);
+      MotorControl->EnableMotor(false);
+    }
+    syslog(LOG_NOTICE, "Client removed, handle = %d", handle);
+  }
 
   int NumClients;
 };
 
-void Main_SubListen::Client_Added(const string & name, int handle)
-{
-  NumClients++;
-  MotorControl->EnableMotor(true);
-  LightMan->Enable(true);
-  syslog(LOG_NOTICE, "Client %s added, handle = %d", name.c_str(), handle);
-}
-void Main_SubListen::Client_Removed(int handle)
-{
-  NumClients--;
-  if ( NumClients == 0 ) {
-    LightMan->Enable(false);
-    MotorControl->EnableMotor(false);
-  }
-  syslog(LOG_NOTICE, "Client removed, handle = %d", handle);
-}
-
+/* ======================== */
+MainCallBack TaskCallback;
 Main_SubListen SubListener;
 
 /* ======================== */
@@ -133,7 +130,7 @@ static void Init_Modules(void)
   SubProt = new SubProtocol();
   SubProt->AddListener((SubProt_Interface *) &SubListener);
 
-  MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
+  MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
   MotorControl->EnableMotor(false);
   task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
@@ -161,7 +158,7 @@ static void Init_Modules(void)
   SubProt->AddModule("Power",      (CmdModule *) Power );
   task = new RealTimeTask("Power", (RTT_Interface *) Power);
   task->SetFrequency(1);
-  task->SetMaxDuration(50);
+  task->SetMaxDuration(100);
   TaskMan.AddTask(task);
 
   CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
@@ -210,6 +207,8 @@ int main (int argc, char *argv[])
     syslog(LOG_ALERT, "PWM_Connect() failed\n");
     return -1;
   }
+  Motor_Set(PwmModule);
+  Motor::SetRamp(1.0);
 
   /* --------------------------------------------- */
   // open sub-modules

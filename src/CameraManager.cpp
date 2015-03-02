@@ -27,6 +27,8 @@
 
 #include "CameraManager.h"
 
+using namespace std;
+
 #define CAMMAN_SC_SIZE 4096
 
 // *******************************************************************************************
