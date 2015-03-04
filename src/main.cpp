@@ -227,7 +227,7 @@ int main (int argc, char *argv[])
     if ( time > 0 ) {
       struct timeval system_time;
       system_time.tv_sec = 0;
-      system_time.tv_usec = time;
+      system_time.tv_usec =  10000;
       SubProt->Run(system_time);
     }
   }
