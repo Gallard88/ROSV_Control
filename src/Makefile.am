@@ -22,6 +22,8 @@ LDADD = \
 	/usr/local/lib/libRealTime.a
 
 ROSV_Control_SOURCES = \
+	Alarm.cpp \
+	Alarm.h \
 	CameraManager.cpp \
 	CameraManager.h \
 	CmdModule.h \
@@ -31,6 +33,8 @@ ROSV_Control_SOURCES = \
 	Logger.h \
 	Motor.cpp \
 	Motor.h \
+	Permissions.cpp \
+	Permissions.h \
 	PowerManager.cpp \
 	PowerManager.h \
 	Navigation.cpp \
