@@ -32,13 +32,17 @@
 #include "CmdModule.h"
 #include "RTT_Interface.h"
 #include "Variable.h"
+#include "Alarm.h"
 
 //*******************************************************************************************
+#define NUM_VOLTAGE_CH  3
 //*******************************************************************************************
 class  PowerManager: CmdModule, RTT_Interface {
 
 public:
   PowerManager(const char * filename, PWM_Con_t p);
+  virtual ~PowerManager();
+
   void Run_Task(void);
 
   void Update(const char *packet, JSON_Object *msg);
@@ -46,8 +50,16 @@ public:
 
 private:
 
-  Variable Volts[3];
+  // these need to become a shared pointer...
+  AlarmGroup *VoltGroup;
+  AlarmGroup *TempGroup;
+
+  Variable Volts[NUM_VOLTAGE_CH];
   Variable Temp;
+
+  // these need to become a shared pointer...
+  Alarm *VoltAlarms[NUM_VOLTAGE_CH];
+  Alarm *TempAlarms;
 
   PMon_t    PMon;
   PWM_Con_t Pwm;

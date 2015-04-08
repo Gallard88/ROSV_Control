@@ -28,6 +28,12 @@
 
 using namespace std;
 
+const char *VoltNames[NUM_VOLTAGE_CH] = {
+  "Pwm_Volt",
+  "PMon_Pri",
+  "PMon_Sec"
+};
+
 //  *******************************************************************************************
 PowerManager::PowerManager(const char * filename, PWM_Con_t p):
   Pwm(p)
@@ -39,28 +45,70 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
     exit(-1);
   }
 
-  Volts[0].SetName("Pwm_Volt");
-  Volts[1].SetName("PMon_Pri");
-  Volts[2].SetName("PMon_Sec");
+  VoltGroup = new AlarmGroup("Voltage");
+  for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
+    Volts[i].SetName(VoltNames[i]);
+    VoltAlarms[i] = new Alarm(VoltNames[i], false, true);
+    VoltGroup->AddAlarm(VoltAlarms[i]);
+  }
+
+  TempGroup = new AlarmGroup("Temp");
   Temp.SetName("Pwm_Temp");
+  TempAlarms = new Alarm("Pwm_Temp", false, false);
+  TempGroup->AddAlarm(TempAlarms);
+
 }
 
+PowerManager::~PowerManager()
+{
+  delete TempGroup;
+  delete VoltGroup;
+  for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
+    delete VoltAlarms[i];
+  }
+  delete TempAlarms;
+}
+
+
 //  *******************************************************************************************
+static enum Severity CheckTemp(float temp)
+{
+  if ( temp < -10.0 || temp > 50.0 )
+    return ERROR;
+  if ( temp < 0.0 || temp > 40.0 )
+    return WARNING;
+  return CLEAR;
+}
+
+static enum Severity CheckVoltage(float v)
+{
+  if ( v < 10.0 || v > 17.0 )
+    return ERROR;
+  if ( v < 11.0 )
+    return WARNING;
+  return CLEAR;
+}
+
 void PowerManager::Run_Task(void)
 {
   PacketTime = time(NULL);
-  Volts[0].Set(PWM_GetVoltage(Pwm));
 
-  float v = PMon_GetVoltage(PMon, 0);
-  if ( fabsf(Volts[1].Get() - v) > 0.1 ) {
-    Volts[1].Set(v);
+  float v[NUM_VOLTAGE_CH];
+
+  v[0] = PWM_GetVoltage(Pwm);
+  v[1] = PMon_GetVoltage(PMon, 0);
+  v[2] = PMon_GetVoltage(PMon, 1);
+
+  for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
+    if ( fabsf(Volts[i].Get() - v[i]) > 0.1 ) {
+      Volts[i].Set(v[i]);
+    }
+    VoltAlarms[i]->SetState(CheckVoltage(v[i]));
   }
 
-  v = PMon_GetVoltage(PMon, 1);
-  if ( fabsf(Volts[2].Get() - v) > 0.1 ) {
-    Volts[2].Set(v);
-  }
-  Temp.Set(PWM_GetTemp(Pwm));
+  float t = PWM_GetTemp(Pwm);
+  TempAlarms->SetState(CheckTemp(t));
+  Temp.Set(t);
 }
 
 //  *******************************************************************************************
