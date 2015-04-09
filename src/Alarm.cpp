@@ -23,12 +23,12 @@ Alarm::~Alarm()
   Name.clear();
 }
 
-const char *GetSeverityName(enum Severity s)
+const char *Alarm::GetSeverityName(Severity_t s)
 {
   return SeverityNames[s];
 }
 
-enum Severity Alarm::GetState(void) const
+Alarm::Severity_t Alarm::GetState(void) const
 {
   if (( State == WARNING ) && ( Muteable == true )) {
     return CLEAR;
@@ -41,7 +41,7 @@ string Alarm::GetName(void) const
   return Name;
 }
 
-void Alarm::SetState(enum Severity state)
+void Alarm::SetState(Severity_t state)
 {
   if ( this->State == state ) {
     return;	// this means we only get below on an edge.
@@ -106,7 +106,7 @@ void Alarm::SetMuted(void)
 
 /* ========================================== */
 AlarmGroup::AlarmGroup(std::string name):
-  Name(name), GroupState(CLEAR)
+  Name(name), GroupState(Alarm::Severity_t::CLEAR)
 {
 }
 
@@ -122,26 +122,26 @@ void AlarmGroup::AddAlarm(const Alarm * alm)
   syslog(LOG_NOTICE, "Alarm %s added to Group %s ", alm->GetName().c_str(), Name.c_str());
 }
 
-enum Severity AlarmGroup::GetGroupState(void)
+Alarm::Severity_t AlarmGroup::GetGroupState(void)
 {
-  enum Severity global = CLEAR;
+  Alarm::Severity_t global = Alarm::Severity_t::CLEAR;
 
   for ( size_t i = 0; i < AlarmList.size(); i ++ ) {
 
-    enum Severity local = AlarmList[i]->GetState();
+    Alarm::Severity_t local = AlarmList[i]->GetState();
 
     //	We can only move forward in severity.
     //	Function returns the highest Severity found.
     switch ( global ) {
-    case CLEAR:
+    case Alarm::CLEAR:
       global = local;
       break;
-    case WARNING:
-      if ( local == ERROR ) {
-        global = ERROR;
+    case Alarm::WARNING:
+      if ( local == Alarm::ERROR ) {
+        global = Alarm::ERROR;
       }
       break;
-    case ERROR:
+    case Alarm::ERROR:
       break;
     }
   }

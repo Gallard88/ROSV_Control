@@ -26,14 +26,16 @@
 #define __POWER_MANAGER__
 //*******************************************************************************************
 #include <string>
+#include <memory>
 #include <PWM_Controller.h>
 #include <PowerMonitor.h>
 
 #include "CmdModule.h"
 #include "RTT_Interface.h"
 #include "Variable.h"
-#include "Alarm.h"
 
+class Alarm;
+class AlarmGroup;
 //*******************************************************************************************
 #define NUM_VOLTAGE_CH  3
 //*******************************************************************************************

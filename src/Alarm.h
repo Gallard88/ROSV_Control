@@ -5,79 +5,82 @@
 #include <vector>
 
 /*
- *	Alarm
- *	This is a class to track errors and problems.
- *	Active Alarm (not CLEAR) may be muted. Muted alarm returns CLEAR.
- *	Muted status is cleared upon state change.
- *	Alarm may be latched, I.E. can increase in severity, but not decrease.
+ * Alarm
+ * This is a class to track errors and problems.
+ * Active Alarm (not CLEAR) may be muted. Muted alarm returns CLEAR.
+ * Muted status is cleared upon state change.
+ * Alarm may be latched, I.E. can increase in severity, but not decrease.
  */
-enum Severity {
-  CLEAR,
-  WARNING,
-  ERROR
-};
-
 
 class Alarm
 {
 public:
-	Alarm(std::string name_, bool mutable_, bool latching_);
-	virtual ~Alarm();
+  Alarm(std::string name_, bool mutable_, bool latching_);
+  virtual ~Alarm();
 
-	enum Severity GetState(void) const;
-	std::string GetName(void) const;
+  typedef enum {
+    CLEAR,
+    WARNING,
+    ERROR
+  } Severity_t;
 
-	// These functions can set the state of the object
-	void SetState(enum Severity state);
-	void SetClear(void);
-	void SetWarning(void);
-	void SetError(void);
+  Severity_t GetState(void) const;
+  std::string GetName(void) const;
 
-	// Mutes alarm. Only mutes if the alarm is not clear, and CAN be muted.
-	// Muted status is cleared when alarm changes state.
-	void SetMuted(void);
+  // These functions can set the state of the object
+  void SetState(Severity_t state);
+  void SetClear(void);
+  void SetWarning(void);
+  void SetError(void);
 
-	static const char *GetSeverityName(enum Severity s);
+  // Mutes alarm. Only mutes if the alarm is not clear, and CAN be muted.
+  // Muted status is cleared when alarm changes state.
+  void SetMuted(void);
+
+  static const char *GetSeverityName(Severity_t s);
 
 private:
 
-	std::string Name;
-	enum Severity State;
-	bool Muteable;
-	bool Latching;
+  std::string Name;
+  Severity_t State;
+  bool Muteable;
+  bool Latching;
 
-	bool Muted;
-	Alarm(const Alarm&);
-	Alarm & operator=(const Alarm&);
+  bool Muted;
+
+  // disable copying
+  Alarm(const Alarm&);
+  Alarm & operator=(const Alarm&);
 };
 
 /* ========================================== */
-/*	Alarm Group Class.
+/* Alarm Group Class.
  *
- *	A class to group alarms. This allows a system to combine many alarms into one.
- * 	This makes it easier to hide complex logic, e.g. multiple Temperature alarms can be merged into 
- *	a single actionable item, while each retaining individual reporting.
+ * A class to group alarms. This allows a system to combine many alarms into one.
+ * This makes it easier to hide complex logic, e.g. multiple Temperature alarms can be merged into 
+ * a single actionable item, while each retaining individual reporting.
  */
 
 class AlarmGroup
 {
 public:
-	AlarmGroup(std::string name);
-	~AlarmGroup();
+  AlarmGroup(std::string name);
+  ~AlarmGroup();
 
-	// Add an alarm to a group.
-	void AddAlarm(const Alarm * alm);
+  // Add an alarm to a group.
+  void AddAlarm(const Alarm * alm);
 
-	//	This functions scans the group of errors and reports the highest severity found.
-	enum Severity GetGroupState(void);
+  //	This functions scans the group of errors and reports the highest severity found.
+  Alarm::Severity_t GetGroupState(void);
 
 private:
-	std::vector<const Alarm *> AlarmList;
-	std::string Name;
-	enum Severity GroupState;
+  std::vector<const Alarm *> AlarmList;
+  std::string Name;
+  Alarm::Severity_t GroupState;
 
-	AlarmGroup(const AlarmGroup&);
-	AlarmGroup & operator=(const AlarmGroup&);
+  // Disable copying
+  AlarmGroup(const AlarmGroup&);
+  AlarmGroup & operator=(const AlarmGroup&);
 
 };
 

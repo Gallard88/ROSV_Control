@@ -25,6 +25,7 @@
 #include <syslog.h>
 #include <math.h>
 #include "PowerManager.h"
+#include "Alarm.h"
 
 using namespace std;
 
@@ -71,22 +72,22 @@ PowerManager::~PowerManager()
 
 
 //  *******************************************************************************************
-static enum Severity CheckTemp(float temp)
+static Alarm::Severity_t CheckTemp(float temp)
 {
   if ( temp < -10.0 || temp > 50.0 )
-    return ERROR;
+    return Alarm::ERROR;
   if ( temp < 0.0 || temp > 40.0 )
-    return WARNING;
-  return CLEAR;
+    return Alarm::WARNING;
+  return Alarm::CLEAR;
 }
 
-static enum Severity CheckVoltage(float v)
+static Alarm::Severity_t CheckVoltage(float v)
 {
   if ( v < 10.0 || v > 17.0 )
-    return ERROR;
+    return Alarm::ERROR;
   if ( v < 11.0 )
-    return WARNING;
-  return CLEAR;
+    return Alarm::WARNING;
+  return Alarm::CLEAR;
 }
 
 void PowerManager::Run_Task(void)
