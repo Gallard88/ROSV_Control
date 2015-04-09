@@ -49,27 +49,36 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
   VoltGroup = new AlarmGroup("Voltage");
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
     Volts[i].SetName(VoltNames[i]);
-    VoltAlarms[i] = new Alarm(VoltNames[i], false, true);
-    VoltGroup->AddAlarm(VoltAlarms[i]);
+
+    std::shared_ptr<Alarm> a(new Alarm(VoltNames[i], false, true));
+    VoltAlarms[i] = a;
+    VoltGroup->AddAlarm(std::const_pointer_cast<const Alarm>(a));
   }
 
   TempGroup = new AlarmGroup("Temp");
   Temp.SetName("Pwm_Temp");
-  TempAlarms = new Alarm("Pwm_Temp", false, false);
-  TempGroup->AddAlarm(TempAlarms);
 
+  std::shared_ptr<Alarm> t(new Alarm("Pwm_Temp", false, true));
+  TempAlarms = t;
+  TempGroup->AddAlarm(std::const_pointer_cast<const Alarm>(TempAlarms));
 }
 
 PowerManager::~PowerManager()
 {
   delete TempGroup;
   delete VoltGroup;
-  for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
-    delete VoltAlarms[i];
-  }
-  delete TempAlarms;
 }
 
+//  *******************************************************************************************
+const AlarmGroup & PowerManager::getVoltAlarmGroup(void)
+{
+  return *VoltGroup;
+}
+
+const AlarmGroup & PowerManager::getTempAlarmGroup(void)
+{
+  return *TempGroup;
+}
 
 //  *******************************************************************************************
 static Alarm::Severity_t CheckTemp(float temp)

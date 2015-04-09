@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 /*
  * Alarm
@@ -51,6 +52,7 @@ private:
   // disable copying
   Alarm(const Alarm&);
   Alarm & operator=(const Alarm&);
+  Alarm & operator+(const Alarm&);
 };
 
 /* ========================================== */
@@ -64,23 +66,27 @@ private:
 class AlarmGroup
 {
 public:
+  AlarmGroup();
   AlarmGroup(std::string name);
   ~AlarmGroup();
 
   // Add an alarm to a group.
-  void AddAlarm(const Alarm * alm);
+  void AddAlarm(std::shared_ptr<const Alarm > alm);
+  void add(const AlarmGroup & alarm);
+  void SetName(std::string name);
 
   //	This functions scans the group of errors and reports the highest severity found.
   Alarm::Severity_t GetGroupState(void);
 
 private:
-  std::vector<const Alarm *> AlarmList;
+  std::vector<std::shared_ptr<const Alarm >> AlarmList;
   std::string Name;
   Alarm::Severity_t GroupState;
 
   // Disable copying
   AlarmGroup(const AlarmGroup&);
   AlarmGroup & operator=(const AlarmGroup&);
+  AlarmGroup & operator+(const AlarmGroup&);
 
 };
 

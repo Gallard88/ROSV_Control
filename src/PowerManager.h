@@ -33,9 +33,8 @@
 #include "CmdModule.h"
 #include "RTT_Interface.h"
 #include "Variable.h"
+#include "Alarm.h"
 
-class Alarm;
-class AlarmGroup;
 //*******************************************************************************************
 #define NUM_VOLTAGE_CH  3
 //*******************************************************************************************
@@ -50,6 +49,9 @@ public:
   void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);
 
+  const AlarmGroup & getVoltAlarmGroup(void);
+  const AlarmGroup & getTempAlarmGroup(void);
+
 private:
 
   // these need to become a shared pointer...
@@ -60,8 +62,8 @@ private:
   Variable Temp;
 
   // these need to become a shared pointer...
-  Alarm *VoltAlarms[NUM_VOLTAGE_CH];
-  Alarm *TempAlarms;
+  std::shared_ptr<Alarm> VoltAlarms[NUM_VOLTAGE_CH];
+  std::shared_ptr<Alarm> TempAlarms;
 
   PMon_t    PMon;
   PWM_Con_t Pwm;

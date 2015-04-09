@@ -25,6 +25,8 @@
 #include <cstring>
 
 #include "SubControl.h"
+#include "Alarm.h"
+#include "Permissions.h"
 
 using namespace std;
 
@@ -32,9 +34,10 @@ using namespace std;
 const ControlVector BlankVec = { 0, 0, 0, 0, 0, 0};
 // *******************************************************************************************
 SubControl::SubControl(const char *filename):
-  Enable(false)
+  Enable(false), Alarms(NULL)
 {
-  memset(&Velocity, 0, sizeof(Velocity));
+  Alarms = new AlarmGroup("SubControl");
+  Velocity = BlankVec;
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
@@ -73,6 +76,12 @@ SubControl::SubControl(const char *filename):
 
 SubControl::~SubControl()
 {
+}
+
+// *******************************************************************************************
+void SubControl::AddAlarmGroup(const AlarmGroup & group)
+{
+  Alarms->add(group);
 }
 
 // *******************************************************************************************
@@ -129,6 +138,9 @@ void SubControl::Run_Task(void)
 {
   float power[VECTOR_SIZE];
 
+  if ( Alarms->GetGroupState() != Alarm::CLEAR ) {
+    Velocity = BlankVec;
+  }
 
   // run each Axes controller.
   power[VECTOR_X]     = Velocity.x / MOT_SCALE;

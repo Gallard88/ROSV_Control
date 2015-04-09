@@ -28,16 +28,20 @@
 //  *******************************************************************************************
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "Motor.h"
 #include "Navigation.h"
+#include "Alarm.h"
 
 class SubControl: CmdModule, RTT_Interface, NavUpdate_Interface {
 public:
   SubControl(const char *filename);
   ~SubControl();
+
+  void AddAlarmGroup(const AlarmGroup & group);
 
   void Run_Task(void);
 
@@ -51,6 +55,7 @@ public:
 private:
   std::vector<Motor> MotorList;
   bool Enable;
+  AlarmGroup *Alarms;
 
   ControlVector Velocity;
 };

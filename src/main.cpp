@@ -127,9 +127,11 @@ static void Init_Modules(void)
 
   TaskMan.AddCallback((RT_TaskMan_Interface *)&TaskCallback);
 
+  syslog(LOG_NOTICE, "Init_Modules()");
   SubProt = new SubProtocol();
   SubProt->AddListener((SubProt_Interface *) &SubListener);
 
+  syslog(LOG_NOTICE, "Motors()");
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
   MotorControl->EnableMotor(false);
@@ -138,6 +140,7 @@ static void Init_Modules(void)
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
 
+  syslog(LOG_NOTICE, "Nav()");
   Nav = new Navigation("/etc/ROSV_Control/navigation.json");
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
   Nav->SetUpdateInterface((NavUpdate_Interface *) MotorControl);
@@ -146,6 +149,7 @@ static void Init_Modules(void)
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
 
+  syslog(LOG_NOTICE, "Lighting()");
   LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;
   SubProt->AddModule("Light",      (CmdModule *) LightMan );
@@ -154,6 +158,7 @@ static void Init_Modules(void)
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
 
+  syslog(LOG_NOTICE, "Power()");
   Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
   SubProt->AddModule("Power",      (CmdModule *) Power );
   task = new RealTimeTask("Power", (RTT_Interface *) Power);
@@ -167,6 +172,10 @@ static void Init_Modules(void)
   task->SetFrequency(1);
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
+
+  // Wire up alarms
+  MotorControl->AddAlarmGroup(Power->getVoltAlarmGroup());
+  MotorControl->AddAlarmGroup(Power->getTempAlarmGroup());
 
 }
 

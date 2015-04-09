@@ -110,16 +110,32 @@ AlarmGroup::AlarmGroup(std::string name):
 {
 }
 
+AlarmGroup::AlarmGroup()
+{
+  AlarmGroup("UnNamed");
+}
+
 AlarmGroup::~AlarmGroup()
 {
   Name.clear();
   AlarmList.clear();
 }
 
-void AlarmGroup::AddAlarm(const Alarm * alm)
+void AlarmGroup::SetName(std::string name)
+{
+  Name = name;
+}
+
+void AlarmGroup::AddAlarm(std::shared_ptr<const Alarm> alm)
 {
   AlarmList.push_back(alm);
   syslog(LOG_NOTICE, "Alarm %s added to Group %s ", alm->GetName().c_str(), Name.c_str());
+}
+
+void AlarmGroup::add(const AlarmGroup & alarm)
+{
+  this->AlarmList.insert(this->AlarmList.end(), alarm.AlarmList.begin(), alarm.AlarmList.end());
+  syslog(LOG_NOTICE, "AlarmGroup %s copied into %s ", alarm.Name.c_str(), this->Name.c_str());
 }
 
 Alarm::Severity_t AlarmGroup::GetGroupState(void)
