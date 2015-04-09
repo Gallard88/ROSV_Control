@@ -177,6 +177,9 @@ static void Init_Modules(void)
   MotorControl->AddAlarmGroup(Power->getVoltAlarmGroup());
   MotorControl->AddAlarmGroup(Power->getTempAlarmGroup());
 
+  LightMan->AddAlarmGroup(Power->getVoltAlarmGroup());
+  LightMan->AddAlarmGroup(Power->getTempAlarmGroup());
+
 }
 
 /* ======================== */

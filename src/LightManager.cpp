@@ -35,6 +35,7 @@ using namespace std;
 LightManager::LightManager(const char * filename):
   Enabled(false)
 {
+  Alarms = new AlarmGroup("Lighting");
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
@@ -94,6 +95,7 @@ LightManager::~LightManager()
       PWM_SetPWM(Pwm, ch.Modules[j], 0);
     }
   }
+  delete Alarms;
 }
 
 //  *******************************************************************************************
@@ -103,13 +105,32 @@ void LightManager::Enable(bool en)
 }
 
 //  *******************************************************************************************
+void LightManager::AddAlarmGroup(const AlarmGroup & alarm)
+{
+  Alarms->add(alarm);
+}
+
+//  *******************************************************************************************
 void LightManager::Run_Task(void)
 {
+  bool alm_en = true;
+  int pwr;
+
+  if ( Alarms->GetGroupState() != Alarm::ERROR ) {
+    alm_en = false;
+  }
+
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
     LightChanel ch = Chanels[i];
     for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
-      bool en = (Enabled == true)? ch.Power.Get(): 0;
-      PWM_SetPWM(Pwm, ch.Modules[j], en);
+
+      if (( alm_en == true ) &&
+          ( Enabled == true )) {
+        pwr = ch.Power.Get();
+      } else {
+        pwr = 0;
+      }
+      PWM_SetPWM(Pwm, ch.Modules[j], pwr);
     }
   }
 }

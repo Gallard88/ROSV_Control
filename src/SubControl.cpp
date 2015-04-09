@@ -76,6 +76,7 @@ SubControl::SubControl(const char *filename):
 
 SubControl::~SubControl()
 {
+  delete Alarms;
 }
 
 // *******************************************************************************************
@@ -138,7 +139,7 @@ void SubControl::Run_Task(void)
 {
   float power[VECTOR_SIZE];
 
-  if ( Alarms->GetGroupState() != Alarm::CLEAR ) {
+  if ( Alarms->GetGroupState() == Alarm::ERROR ) {
     Velocity = BlankVec;
   }
 

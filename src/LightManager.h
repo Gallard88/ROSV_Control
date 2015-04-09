@@ -33,6 +33,7 @@
 #include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "Variable.h"
+#include "Alarm.h"
 
 //*******************************************************************************************
 //*******************************************************************************************
@@ -47,6 +48,9 @@ class  LightManager: CmdModule, RTT_Interface {
 public:
   LightManager(const char * filename);
   ~LightManager();
+
+  void AddAlarmGroup(const AlarmGroup & alarm);
+
   void Run_Task(void);
   void Enable(bool en);
 
@@ -58,6 +62,7 @@ public:
 private:
   bool Enabled;
   std::vector<LightChanel> Chanels;
+  AlarmGroup *Alarms;
 };
 
 //*******************************************************************************************

@@ -41,30 +41,32 @@ string Alarm::GetName(void) const
   return Name;
 }
 
-void Alarm::SetState(Severity_t state)
+void Alarm::SetState(Severity_t s)
 {
-  if ( this->State == state ) {
+  if ( State == s ) {
     return;	// this means we only get below on an edge.
   }
+  Severity_t old = this->State;
+
   switch ( this-> State ) {
   case CLEAR:
-    this->State = state;
+    this->State = s;
     break;
 
   case WARNING:
     // Severity can be CLEAR or ERROR.
     // We can always increase Severity,
     // but need to check is we can decrease it.
-    if (( state == ERROR ) ||
+    if (( s == ERROR ) ||
         ( this->Latching == false )) {
-      this->State = state;
+      this->State = s;
     }
     break;
 
     // Need to check if we can go back (non-latching)
   case ERROR:
     if ( this->Latching == false ) {
-      this->State = state;
+      this->State = s;
     }
     break;
   }
@@ -73,7 +75,7 @@ void Alarm::SetState(Severity_t state)
   this->Muted = false;
 
   // Record state change.
-  syslog(LOG_NOTICE, "Alarm %s => %s", Name.c_str(), SeverityNames[State]);
+  syslog(LOG_NOTICE, "Alarm %s => %s (%s)", Name.c_str(), SeverityNames[State], SeverityNames[old]);
 }
 
 void Alarm::SetClear(void)
