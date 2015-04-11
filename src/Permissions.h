@@ -1,6 +1,8 @@
 #ifndef __PERMISSION_H__
 #define __PERMISSION_H__
 #include <string>
+#include <memory>
+#include <vector>
 
 /*	Permission Class
  *	An object to control system wide modules.
@@ -12,24 +14,43 @@
 class Permission
 {
 public:
+  Permission(std::string name );
+  virtual ~Permission();
 
-	Permission(std::string name );
-	virtual ~Permission();
-
-	bool isEnabled(void);
-
-	void Inc(void);
-	void Dec(void);
-	void Set(bool en);
+  bool isEnabled(void) const;
+  void Set(bool en);
+  std::string GetName() const;
 
 private:
+  std::string Name;
+  bool Value;
+  unsigned int Max_Value;
 
-	std::string Name;
-	unsigned int Value;
-	unsigned int Max_Value;
-	Permission(const Permission &);
-	Permission & operator=(const Permission &);
+  // Disable copying.
+  Permission(const Permission &);
+  Permission & operator=(const Permission &);
+};
 
+class PermissionGroup
+{
+public:
+  PermissionGroup();
+  virtual ~PermissionGroup();
+
+  void add(std::shared_ptr<const Permission > p);
+  void add(const PermissionGroup & p);
+  void SetName(std::string name);
+
+  bool isGroupEnabled();  // returns true if all member Permissions are enabled.
+
+private:
+  std::vector<std::shared_ptr<const Permission >> PermList;
+  std::string Name;
+  bool GroupState;
+
+  // Disable copying
+  PermissionGroup & operator=(const PermissionGroup&);
+  PermissionGroup & operator+(const PermissionGroup&);
 };
 
 #endif
