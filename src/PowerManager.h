@@ -54,9 +54,8 @@ public:
 
 private:
 
-  // these need to become a shared pointer...
-  AlarmGroup *VoltGroup;
-  AlarmGroup *TempGroup;
+  AlarmGroup VoltGroup;
+  AlarmGroup TempGroup;
 
   Variable Volts[NUM_VOLTAGE_CH];
   Variable Temp;

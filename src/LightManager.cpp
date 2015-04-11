@@ -34,9 +34,8 @@ using namespace std;
 //  *******************************************************************************************
 LightManager::LightManager(const char * filename)
 {
-  Alarms = new AlarmGroup("Lighting");
-  PermGroup = new PermissionGroup();
-  PermGroup->SetName("Lighting");
+  Alarms.SetName("Lighting");
+  PermGroup.SetName("Lighting");
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
@@ -96,18 +95,16 @@ LightManager::~LightManager()
       PWM_SetPWM(Pwm, ch.Modules[j], 0);
     }
   }
-  delete Alarms;
-  delete PermGroup;
 }
 
 void LightManager::Add(const AlarmGroup & alarm)
 {
-  Alarms->add(alarm);
+  Alarms.add(alarm);
 }
 
 void LightManager::Add(const PermissionGroup & p)
 {
-  PermGroup->add(p);
+  PermGroup.add(p);
 }
 
 void LightManager::Run_Task(void)
@@ -115,8 +112,8 @@ void LightManager::Run_Task(void)
   bool en = true;
   int  pwr;
 
-  if (( Alarms->GetGroupState() == Alarm::ERROR ) ||
-      ( PermGroup->isGroupEnabled() == false )) {
+  if (( Alarms.GetGroupState() == Alarm::ERROR ) ||
+      ( PermGroup.isGroupEnabled() == false )) {
 
     en = false;
   }
@@ -125,7 +122,8 @@ void LightManager::Run_Task(void)
     LightChanel ch = Chanels[i];
     for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
 
-      pwr = ( en == true )? ch.Power.Get(): 0;
+//      pwr = ( en == true )? ch.Power.Get(): 0;
+      pwr = ( en == true )? 1: 0;
       PWM_SetPWM(Pwm, ch.Modules[j], pwr);
     }
   }

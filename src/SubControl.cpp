@@ -34,11 +34,10 @@ const ControlVector BlankVec = { 0, 0, 0, 0, 0, 0};
 
 
 SubControl::SubControl(const char *filename):
-  Alarms(NULL), Velocity(BlankVec)
+  Velocity(BlankVec)
 {
-  Alarms = new AlarmGroup("SubControl");
-  Perm   = new PermissionGroup();
-  Perm->SetName("SubControl");
+  Alarms.SetName("SubControl");
+  Perm.SetName("SubControl");
 
 
   JSON_Value *val = json_parse_file(filename);
@@ -78,18 +77,16 @@ SubControl::SubControl(const char *filename):
 
 SubControl::~SubControl()
 {
-  delete Alarms;
-  delete Perm;
 }
 
 void SubControl::Add(const AlarmGroup & group)
 {
-  Alarms->add(group);
+  Alarms.add(group);
 }
 
 void SubControl::Add(const PermissionGroup & group)
 {
-  Perm->add(group);
+  Perm.add(group);
 }
 
 void SubControl::Update(const char *packet, JSON_Object *msg)
@@ -131,8 +128,8 @@ void SubControl::Run_Task(void)
   float power[VECTOR_SIZE];
   const ControlVector *v;
 
-  if (( Alarms->GetGroupState() == Alarm::ERROR ) ||
-      ( Perm->isGroupEnabled() == false )) {
+  if (( Alarms.GetGroupState() == Alarm::ERROR ) ||
+      ( Perm.isGroupEnabled() == false )) {
     v = &BlankVec;
   } else {
     v = &Velocity;

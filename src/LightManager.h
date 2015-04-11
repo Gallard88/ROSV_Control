@@ -63,8 +63,8 @@ public:
 
 private:
   std::vector<LightChanel> Chanels;
-  PermissionGroup *PermGroup;
-  AlarmGroup      *Alarms;
+  PermissionGroup PermGroup;
+  AlarmGroup      Alarms;
 };
 
 //*******************************************************************************************

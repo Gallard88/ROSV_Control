@@ -40,44 +40,42 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
   Pwm(p)
 {
   PMon = PMon_Connect();
+  TempGroup.SetName("Temp");
+  VoltGroup.SetName("Voltage");
 
   if ( PMon == NULL ) {
     syslog(LOG_EMERG, "PowerManager: failed to open PowerMonitor");
     exit(-1);
   }
 
-  VoltGroup = new AlarmGroup("Voltage");
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
     Volts[i].SetName(VoltNames[i]);
 
     std::shared_ptr<Alarm> a(new Alarm(VoltNames[i], false, true));
     VoltAlarms[i] = a;
-    VoltGroup->AddAlarm(std::const_pointer_cast<const Alarm>(a));
+    VoltGroup.AddAlarm(std::const_pointer_cast<const Alarm>(a));
   }
 
-  TempGroup = new AlarmGroup("Temp");
-  Temp.SetName("Pwm_Temp");
 
+  Temp.SetName("Pwm_Temp");
   std::shared_ptr<Alarm> t(new Alarm("Pwm_Temp", false, true));
   TempAlarms = t;
-  TempGroup->AddAlarm(std::const_pointer_cast<const Alarm>(TempAlarms));
+  TempGroup.AddAlarm(std::const_pointer_cast<const Alarm>(TempAlarms));
 }
 
 PowerManager::~PowerManager()
 {
-  delete TempGroup;
-  delete VoltGroup;
 }
 
 //  *******************************************************************************************
 const AlarmGroup & PowerManager::getVoltAlarmGroup(void)
 {
-  return *VoltGroup;
+  return VoltGroup;
 }
 
 const AlarmGroup & PowerManager::getTempAlarmGroup(void)
 {
-  return *TempGroup;
+  return TempGroup;
 }
 
 //  *******************************************************************************************

@@ -54,8 +54,8 @@ public:
 
 private:
   std::vector<Motor> MotorList;
-  AlarmGroup *Alarms;
-  PermissionGroup *Perm;
+  AlarmGroup      Alarms;
+  PermissionGroup Perm;
   ControlVector Velocity;
 };
 
