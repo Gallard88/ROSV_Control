@@ -32,10 +32,12 @@
 using namespace std;
 
 //  *******************************************************************************************
-LightManager::LightManager(const char * filename):
-  Enabled(false)
+LightManager::LightManager(const char * filename)
 {
   Alarms = new AlarmGroup("Lighting");
+  PermGroup = new PermissionGroup();
+  PermGroup->SetName("Lighting");
+
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
@@ -86,7 +88,6 @@ LightManager::LightManager(const char * filename):
   json_value_free (val);
 }
 
-//  *******************************************************************************************
 LightManager::~LightManager()
 {
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
@@ -96,52 +97,45 @@ LightManager::~LightManager()
     }
   }
   delete Alarms;
+  delete PermGroup;
 }
 
-//  *******************************************************************************************
-void LightManager::Enable(bool en)
-{
-  Enabled = en;
-}
-
-//  *******************************************************************************************
-void LightManager::AddAlarmGroup(const AlarmGroup & alarm)
+void LightManager::Add(const AlarmGroup & alarm)
 {
   Alarms->add(alarm);
 }
 
-//  *******************************************************************************************
+void LightManager::Add(const PermissionGroup & p)
+{
+  PermGroup->add(p);
+}
+
 void LightManager::Run_Task(void)
 {
-  bool alm_en = true;
-  int pwr;
+  bool en = true;
+  int  pwr;
 
-  if ( Alarms->GetGroupState() != Alarm::ERROR ) {
-    alm_en = false;
+  if (( Alarms->GetGroupState() == Alarm::ERROR ) ||
+      ( PermGroup->isGroupEnabled() == false )) {
+
+    en = false;
   }
 
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
     LightChanel ch = Chanels[i];
     for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
 
-      if (( alm_en == true ) &&
-          ( Enabled == true )) {
-        pwr = ch.Power.Get();
-      } else {
-        pwr = 0;
-      }
+      pwr = ( en == true )? ch.Power.Get(): 0;
       PWM_SetPWM(Pwm, ch.Modules[j], pwr);
     }
   }
 }
 
-//  *******************************************************************************************
 void LightManager::Update(const char *packet, JSON_Object *msg)
 {
   PacketTime = time(NULL);
 }
 
-//  *******************************************************************************************
 const string LightManager::GetData(void)
 {
   string msg;
@@ -158,7 +152,5 @@ const string LightManager::GetData(void)
   return msg;
 }
 
-//*******************************************************************************************
-//*******************************************************************************************
 
 

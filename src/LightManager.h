@@ -27,6 +27,7 @@
 //*******************************************************************************************
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <PWM_Controller.h>
 
@@ -34,6 +35,7 @@
 #include "CmdModule.h"
 #include "Variable.h"
 #include "Alarm.h"
+#include "Permissions.h"
 
 //*******************************************************************************************
 //*******************************************************************************************
@@ -49,10 +51,10 @@ public:
   LightManager(const char * filename);
   ~LightManager();
 
-  void AddAlarmGroup(const AlarmGroup & alarm);
+  void Add(const AlarmGroup & alarm);
+  void Add(const PermissionGroup & p);
 
   void Run_Task(void);
-  void Enable(bool en);
 
   void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);
@@ -60,9 +62,9 @@ public:
   PWM_Con_t Pwm;
 
 private:
-  bool Enabled;
   std::vector<LightChanel> Chanels;
-  AlarmGroup *Alarms;
+  PermissionGroup *PermGroup;
+  AlarmGroup      *Alarms;
 };
 
 //*******************************************************************************************

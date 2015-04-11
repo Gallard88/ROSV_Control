@@ -25,7 +25,9 @@
 #define __SUBPROTOCOL__
 //*******************************************************************************************
 #include <vector>
+#include <memory>
 
+#include "Permissions.h"
 #include "CmdModule.h"
 #include "TcpServer.h"
 
@@ -36,14 +38,6 @@ struct Modules {
 };
 
 //*******************************************************************************************
-class SubProt_Interface
-{
-public:
-  virtual void Client_Added  (const std::string & name, int hande) = 0;
-  virtual void Client_Removed(int handle) = 0;
-};
-
-//*******************************************************************************************
 class SubProtocol: CmdModule {
 public:
   SubProtocol();
@@ -51,16 +45,17 @@ public:
 
   void AddModule(const std::string & name, CmdModule *mod);
   void Run(struct timeval timeout);
-  int GetNumClients(void);
-  void AddListener(SubProt_Interface *listen);
+  int GetNumClients(void) const;
+  const PermissionGroup &getPermGroup() const;
 
 protected:
 
 private:
-  SubProt_Interface           *IntListeners;
   std::vector<struct Modules>  Modules;
   std::vector<int>             Handles;
-  TcpServer                    *Server;
+  TcpServer                   *Server;
+  std::shared_ptr<Permission>  PermClient;
+  PermissionGroup              PermGroup;
 
   void ResetPacketTime(void);
   void Update(const char *packet, JSON_Object *msg);

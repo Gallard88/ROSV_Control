@@ -76,7 +76,7 @@ bool PermissionGroup::isGroupEnabled()
     }
   }
   if ( GroupState != global ) {
-    syslog(LOG_NOTICE, "Alarm Group %s => %s", Name.c_str(), (global==true)? "true": "false");
+    syslog(LOG_NOTICE, "PermissionGroup %s => %s", Name.c_str(), (global==true)? "true": "false");
     GroupState = global;
   }
   return global;

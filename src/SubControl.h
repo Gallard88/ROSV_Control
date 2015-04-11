@@ -35,17 +35,17 @@
 #include "Motor.h"
 #include "Navigation.h"
 #include "Alarm.h"
+#include "Permissions.h"
 
 class SubControl: CmdModule, RTT_Interface, NavUpdate_Interface {
 public:
   SubControl(const char *filename);
   ~SubControl();
 
-  void AddAlarmGroup(const AlarmGroup & group);
+  void Add(const AlarmGroup & group);
+  void Add(const PermissionGroup & group);
 
   void Run_Task(void);
-
-  void EnableMotor(bool en);
 
   void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);
@@ -54,9 +54,8 @@ public:
 
 private:
   std::vector<Motor> MotorList;
-  bool Enable;
   AlarmGroup *Alarms;
-
+  PermissionGroup *Perm;
   ControlVector Velocity;
 };
 

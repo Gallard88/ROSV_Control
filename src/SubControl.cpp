@@ -30,14 +30,16 @@
 
 using namespace std;
 
-// *******************************************************************************************
 const ControlVector BlankVec = { 0, 0, 0, 0, 0, 0};
-// *******************************************************************************************
+
+
 SubControl::SubControl(const char *filename):
-  Enable(false), Alarms(NULL)
+  Alarms(NULL), Velocity(BlankVec)
 {
   Alarms = new AlarmGroup("SubControl");
-  Velocity = BlankVec;
+  Perm   = new PermissionGroup();
+  Perm->SetName("SubControl");
+
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
@@ -77,20 +79,23 @@ SubControl::SubControl(const char *filename):
 SubControl::~SubControl()
 {
   delete Alarms;
+  delete Perm;
 }
 
-// *******************************************************************************************
-void SubControl::AddAlarmGroup(const AlarmGroup & group)
+void SubControl::Add(const AlarmGroup & group)
 {
   Alarms->add(group);
 }
 
-// *******************************************************************************************
+void SubControl::Add(const PermissionGroup & group)
+{
+  Perm->add(group);
+}
+
 void SubControl::Update(const char *packet, JSON_Object *msg)
 {
 }
 
-// *******************************************************************************************
 const string SubControl::GetData(void)
 {
   string msg("\"RecordType\": \"MotorData\", ");
@@ -107,13 +112,6 @@ const string SubControl::GetData(void)
   return msg;
 }
 
-// *******************************************************************************************
-void SubControl::EnableMotor(bool en)
-{
-  Enable = en;
-}
-
-// *******************************************************************************************
 const float MOT_SCALE = 100.0;
 #define VECTOR_X      0
 #define VECTOR_Y      1
@@ -122,21 +120,19 @@ const float MOT_SCALE = 100.0;
 #define VECTOR_PITCH  4
 #define VECTOR_YAW    5
 
-// *******************************************************************************************
 void SubControl::UpdateControlVector(const ControlVector & vec)
 {
   PacketTime = time(NULL);
   Velocity = vec;
 }
 
-// *******************************************************************************************
 void SubControl::Run_Task(void)
 {
   float power[VECTOR_SIZE];
   const ControlVector *v;
 
   if (( Alarms->GetGroupState() == Alarm::ERROR ) ||
-      ( Enable == false)) {
+      ( Perm->isGroupEnabled() == false )) {
     v = &BlankVec;
   } else {
     v = &Velocity;
@@ -155,7 +151,3 @@ void SubControl::Run_Task(void)
     MotorList[i].Run(power);
   }
 }
-
-//*******************************************************************************************
-//*******************************************************************************************
-//*******************************************************************************************

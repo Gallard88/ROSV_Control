@@ -56,31 +56,7 @@ public:
 };
 
 /* ======================== */
-class Main_SubListen: SubProt_Interface {
-public:
-  Main_SubListen(): NumClients(0) {
-  };
-  void Client_Added(const string & name, int handle) {
-    NumClients++;
-    MotorControl->EnableMotor(true);
-    LightMan->Enable(true);
-    syslog(LOG_NOTICE, "Client %s added, handle = %d", name.c_str(), handle);
-  }
-  void Client_Removed(int handle) {
-    NumClients--;
-    if ( NumClients == 0 ) {
-      LightMan->Enable(false);
-      MotorControl->EnableMotor(false);
-    }
-    syslog(LOG_NOTICE, "Client removed, handle = %d", handle);
-  }
-
-  int NumClients;
-};
-
-/* ======================== */
 MainCallBack TaskCallback;
-Main_SubListen SubListener;
 
 /* ======================== */
 void SignalHandler_Setup(void)
@@ -129,12 +105,10 @@ static void Init_Modules(void)
 
   syslog(LOG_NOTICE, "Init_Modules()");
   SubProt = new SubProtocol();
-  SubProt->AddListener((SubProt_Interface *) &SubListener);
 
   syslog(LOG_NOTICE, "Motors()");
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
-  MotorControl->EnableMotor(false);
   task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
   task->SetFrequency(10);
   task->SetMaxDuration(50);
@@ -174,12 +148,14 @@ static void Init_Modules(void)
   TaskMan.AddTask(task);
 
   // Wire up alarms
-  MotorControl->AddAlarmGroup(Power->getVoltAlarmGroup());
-  MotorControl->AddAlarmGroup(Power->getTempAlarmGroup());
+  MotorControl->Add(Power->getVoltAlarmGroup());
+  MotorControl->Add(Power->getTempAlarmGroup());
 
-  LightMan->AddAlarmGroup(Power->getVoltAlarmGroup());
-  LightMan->AddAlarmGroup(Power->getTempAlarmGroup());
+  LightMan->Add(Power->getVoltAlarmGroup());
+  LightMan->Add(Power->getTempAlarmGroup());
 
+  MotorControl->Add(SubProt->getPermGroup());
+  LightMan->Add(SubProt->getPermGroup());
 }
 
 /* ======================== */

@@ -27,9 +27,6 @@
 
 using namespace std;
 
-// *******************************************************************************************
-using namespace std;
-
 /*
  * The ROSV Protocol is a general purpose protocol, that enables the various
  * sub systems and controllers to communicate with the Sub.
@@ -53,6 +50,10 @@ SubProtocol::SubProtocol()
 {
   Server = new TcpServer(8090);
   AddModule("Clients", this);
+  std::shared_ptr<Permission> p(new Permission("Clients"));
+  PermClient = p;
+  PermGroup.SetName("SubProtocol");
+  PermGroup.add(std::const_pointer_cast<const Permission>(p));
 }
 
 // *******************************************************************************************
@@ -71,6 +72,11 @@ void SubProtocol::AddModule(const string & name, CmdModule *mod)
   Modules.push_back(new_module);
 }
 
+const PermissionGroup &SubProtocol::getPermGroup() const
+{
+  return PermGroup;
+}
+
 // *******************************************************************************************
 #define MAX_FP(a, b)  b = (a > b)? a : b
 // *******************************************************************************************
@@ -81,9 +87,6 @@ void SubProtocol::Run(struct timeval timeout)
 
   fd = Server->Listen(timeout);
   if ( fd >= 0 ) {
-    if ( IntListeners != NULL ) {
-      IntListeners->Client_Added(Server->GetHandleName(fd), fd);
-    }
     Handles.push_back(fd);
     ResetPacketTime();
     PacketTime = time(NULL);
@@ -97,9 +100,6 @@ void SubProtocol::Run(struct timeval timeout)
       }
     }
   } catch (int ex ) {
-    if ( IntListeners != NULL ) {
-      IntListeners->Client_Removed(Handles[i]);
-    }
     Handles.erase (Handles.begin()+i);
     PacketTime = time(NULL);
   }
@@ -107,6 +107,7 @@ void SubProtocol::Run(struct timeval timeout)
   if ( Handles.size() != 0 ) {
     SendUpdatedData();
   }
+  PermClient->Set(Handles.size() != 0? true: false);
 }
 
 // *******************************************************************************************
@@ -116,7 +117,6 @@ for ( auto& m: Modules) {
     m.PTime = 0;
   }
 }
-
 
 // *******************************************************************************************
 void SubProtocol::SendUpdatedData(void)
@@ -150,9 +150,6 @@ void SubProtocol::SendMsg(const string & msg)
     }
 
   } catch (int e) {
-    if ( IntListeners != NULL ) {
-      IntListeners->Client_Removed(Handles[i]);
-    }
     PacketTime = time(NULL);
     Handles.erase(Handles.begin()+i);
   }
@@ -187,7 +184,6 @@ const string SubProtocol::GetData(void)
 // *******************************************************************************************
 void SubProtocol::ProcessLine(string line)
 {
-//  printf("Line: %s\r\n", line.c_str());
   JSON_Value *data = json_parse_string(line.c_str());
 
   if ( data == NULL ) {
@@ -210,17 +206,10 @@ void SubProtocol::ProcessLine(string line)
 }
 
 // *******************************************************************************************
-void SubProtocol::AddListener(SubProt_Interface *listen)
-{
-  IntListeners = listen;
-}
-
-// *******************************************************************************************
-int SubProtocol::GetNumClients(void)
+int SubProtocol::GetNumClients(void) const
 {
   return Handles.size();
 }
 
 // *******************************************************************************************
 // *******************************************************************************************
-
