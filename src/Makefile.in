@@ -67,9 +67,10 @@ PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = Alarm.$(OBJEXT) AlarmManager.$(OBJEXT) \
 	CameraManager.$(OBJEXT) LightManager.$(OBJEXT) \
 	Logger.$(OBJEXT) Motor.$(OBJEXT) Permissions.$(OBJEXT) \
-	PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
-	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
-	Variable.$(OBJEXT) main.$(OBJEXT)
+	PermissionManager.$(OBJEXT) PowerManager.$(OBJEXT) \
+	Navigation.$(OBJEXT) SubControl.$(OBJEXT) \
+	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) Variable.$(OBJEXT) \
+	main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -255,6 +256,8 @@ ROSV_Control_SOURCES = \
 	Motor.h \
 	Permissions.cpp \
 	Permissions.h \
+	PermissionManager.cpp \
+	PermissionManager.h \
 	PowerManager.cpp \
 	PowerManager.h \
 	Navigation.cpp \
@@ -360,6 +363,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Motor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Navigation.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PermissionManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Permissions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@

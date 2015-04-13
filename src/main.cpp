@@ -18,6 +18,7 @@
 #include "SubProtocol.h"
 #include "Logger.h"
 #include "AlarmManager.h"
+#include "PermissionManager.h"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ Logger            Log;
 Navigation       *Nav;
 RT_TaskManager    TaskMan;
 AlarmManager     *AlmManager;
+PermGroupManager *PManager;
 
 //static thread ListenThread;
 volatile bool RunSystem;
@@ -93,6 +95,7 @@ void System_Shutdown(void)
     delete SubProt;
   }
   delete AlmManager;
+  delete PManager;
 
   Log.RecordValue("ROSV_Control", "Shutdown", 1);
   syslog(LOG_NOTICE, "System shutting down");
@@ -153,6 +156,9 @@ static void Init_Modules(void)
   AlmManager = new AlarmManager();
   SubProt->AddModule("AlarmManager", (CmdModule *) AlmManager );
 
+  PManager = new PermGroupManager();
+  SubProt->AddModule("PermissionManager", (CmdModule *) PManager );
+
 
   // Wire up alarms
   MotorControl->Add(Power->getVoltAlarmGroup());
@@ -166,6 +172,7 @@ static void Init_Modules(void)
 
   MotorControl->Add(SubProt->getPermGroup());
   LightMan->Add(SubProt->getPermGroup());
+  PManager->add(SubProt->getPermGroup());
 }
 
 /* ======================== */

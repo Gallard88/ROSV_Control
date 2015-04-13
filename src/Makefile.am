@@ -37,6 +37,8 @@ ROSV_Control_SOURCES = \
 	Motor.h \
 	Permissions.cpp \
 	Permissions.h \
+	PermissionManager.cpp \
+	PermissionManager.h \
 	PowerManager.cpp \
 	PowerManager.h \
 	Navigation.cpp \
