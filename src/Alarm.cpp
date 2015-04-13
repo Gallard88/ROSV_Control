@@ -36,6 +36,11 @@ Alarm::Severity_t Alarm::GetState(void) const
   return State;
 }
 
+std::string Alarm::GetState_Text(void) const
+{
+  return string(SeverityNames[GetState()]);
+}
+
 string Alarm::GetName(void) const
 {
   return Name;

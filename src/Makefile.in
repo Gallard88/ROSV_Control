@@ -64,12 +64,12 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 	"$(DESTDIR)$(ROSV_Control_Filesdir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = Alarm.$(OBJEXT) CameraManager.$(OBJEXT) \
-	LightManager.$(OBJEXT) Logger.$(OBJEXT) Motor.$(OBJEXT) \
-	Permissions.$(OBJEXT) PowerManager.$(OBJEXT) \
-	Navigation.$(OBJEXT) SubControl.$(OBJEXT) \
-	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) Variable.$(OBJEXT) \
-	main.$(OBJEXT)
+am_ROSV_Control_OBJECTS = Alarm.$(OBJEXT) AlarmManager.$(OBJEXT) \
+	CameraManager.$(OBJEXT) LightManager.$(OBJEXT) \
+	Logger.$(OBJEXT) Motor.$(OBJEXT) Permissions.$(OBJEXT) \
+	PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
+	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
+	Variable.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -242,6 +242,8 @@ LDADD = \
 ROSV_Control_SOURCES = \
 	Alarm.cpp \
 	Alarm.h \
+	AlarmManager.cpp \
+	AlarmManager.h \
 	CameraManager.cpp \
 	CameraManager.h \
 	CmdModule.h \
@@ -352,6 +354,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Alarm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AlarmManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Po@am__quote@

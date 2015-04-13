@@ -17,6 +17,7 @@
 #include "SubControl.h"
 #include "SubProtocol.h"
 #include "Logger.h"
+#include "AlarmManager.h"
 
 using namespace std;
 
@@ -34,6 +35,7 @@ PowerManager     *Power;
 Logger            Log;
 Navigation       *Nav;
 RT_TaskManager    TaskMan;
+AlarmManager     *AlmManager;
 
 //static thread ListenThread;
 volatile bool RunSystem;
@@ -90,6 +92,7 @@ void System_Shutdown(void)
   if ( SubProt != NULL ) {
     delete SubProt;
   }
+  delete AlmManager;
 
   Log.RecordValue("ROSV_Control", "Shutdown", 1);
   syslog(LOG_NOTICE, "System shutting down");
@@ -147,9 +150,16 @@ static void Init_Modules(void)
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
 
+  AlmManager = new AlarmManager();
+  SubProt->AddModule("AlarmManager", (CmdModule *) AlmManager );
+
+
   // Wire up alarms
   MotorControl->Add(Power->getVoltAlarmGroup());
   MotorControl->Add(Power->getTempAlarmGroup());
+
+  AlmManager->add(Power->getVoltAlarmGroup());
+  AlmManager->add(Power->getTempAlarmGroup());
 
   LightMan->Add(Power->getVoltAlarmGroup());
   LightMan->Add(Power->getTempAlarmGroup());

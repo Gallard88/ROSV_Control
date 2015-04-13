@@ -24,6 +24,8 @@ LDADD = \
 ROSV_Control_SOURCES = \
 	Alarm.cpp \
 	Alarm.h \
+	AlarmManager.cpp \
+	AlarmManager.h \
 	CameraManager.cpp \
 	CameraManager.h \
 	CmdModule.h \

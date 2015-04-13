@@ -26,6 +26,7 @@ public:
   } Severity_t;
 
   Severity_t GetState(void) const;
+  std::string GetState_Text(void) const;
   std::string GetName(void) const;
 
   // These functions can set the state of the object
@@ -68,7 +69,7 @@ class AlarmGroup
 public:
   AlarmGroup();
   AlarmGroup(std::string name);
-  ~AlarmGroup();
+  virtual ~AlarmGroup();
 
   // Add an alarm to a group.
   void AddAlarm(std::shared_ptr<const Alarm > alm);
@@ -78,7 +79,7 @@ public:
   //	This functions scans the group of errors and reports the highest severity found.
   Alarm::Severity_t GetGroupState(void);
 
-private:
+protected:
   std::vector<std::shared_ptr<const Alarm >> AlarmList;
   std::string Name;
   Alarm::Severity_t GroupState;
