@@ -235,6 +235,8 @@ int main (int argc, char *argv[])
       system_time.tv_usec =  10000;
       SubProt->Run(system_time);
     }
+    PManager->Check();
+    AlmManager->Check();
   }
   return 0;
 }

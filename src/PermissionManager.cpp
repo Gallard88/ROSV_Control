@@ -11,6 +11,12 @@ PermGroupManager::~PermGroupManager()
 {
 }
 
+void PermGroupManager::Check(void)
+{
+  PacketTime = time(NULL);
+}
+
+
 void PermGroupManager::Update(const char *packet, JSON_Object *msg)
 {
   // nothing to do here.
@@ -23,7 +29,7 @@ const std::string PermGroupManager::GetData(void)
   char vec[256];
 
   msg = "\"RecordType\": \"ReportPermission\", ";
-  msg += "\"Alarms\":[";
+  msg += "\"Permissions\":[";
 
   for ( size_t i = 0; i < PermList.size(); i ++ ) {
     sprintf(vec, "{ \"Permission\":\"%s\", \"State\": \"%s\" }", PermList[i]->GetName().c_str(), PermList[i]->isEnabled()?"En":"Dis");

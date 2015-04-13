@@ -11,6 +11,11 @@ AlarmManager::~AlarmManager()
 {
 }
 
+void AlarmManager::Check(void)
+{
+  PacketTime = time(NULL);
+}
+
 void AlarmManager::Update(const char *packet, JSON_Object *msg)
 {
   // nothing to do here.

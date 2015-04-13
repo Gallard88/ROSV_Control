@@ -10,6 +10,8 @@ public:
   PermGroupManager();
   virtual ~PermGroupManager();
 
+  void Check(void);
+
   // Cmd Module Functions.
   void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);
