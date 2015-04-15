@@ -29,6 +29,8 @@ ROSV_Control_SOURCES = \
 	CameraManager.cpp \
 	CameraManager.h \
 	CmdModule.h \
+	EventMessages.cpp \
+	EventMessages.h \
 	LightManager.cpp \
 	LightManager.h \
 	Logger.cpp \
