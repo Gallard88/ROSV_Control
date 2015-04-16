@@ -165,7 +165,6 @@ const string SubProtocol::GetData(void)
 {
   string msg;
 
-  msg = "{ \"Module\": \"ClientList\", ";
   msg += "\"RecordType\":\"Clients\", ";
   msg += "\"Values\":[ ";
   for ( size_t i = 0; i < Handles.size(); i ++ ) {
@@ -177,7 +176,7 @@ const string SubProtocol::GetData(void)
       msg += ", ";
     }
   }
-  msg += " ]}\r\n";
+  msg += "]";
   return msg;
 }
 
