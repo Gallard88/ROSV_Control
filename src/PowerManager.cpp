@@ -22,12 +22,13 @@
 */
 
 //  *******************************************************************************************
-#include <syslog.h>
 #include <math.h>
 #include "PowerManager.h"
 #include "Alarm.h"
+#include "EventMessages.h"
 
 using namespace std;
+
 
 const char *VoltNames[NUM_VOLTAGE_CH] = {
   "Pwm_Volt",
@@ -42,9 +43,11 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
   PMon = PMon_Connect();
   TempGroup.SetName("Temp");
   VoltGroup.SetName("Voltage");
+  EventMsg *Msg = EventMsg::Init();
+
 
   if ( PMon == NULL ) {
-    syslog(LOG_EMERG, "PowerManager: failed to open PowerMonitor");
+    Msg->Log(EventMsg::ERROR, "PowerManager: failed to open PowerMonitor");
     exit(-1);
   }
 

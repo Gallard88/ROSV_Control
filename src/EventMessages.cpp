@@ -47,9 +47,12 @@ EventMsg *EventMsg::Init()
   return EventPtr;
 }
 
-void EventMsg::sendToSyslog(bool en)
+void EventMsg::sendToSyslog(const char *name)
 {
-  PrintSyslog = en;
+  if ( PrintSyslog != true ) {
+    PrintSyslog = true;
+    openlog(name, LOG_PID, LOG_USER);
+  }
 }
 
 void EventMsg::sendToTerminal(bool en)

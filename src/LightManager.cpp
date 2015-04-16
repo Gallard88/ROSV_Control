@@ -21,13 +21,13 @@
  THE SOFTWARE.
 */
 
-#include <syslog.h>
 #include <stdio.h>
 #include <string.h>
 #include <string>
 
 #include "LightManager.h"
 #include "parson.h"
+#include "EventMessages.h"
 
 using namespace std;
 
@@ -39,22 +39,23 @@ LightManager::LightManager(const char * filename)
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
+  EventMsg *Msg = EventMsg::Init();
 
   if ( rv != JSONObject ) {
-    syslog(LOG_EMERG, "Lighting: JSON Parse file failed\n");
+    Msg->Log(EventMsg::ERROR, "Lighting: JSON Parse file failed\n");
     json_value_free (val);
     return;
   }
 
   JSON_Object *settings = json_value_get_object(val);
   if ( settings == NULL ) {
-    syslog(LOG_EMERG, "Lighting: Settings == NULL\n");
+    Msg->Log(EventMsg::ERROR, "Lighting: Settings == NULL\n");
     json_value_free (val);
     return;
   }
   JSON_Array *ch_array = json_object_get_array( settings, "Modules");
   if ( ch_array == NULL ) {
-    syslog(LOG_EMERG,"Lighting: Failed to find \"Modules\" array in settings");
+    Msg->Log(EventMsg::ERROR, "Lighting: Failed to find \"Modules\" array in settings");
     json_value_free (val);
     return ;
   }

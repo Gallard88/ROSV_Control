@@ -1,7 +1,6 @@
 /* ======================== */
 #include <signal.h>
 #include <cstring>
-#include <syslog.h>
 #include <unistd.h>
 #include <PWM_Controller.h>
 
@@ -16,9 +15,9 @@
 #include "Motor.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
-#include "Logger.h"
 #include "AlarmManager.h"
 #include "PermissionManager.h"
+#include "EventMessages.h"
 
 using namespace std;
 
@@ -33,11 +32,11 @@ SubProtocol      *SubProt;
 LightManager     *LightMan;
 CameraManager    *CamMan;
 PowerManager     *Power;
-Logger            Log;
 Navigation       *Nav;
 RT_TaskManager    TaskMan;
 AlarmManager     *AlmManager;
 PermGroupManager *PManager;
+EventMsg         *Msg;
 
 //static thread ListenThread;
 volatile bool RunSystem;
@@ -46,16 +45,13 @@ volatile bool RunSystem;
 class MainCallBack: public RT_TaskMan_Interface {
 public:
   void Deadline_Missed(const std::string & name) {
-    syslog(LOG_NOTICE, "Task %s: Deadline missed\n", name.c_str());
-    printf("Task %s: Deadline missed\n", name.c_str());
+    Msg->Log(EventMsg::NOTICE, "Task %s: Deadline missed", name.c_str());
   }
   void Deadline_Recovered(const std::string & name) {
-    syslog(LOG_NOTICE, "Task %s: Deadline recovered\n", name.c_str());
-    printf("Task %s: Deadline recovered\n", name.c_str());
+    Msg->Log(EventMsg::NOTICE,"Task %s: Deadline recovered\n", name.c_str());
   }
   void Duration_Overrun(const std::string & name) {
-    syslog(LOG_NOTICE, "Task %s: Duration overrun\n", name.c_str());
-    printf("Task %s: Duration overrun\n", name.c_str());
+    Msg->Log(EventMsg::NOTICE, "Task %s: Duration overrun\n", name.c_str());
   }
 };
 
@@ -97,9 +93,7 @@ void System_Shutdown(void)
   delete AlmManager;
   delete PManager;
 
-  Log.RecordValue("ROSV_Control", "Shutdown", 1);
-  syslog(LOG_NOTICE, "System shutting down");
-  closelog();
+  Msg->Log(EventMsg::NOTICE, "System Shutdown");
 }
 
 /* ======================== */
@@ -109,10 +103,8 @@ static void Init_Modules(void)
 
   TaskMan.AddCallback((RT_TaskMan_Interface *)&TaskCallback);
 
-  syslog(LOG_NOTICE, "Init_Modules()");
   SubProt = new SubProtocol();
 
-  syslog(LOG_NOTICE, "Motors()");
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
   task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
@@ -120,7 +112,6 @@ static void Init_Modules(void)
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
 
-  syslog(LOG_NOTICE, "Nav()");
   Nav = new Navigation("/etc/ROSV_Control/navigation.json");
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
   Nav->SetUpdateInterface((NavUpdate_Interface *) MotorControl);
@@ -129,7 +120,6 @@ static void Init_Modules(void)
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
 
-  syslog(LOG_NOTICE, "Lighting()");
   LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;
   SubProt->AddModule("Light",      (CmdModule *) LightMan );
@@ -138,7 +128,6 @@ static void Init_Modules(void)
   task->SetMaxDuration(50);
   TaskMan.AddTask(task);
 
-  syslog(LOG_NOTICE, "Power()");
   Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
   SubProt->AddModule("Power",      (CmdModule *) Power );
   task = new RealTimeTask("Power", (RTT_Interface *) Power);
@@ -178,8 +167,13 @@ static void Init_Modules(void)
 /* ======================== */
 int main (int argc, char *argv[])
 {
-  openlog("ROSV_Control", LOG_PID, LOG_USER);
-  syslog(LOG_NOTICE, "Starting program");
+
+  Msg = EventMsg::Init();
+  Msg->sendToSyslog("ROSV_Control");
+  Msg->setFilename("/home/pi/ROSV_Log.txt");
+  Msg->setLogDepth(20);
+  Msg->Log(EventMsg::NOTICE, "Starting Program");
+
 
   bool daemonise = false;
   int opt;
@@ -192,11 +186,13 @@ int main (int argc, char *argv[])
     }
   }
 
+  Msg->sendToTerminal(!daemonise);
+
   if ( daemonise == true ) {
-    syslog(LOG_ALERT, "Daemonising");
+    Msg->Log(EventMsg::NOTICE, "Daemonising");
     int rv = daemon( 0, 0 );
     if ( rv < 0 ) {
-      syslog(LOG_EMERG, "Daemonise failed" );
+      Msg->Log(EventMsg::NOTICE, "Daemonising - failed");
       exit(-1);
     }
   }
@@ -208,8 +204,7 @@ int main (int argc, char *argv[])
   // connect to other external systems
   PwmModule = PWM_Connect();
   if ( PwmModule == NULL ) {
-    printf("PWM_Connect() failed\n");
-    syslog(LOG_ALERT, "PWM_Connect() failed\n");
+    Msg->Log(EventMsg::ERROR, "PWM_Connect() failed");
     return -1;
   }
   Motor_Set(PwmModule);
@@ -217,12 +212,12 @@ int main (int argc, char *argv[])
 
   /* --------------------------------------------- */
   // open sub-modules
-  Log.RecordValue("ROSV_Control","Start", 1);
+  Msg->Log(EventMsg::NOTICE, "Starting System");
 
   RunSystem = true;
   Init_Modules();
 
-  syslog(LOG_ALERT, "Main()");
+  Msg->Log(EventMsg::NOTICE, "Main()");
   /* --------------------------------------------- */
   while ( RunSystem ) {
 

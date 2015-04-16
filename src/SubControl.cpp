@@ -21,12 +21,12 @@
  THE SOFTWARE.
 */
 // *******************************************************************************************
-#include <syslog.h>
 #include <cstring>
 
 #include "SubControl.h"
 #include "Alarm.h"
 #include "Permissions.h"
+#include "EventMessages.h"
 
 using namespace std;
 
@@ -39,19 +39,20 @@ SubControl::SubControl(const char *filename):
   Alarms.SetName("SubControl");
   Perm.SetName("SubControl");
 
+  EventMsg *Msg = EventMsg::Init();
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
   if ( rv != JSONObject ) {
-    syslog(LOG_EMERG, "SubControl: JSON Parse file failed\n");
+    Msg->Log(EventMsg::ERROR, "SubControl: JSON Parse file failed\n");
     json_value_free (val);
     return;
   }
 
   JSON_Object *settings = json_value_get_object(val);
   if ( settings == NULL ) {
-    syslog(LOG_EMERG, "SubControl: Settings == NULL\n");
+    Msg->Log(EventMsg::ERROR,"SubControl: Settings == NULL\n");
     json_value_free (val);
     return;
   }
@@ -59,8 +60,7 @@ SubControl::SubControl(const char *filename):
   // load motor data
   JSON_Array *array = json_object_get_array( settings, "Motors");
   if ( array == NULL ) {
-    syslog(LOG_EMERG,"Failed to find \"Motor\" array in settings");
-    printf("Failed to find \"Motor\" array in settings\n");
+    Msg->Log(EventMsg::ERROR, "Failed to find \"Motor\" array in settings");
     return ;
   }
 

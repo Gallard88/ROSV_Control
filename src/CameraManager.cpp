@@ -22,32 +22,37 @@
  THE SOFTWARE.
 */
 // *******************************************************************************************
-#include <syslog.h>
 #include <cstring>
 
 #include "CameraManager.h"
+#include "EventMessages.h"
 
 using namespace std;
 
 #define CAMMAN_SC_SIZE 4096
 
+static EventMsg *Msg;
+
 // *******************************************************************************************
 CameraManager::CameraManager(const char *filename):
   StartTime(0)
 {
+  if ( Msg == NULL ) {
+    Msg = EventMsg::Init();
+  }
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
 
   if ( rv != JSONObject ) {
-    syslog(LOG_EMERG, "Camera: JSON Parse file failed\n");
+    Msg->Log(EventMsg::ERROR,"Camera: JSON Parse file failed");
     json_value_free (val);
     return;
   }
 
   JSON_Object *settings = json_value_get_object(val);
   if ( settings == NULL ) {
-    syslog(LOG_EMERG, "Camera: Settings == NULL\n");
+    Msg->Log(EventMsg::ERROR,"Camera: Settings == NULL");
     json_value_free (val);
     return;
   }
@@ -56,14 +61,14 @@ CameraManager::CameraManager(const char *filename):
   if ( ptr != NULL ) {
     asprintf(&StartSc, "%s",  ptr);
   } else {
-    syslog(LOG_EMERG, "\"Start\" script not found");
+    Msg->Log(EventMsg::ERROR,"\"Start\" script not found");
   }
 
   ptr = json_object_get_string (settings, "Stop");
   if ( ptr != NULL ) {
     asprintf(&StopSc, "%s",  ptr);
   } else {
-    syslog(LOG_EMERG, "\"Stop\" script not found");
+    Msg->Log(EventMsg::ERROR,"\"Stop\" script not found");
   }
   json_value_free (val);
 }
@@ -85,14 +90,13 @@ void CameraManager::Start(const char *ip)
 //  if ( pid == 0 ) {
   char *cmd;
   asprintf(&cmd, "%s %s &", StartSc, ip);
-  syslog(LOG_EMERG, "Start Script:= %s", cmd);
+  Msg->Log(EventMsg::ERROR,"Start Script:= %s", cmd);
   if ( system(cmd) < 0 ) {
-    syslog(LOG_EMERG,"CameraManager: exec failed");
+    Msg->Log(EventMsg::ERROR,"CameraManager: exec failed");
   }
   free(cmd);
 //    exit(-1);
 //  } else  if ( pid < 0 ) {
-//    syslog(LOG_EMERG, "CameraManager: Failed to fork");
 //    exit(-1);
 //  }
   StartTime = time(NULL);
@@ -117,16 +121,16 @@ void CameraManager::Stop(void)
 // *******************************************************************************************
 void CameraManager::Update(const char *packet, JSON_Object *msg)
 {
-  syslog(LOG_EMERG, "Msg\n");
+  Msg->Log(EventMsg::ERROR, "Msg");
   const char *rec_type = json_object_get_string(msg, "RecordType");
   if ( rec_type == NULL ) {
     return;
   }
   if ( strcmp(rec_type, "Start") == 0 ) {
     this->Start(json_object_get_string(msg, "IP"));
-    syslog(LOG_EMERG, "Camera Start\n");
+    Msg->Log(EventMsg::ERROR,"Camera Start");
   }  else {
-    syslog(LOG_EMERG, "Cam record: %s\n", rec_type);
+    Msg->Log(EventMsg::ERROR, "Cam record: %s", rec_type);
   }
 }
 

@@ -1,7 +1,6 @@
 
-#include <syslog.h>
-
 #include "Alarm.h"
+#include "EventMessages.h"
 
 using namespace std;
 
@@ -11,11 +10,16 @@ const char *SeverityNames[3] = {
   "Error"
 };
 
+static EventMsg *Msg;
+
 Alarm::Alarm(string name_, bool mutable_, bool latching_):
   Name(name_), State(CLEAR),
   Muteable(mutable_), Latching(latching_),
   Muted(false)
 {
+  if ( Msg == NULL ) {
+    Msg = EventMsg::Init();
+  }
 }
 
 Alarm::~Alarm()
@@ -80,7 +84,7 @@ void Alarm::SetState(Severity_t s)
   this->Muted = false;
 
   // Record state change.
-  syslog(LOG_NOTICE, "Alarm %s => %s (%s)", Name.c_str(), SeverityNames[State], SeverityNames[old]);
+  Msg->Log(EventMsg::NOTICE, "Alarm %s => %s (%s)", Name.c_str(), SeverityNames[State], SeverityNames[old]);
 }
 
 void Alarm::SetClear(void)
@@ -107,7 +111,7 @@ void Alarm::SetMuted(void)
     // and alarm is NOT clear
     this->Muted = true;
     // record that alarm has been muted.
-    syslog(LOG_NOTICE, "Alarm %s (%s) muted", Name.c_str(), SeverityNames[State]);
+    Msg->Log(EventMsg::NOTICE, "Alarm %s (%s) muted", Name.c_str(), SeverityNames[State]);
   }
 }
 
@@ -115,6 +119,9 @@ void Alarm::SetMuted(void)
 AlarmGroup::AlarmGroup(std::string name):
   Name(name), GroupState(Alarm::Severity_t::CLEAR)
 {
+  if ( Msg == NULL ) {
+    Msg = EventMsg::Init();
+  }
 }
 
 AlarmGroup::AlarmGroup()
@@ -136,13 +143,13 @@ void AlarmGroup::SetName(std::string name)
 void AlarmGroup::AddAlarm(std::shared_ptr<const Alarm> alm)
 {
   AlarmList.push_back(alm);
-  syslog(LOG_NOTICE, "Alarm %s added to Group %s ", alm->GetName().c_str(), Name.c_str());
+  Msg->Log(EventMsg::NOTICE, "Alarm %s added to Group %s ", alm->GetName().c_str(), Name.c_str());
 }
 
 void AlarmGroup::add(const AlarmGroup & alarm)
 {
   this->AlarmList.insert(this->AlarmList.end(), alarm.AlarmList.begin(), alarm.AlarmList.end());
-  syslog(LOG_NOTICE, "AlarmGroup %s copied into %s ", alarm.Name.c_str(), this->Name.c_str());
+  Msg->Log(EventMsg::NOTICE, "AlarmGroup %s copied into %s ", alarm.Name.c_str(), this->Name.c_str());
 }
 
 Alarm::Severity_t AlarmGroup::GetGroupState(void)
@@ -170,7 +177,7 @@ Alarm::Severity_t AlarmGroup::GetGroupState(void)
   }
 
   if ( GroupState != global ) {
-    syslog(LOG_NOTICE, "Alarm Group %s => %s", Name.c_str(), SeverityNames[global]);
+    Msg->Log(EventMsg::NOTICE, "Alarm Group %s => %s", Name.c_str(), SeverityNames[global]);
     GroupState = global;
   }
   return global;
