@@ -48,10 +48,10 @@ public:
     Msg->Log(EventMsg::NOTICE, "Task %s: Deadline missed", name.c_str());
   }
   void Deadline_Recovered(const std::string & name) {
-    Msg->Log(EventMsg::NOTICE,"Task %s: Deadline recovered\n", name.c_str());
+    Msg->Log(EventMsg::NOTICE,"Task %s: Deadline recovered", name.c_str());
   }
   void Duration_Overrun(const std::string & name) {
-    Msg->Log(EventMsg::NOTICE, "Task %s: Duration overrun\n", name.c_str());
+    Msg->Log(EventMsg::NOTICE, "Task %s: Duration overrun", name.c_str());
   }
 };
 

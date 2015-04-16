@@ -116,7 +116,7 @@ const std::string EventMsg::GetData(void)
     msg += "\"";
     msg += Messages[i];
     msg += "\"";
-    if (( i > 1 ) && ( i < (size-1))) {
+    if (( size > 1 ) && ( i < (size-1))) {
       msg += ", ";
     }
   }
