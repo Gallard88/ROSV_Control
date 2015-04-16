@@ -148,6 +148,7 @@ static void Init_Modules(void)
   PManager = new PermGroupManager();
   SubProt->AddModule("PermissionManager", (CmdModule *) PManager );
 
+  SubProt->AddModule("Messages", (CmdModule *) EventMsg::Init() );
 
   // Wire up alarms
   MotorControl->Add(Power->getVoltAlarmGroup());
