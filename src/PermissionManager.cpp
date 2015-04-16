@@ -2,7 +2,8 @@
 
 using namespace std;
 
-PermGroupManager::PermGroupManager()
+PermGroupManager::PermGroupManager():
+  LastState(false)
 {
   SetName("PermissionManager");
 }
@@ -13,7 +14,11 @@ PermGroupManager::~PermGroupManager()
 
 void PermGroupManager::Check(void)
 {
-  PacketTime = time(NULL);
+  bool s = isGroupEnabled();
+  if ( s != LastState ) {
+    FlagReady();
+    LastState = s;
+  }
 }
 
 

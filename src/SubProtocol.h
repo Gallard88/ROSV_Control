@@ -32,9 +32,9 @@
 #include "TcpServer.h"
 
 struct Modules {
-  std::string Name;
-  time_t      PTime;
-  CmdModule  *module;
+  std::string  Name;
+  unsigned int PTime;
+  CmdModule   *module;
 };
 
 //*******************************************************************************************

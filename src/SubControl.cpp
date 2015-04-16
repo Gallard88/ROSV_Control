@@ -119,7 +119,7 @@ const float MOT_SCALE = 100.0;
 
 void SubControl::UpdateControlVector(const ControlVector & vec)
 {
-  PacketTime = time(NULL);
+  FlagReady();
   Velocity = vec;
 }
 

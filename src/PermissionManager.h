@@ -17,7 +17,7 @@ public:
   const std::string GetData(void);
 
 private:
-
+  bool LastState;
 };
 
 #endif

@@ -89,7 +89,6 @@ void SubProtocol::Run(struct timeval timeout)
   if ( fd >= 0 ) {
     Handles.push_back(fd);
     ResetPacketTime();
-    PacketTime = time(NULL);
   }
 
   try {
@@ -101,7 +100,7 @@ void SubProtocol::Run(struct timeval timeout)
     }
   } catch (int ex ) {
     Handles.erase (Handles.begin()+i);
-    PacketTime = time(NULL);
+    FlagReady();
   }
 
   if ( Handles.size() != 0 ) {
@@ -126,8 +125,8 @@ void SubProtocol::SendUpdatedData(void)
    * and send it to each DataSouce.
    */
   for ( size_t j = 0; j < Modules.size(); j ++ ) {
-    if ( Modules[j].PTime != Modules[j].module->PacketTime ) {
-      Modules[j].PTime = Modules[j].module->PacketTime;
+    if ( Modules[j].PTime != Modules[j].module->GetPacketTime() ) {
+      Modules[j].PTime = Modules[j].module->GetPacketTime();
 
       string msg;
       msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
@@ -150,7 +149,7 @@ void SubProtocol::SendMsg(const string & msg)
     }
 
   } catch (int e) {
-    PacketTime = time(NULL);
+    FlagReady();
     Handles.erase(Handles.begin()+i);
   }
 }

@@ -26,22 +26,30 @@
 #define __CMD_MODULE__
 //*******************************************************************************************
 #include <string>
-#include <sys/time.h>
-
-#include "parson.h"
+#include <parson.h>
 
 //*******************************************************************************************
 class CmdModule {
 public:
-  CmdModule() {
-    PacketTime = 1;
+  CmdModule():
+    PacketTime(1)
+  {
   }
   virtual ~CmdModule() {
   }
 
-  time_t PacketTime;  // a var to record when the msg data was created.
+  void FlagReady() {
+    PacketTime ++;
+  }
+  unsigned int GetPacketTime() {
+    return PacketTime;
+  }
+
   virtual void Update(const char *packet, JSON_Object *msg) = 0;
   virtual const std::string GetData(void) = 0;
+
+private:
+  unsigned int PacketTime;  // a var to record when the msg data was created.
 };
 
 //*******************************************************************************************

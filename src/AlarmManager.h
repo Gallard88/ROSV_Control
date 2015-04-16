@@ -17,7 +17,7 @@ public:
   const std::string GetData(void);
 
 private:
-
+  Alarm::Severity_t LastState;
 };
 
 #endif

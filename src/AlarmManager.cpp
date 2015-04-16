@@ -2,9 +2,11 @@
 
 using namespace std;
 
-AlarmManager::AlarmManager()
+AlarmManager::AlarmManager():
+  LastState(Alarm::CLEAR)
 {
   SetName("AlarmManager");
+  FlagReady();
 }
 
 AlarmManager::~AlarmManager()
@@ -13,7 +15,11 @@ AlarmManager::~AlarmManager()
 
 void AlarmManager::Check(void)
 {
-  PacketTime = time(NULL);
+  Alarm::Severity_t s = GetGroupState();
+  if ( s != LastState ) {
+    FlagReady();
+    LastState = s;
+  }
 }
 
 void AlarmManager::Update(const char *packet, JSON_Object *msg)

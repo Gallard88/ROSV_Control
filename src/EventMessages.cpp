@@ -75,6 +75,8 @@ void EventMsg::Log(EventMsg_t type, const char *fmt, ...)
   char buf [512];
   va_list args;
 
+  FlagReady();
+
   va_start(args,fmt);
   vsnprintf(buf, sizeof(buf), fmt, args);
   va_end(args);

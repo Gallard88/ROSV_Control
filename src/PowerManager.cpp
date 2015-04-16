@@ -102,7 +102,6 @@ static Alarm::Severity_t CheckVoltage(float v)
 
 void PowerManager::Run_Task(void)
 {
-  PacketTime = time(NULL);
 
   float v[NUM_VOLTAGE_CH];
 
@@ -112,6 +111,7 @@ void PowerManager::Run_Task(void)
 
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
     if ( fabsf(Volts[i].Get() - v[i]) > 0.1 ) {
+      FlagReady();
       Volts[i].Set(v[i]);
     }
     VoltAlarms[i]->SetState(CheckVoltage(v[i]));

@@ -132,7 +132,7 @@ void LightManager::Run_Task(void)
 
 void LightManager::Update(const char *packet, JSON_Object *msg)
 {
-  PacketTime = time(NULL);
+  FlagReady();
 }
 
 const string LightManager::GetData(void)

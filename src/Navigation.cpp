@@ -41,7 +41,7 @@ void Navigation::Run_Task(void)
 void Navigation::Update(const char *packet, JSON_Object *msg)
 {
   if ( strcmp("SetVector", packet) == 0 ) {
-    PacketTime = time(NULL);
+    FlagReady();
     const char *ch = json_object_get_string(msg, "Ch");
     const char *mode = json_object_get_string(msg, "Mode");
     float value = json_object_get_number(msg, "Value");
