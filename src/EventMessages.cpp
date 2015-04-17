@@ -1,10 +1,8 @@
 
 #include <cstring>
+#include <cstdio>
 #include <syslog.h>
 #include <stdarg.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 
 #include "EventMessages.h"
@@ -91,10 +89,12 @@ void EventMsg::Log(EventMsg_t type, const char *fmt, ...)
     Messages.erase(Messages.begin());
   }
   Messages.push_back(std::string(buf));
-  int fp = open(Filename.c_str(), O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH );
-  if ( fp >= 0 ) {
-    write(fp, buf, strlen(buf));
-    close(fp);
+  FILE * fp = fopen(Filename.c_str(), "a" );
+  if ( fp != NULL ) {
+    fprintf(fp, "%s, %s\r\n", EventText[type], buf);
+    fclose(fp);
+  } else {
+    perror("open()");
   }
 }
 
