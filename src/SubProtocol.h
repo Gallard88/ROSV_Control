@@ -30,6 +30,7 @@
 #include "Permissions.h"
 #include "CmdModule.h"
 #include "TcpServer.h"
+#include "ClientSocket.h"
 
 struct Modules {
   std::string  Name;
@@ -52,10 +53,10 @@ protected:
 
 private:
   std::vector<struct Modules>  Modules;
-  std::vector<int>             Handles;
   TcpServer                   *Server;
   std::shared_ptr<Permission>  PermClient;
   PermissionGroup              PermGroup;
+  std::vector<ClientSocket::Client_Ptr> Clients;
 
   void ResetPacketTime(void);
   void Update(const char *packet, JSON_Object *msg);

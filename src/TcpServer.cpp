@@ -21,11 +21,9 @@
  THE SOFTWARE.
 */
 
-using namespace std;
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
 
@@ -33,11 +31,7 @@ using namespace std;
 
 #define MAX_FP(a, b)  b = (a > b)? a : b
 
-const int TcpServer_WriteEx = 1;
-const int TcpServer_HandleNotFound = 2;
-
-
-TcpServer::TcpServer(int port): NextFd(0)
+TcpServer::TcpServer(int port)
 {
   struct sockaddr_in serv_addr;
 
@@ -60,33 +54,34 @@ TcpServer::~TcpServer(void)
 {
   shutdown(listen_fd, 2);
   close(listen_fd);
-
-for ( auto& c: Clients) {
-    if ( c.second.File >= 0 ) {
-      close(c.second.File);
-      c.second.File = -1;
-    }
-  }
-  Clients.clear();
+  Clients.erase(Clients.begin(), Clients.end());
 }
 
 /* ======================== */
-int TcpServer::Listen(struct timeval timeout)
+ClientSocket::Client_Ptr TcpServer::Listen(struct timeval timeout)
 {
+  ClientSocket::Client_Ptr ptr = NULL;
   fd_set readfs;
   int fp, new_fp = -1;
 
   // start by pruning old dead clients.
-  CleanMap();
+  for ( size_t i = 0; i < Clients.size(); i ++ ) {
+    if ( Clients[i]->isConnected() == false ) {
+      Clients.erase(Clients.begin() + i );
+      break;
+    }
+  }
 
   FD_ZERO(&readfs);
   FD_SET(listen_fd, &readfs);
   int max_fp = listen_fd;
 
-for ( auto& c: Clients) {
-    fp = c.second.File;
-    FD_SET(fp, &readfs);
-    MAX_FP(fp, max_fp);
+for ( auto& c: Clients ) {
+    if ( c->isConnected() == true ) {
+      fp = c->getFp();
+      FD_SET(fp, &readfs);
+      MAX_FP(fp, max_fp);
+    }
   }
 
   if ( select(max_fp+1, &readfs, NULL, NULL, &timeout) > 0 ) {
@@ -95,96 +90,23 @@ for ( auto& c: Clients) {
       new_fp = accept(listen_fd, (struct sockaddr *) &cli_addr, &clilen);
 
       if ( new_fp >= 0 ) {
-        struct TcpClient client;
-        client.Name = string(inet_ntoa(cli_addr.sin_addr));
-        client.File = new_fp;
-        Clients[NextFd] = client;
-        new_fp = NextFd;
-        NextFd++;
+        ClientSocket::Client_Ptr p(new ClientSocket(std::string(inet_ntoa(cli_addr.sin_addr)), new_fp));
+        Clients.push_back(p);
+        ptr = p;
       }
     }
-for ( auto& c: Clients) {
-      fp = c.second.File;
-      if ( FD_ISSET(fp, &readfs)) {
-        char data[8192];
-        int n = read(fp, data, sizeof(data)-1);
-
-        if ( n <= 0 ) {
-          close(c.second.File);
-          c.second.File = -1;
-
-        } else {
-          data[n] = 0;
-          c.second.Buffer += string(data);
+for ( auto& c: Clients ) {
+      if ( c->isConnected() == true ) {
+        fp = c->getFp();
+        if ( FD_ISSET(fp, &readfs)) {
+          c->ReadData();
         }
       }
     }
   }
 
-  return new_fp;
+  return ptr;
 }
 
 /* ======================== */
 /* ======================== */
-
-void TcpServer::Write(int handle, const string & msg)
-{
-  if (( Clients.find(handle) == Clients.end()) ||
-      ( Clients[handle].File < 0 )) {
-    throw TcpServer_HandleNotFound;
-  }
-
-  int n = write(Clients[handle].File, msg.c_str(), msg.size());
-  if ( n <= 0 ) {
-
-    close(Clients[handle].File);
-    Clients[handle].File = 1;
-    throw TcpServer_WriteEx;
-  }
-}
-
-bool TcpServer::Handle_ReadLine(int handle, string & line)
-{
-  if (( Clients.find(handle) == Clients.end()) ||
-      ( Clients[handle].File < 0 )) {
-    throw TcpServer_HandleNotFound;
-  }
-
-  while ( Clients[handle].Buffer.size() != 0 ) {
-    size_t found = Clients[handle].Buffer.find_first_of("\r\n");
-
-    if ( found != string::npos) {
-
-      line = Clients[handle].Buffer.substr(0, found);
-      Clients[handle].Buffer.erase(0, found+1);
-
-      if ( line.length())
-        return true;
-    }
-  }
-  return false;
-}
-
-string TcpServer::GetHandleName(int handle)
-{
-  if ( Clients.find(handle) == Clients.end()) {
-    return "";
-  }
-  return Clients[handle].Name;
-}
-
-void TcpServer::CleanMap(void)
-{
-for ( auto& c: Clients) {
-    if ( c.second.File == -1 ) {
-      c.second.Buffer.clear();
-      Clients.erase(c.first);
-      break;
-    }
-  }
-}
-
-
-/* ======================== */
-/* ======================== */
-

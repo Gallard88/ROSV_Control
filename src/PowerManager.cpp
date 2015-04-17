@@ -108,10 +108,10 @@ void PowerManager::Run_Task(void)
   v[0] = PWM_GetVoltage(Pwm);
   v[1] = PMon_GetVoltage(PMon, 0);
   v[2] = PMon_GetVoltage(PMon, 1);
+  FlagReady();
 
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
     if ( fabsf(Volts[i].Get() - v[i]) > 0.1 ) {
-      FlagReady();
       Volts[i].Set(v[i]);
     }
     VoltAlarms[i]->SetState(CheckVoltage(v[i]));

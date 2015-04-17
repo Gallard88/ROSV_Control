@@ -59,6 +59,7 @@ SubProtocol::SubProtocol()
 // *******************************************************************************************
 SubProtocol::~SubProtocol()
 {
+  Clients.erase(Clients.begin(), Clients.end());
 }
 
 // *******************************************************************************************
@@ -82,31 +83,35 @@ const PermissionGroup &SubProtocol::getPermGroup() const
 // *******************************************************************************************
 void SubProtocol::Run(struct timeval timeout)
 {
-  int fd;
   size_t i;
 
-  fd = Server->Listen(timeout);
-  if ( fd >= 0 ) {
-    Handles.push_back(fd);
+  for ( i = 0; i < Clients.size(); i ++ ) {
+    if ( Clients[i]->isConnected() == false ) {
+      Clients.erase(Clients.begin() + i);
+      break;
+    }
+  }
+
+  ClientSocket::Client_Ptr p;
+  p = Server->Listen(timeout);
+  if ( p != NULL ) {
+    Clients.push_back(p);
     ResetPacketTime();
   }
 
-  try {
-    string l;
-    for ( i = 0; i < Handles.size(); i ++ ) {
-      while ( Server->Handle_ReadLine(Handles[i], l) == true ) {
-        ProcessLine(l);
-      }
+  string l;
+  for ( i = 0; i < Clients.size(); i ++ ) {
+    while ( Clients[i]->Read(l) == true ) {
+      ProcessLine(l);
     }
-  } catch (int ex ) {
-    Handles.erase (Handles.begin()+i);
-    FlagReady();
   }
 
-  if ( Handles.size() != 0 ) {
+  if ( Clients.size() != 0 ) {
     SendUpdatedData();
+    PermClient->Set(true);
+  } else {
+    PermClient->Set(false);
   }
-  PermClient->Set(Handles.size() != 0? true: false);
 }
 
 // *******************************************************************************************
@@ -141,16 +146,8 @@ void SubProtocol::SendUpdatedData(void)
 void SubProtocol::SendMsg(const string & msg)
 {
   size_t i;
-
-  try {
-
-    for ( i = 0; i < Handles.size(); i ++ ) {
-      Server->Write(Handles[i], msg);
-    }
-
-  } catch (int e) {
-    FlagReady();
-    Handles.erase(Handles.begin()+i);
+  for ( i = 0; i < Clients.size(); i ++ ) {
+    Clients[i]->Send( msg);
   }
 }
 
@@ -166,12 +163,12 @@ const string SubProtocol::GetData(void)
 
   msg += "\"RecordType\":\"Clients\", ";
   msg += "\"Values\":[ ";
-  for ( size_t i = 0; i < Handles.size(); i ++ ) {
+  for ( size_t i = 0; i < Clients.size(); i ++ ) {
     msg += "{ \"ip\":\"";
-    msg += string(Server->GetHandleName(Handles[i]));
+    msg += string(Clients[i]->GetName());
     msg += "\"} ";
 
-    if (( Handles.size() > 1 ) && ( i <  (Handles.size()-1))) {
+    if (( Clients.size() > 1 ) && ( i <  (Clients.size()-1))) {
       msg += ", ";
     }
   }
@@ -206,7 +203,7 @@ void SubProtocol::ProcessLine(string line)
 // *******************************************************************************************
 int SubProtocol::GetNumClients(void) const
 {
-  return Handles.size();
+  return Clients.size();
 }
 
 // *******************************************************************************************

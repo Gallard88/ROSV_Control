@@ -26,22 +26,13 @@
 #define __TCPSERVER__
 
 /* ======================== */
-#include <string>
-#include <map>
+#include <vector>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-
-struct TcpClient {
-  std::string Name;
-  int File;
-  std::string Buffer;
-};
-
-extern const int TcpServer_WriteEx;
-extern const int TcpServer_HandleNotFound;
+#include "ClientSocket.h"
 
 /* ======================== */
 class TcpServer {
@@ -49,20 +40,13 @@ public:
   TcpServer(int port);
   virtual ~TcpServer(void);
 
-  int Listen(struct timeval timeout);
-
-  std::string GetHandleName(int handle);
-  bool Handle_ReadLine(int handle, std::string & line);
-  void Write(int handle, const std::string & msg);
+  ClientSocket::Client_Ptr Listen(struct timeval timeout);
 
 private:
   struct sockaddr_in cli_addr;
   int listen_fd;
-  int NextFd;
 
-  std::map<int, struct TcpClient> Clients;
-  void CleanMap(void);
-
+  std::vector<ClientSocket::Client_Ptr>  Clients;
 };
 
 /* ======================== */

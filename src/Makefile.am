@@ -28,6 +28,8 @@ ROSV_Control_SOURCES = \
 	AlarmManager.h \
 	CameraManager.cpp \
 	CameraManager.h \
+	ClientSocket.cpp \
+	ClientSocket.h \
 	CmdModule.h \
 	EventMessages.cpp \
 	EventMessages.h \
