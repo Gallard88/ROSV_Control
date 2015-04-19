@@ -38,7 +38,7 @@
 //*******************************************************************************************
 #define NUM_VOLTAGE_CH  3
 //*******************************************************************************************
-class  PowerManager: CmdModule, RTT_Interface {
+class  PowerManager: CmdModule, RealTime::Task_Interface {
 
 public:
   PowerManager(const char * filename, PWM_Con_t p);

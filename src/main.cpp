@@ -20,6 +20,7 @@
 #include "EventMessages.h"
 
 using namespace std;
+using namespace RealTime;
 
 /* ======================== */
 /* ======================== */
@@ -33,7 +34,7 @@ LightManager     *LightMan;
 CameraManager    *CamMan;
 PowerManager     *Power;
 Navigation       *Nav;
-RT_TaskManager    TaskMan;
+RT_TaskManager   *TaskMan;
 AlarmManager     *AlmManager;
 PermGroupManager *PManager;
 EventMsg         *Msg;
@@ -42,7 +43,7 @@ EventMsg         *Msg;
 volatile bool RunSystem;
 
 /* ======================== */
-class MainCallBack: public RT_TaskMan_Interface {
+class MainCallBack: public RealTime::Reporting_Interface {
 public:
   void Deadline_Missed(const std::string & name) {
     Msg->Log(EventMsg::NOTICE, "Task %s: Deadline missed", name.c_str());
@@ -52,6 +53,14 @@ public:
   }
   void Duration_Overrun(const std::string & name) {
     Msg->Log(EventMsg::NOTICE, "Task %s: Duration overrun", name.c_str());
+  }
+  void Statistics(const std::string & name, RealTimeTask::Statistics_t stats) {
+    Msg->Log(EventMsg::NOTICE, "========================" );
+    Msg->Log(EventMsg::NOTICE, "Task %s", name.c_str() );
+    Msg->Log(EventMsg::NOTICE, "   Min  = %u", stats.Min );
+    Msg->Log(EventMsg::NOTICE, "   Max  = %u", stats.Max );
+//    Msg->Log(EventMsg::NOTICE, "   Avg  = %u", stats.Avg );
+    Msg->Log(EventMsg::NOTICE, "   Call = %u", stats.Called );
   }
 };
 
@@ -75,6 +84,7 @@ void SignalHandler_Setup(void)
 void System_Shutdown(void)
 {
   RunSystem = false;
+  delete TaskMan;
   if ( Power != NULL ) {
     delete Power;
   }
@@ -101,46 +111,47 @@ static void Init_Modules(void)
 {
   RealTimeTask *task;
 
-  TaskMan.AddCallback((RT_TaskMan_Interface *)&TaskCallback);
+  TaskMan = new RT_TaskManager();
+  TaskMan->AddCallback((Reporting_Interface *)&TaskCallback);
 
   SubProt = new SubProtocol();
 
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
-  task = new RealTimeTask("Motor", (RTT_Interface *) MotorControl);
+  task = new RealTimeTask("Motor", (Task_Interface *) MotorControl);
   task->SetFrequency(10);
-  task->SetMaxDuration(50);
-  TaskMan.AddTask(task);
+  task->SetMaxDuration_Ms(50);
+  TaskMan->AddTask(task);
 
   Nav = new Navigation("/etc/ROSV_Control/navigation.json");
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
   Nav->SetUpdateInterface((NavUpdate_Interface *) MotorControl);
-  task = new RealTimeTask("Navigation", (RTT_Interface *) Nav);
+  task = new RealTimeTask("Navigation", (Task_Interface *) Nav);
   task->SetFrequency(10);
-  task->SetMaxDuration(50);
-  TaskMan.AddTask(task);
+  task->SetMaxDuration_Ms(50);
+  TaskMan->AddTask(task);
 
   LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;
   SubProt->AddModule("Light",      (CmdModule *) LightMan );
-  task = new RealTimeTask("Light", (RTT_Interface *) LightMan);
+  task = new RealTimeTask("Light", (Task_Interface *) LightMan);
   task->SetFrequency(1);
-  task->SetMaxDuration(50);
-  TaskMan.AddTask(task);
+  task->SetMaxDuration_Ms(50);
+  TaskMan->AddTask(task);
 
   Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
   SubProt->AddModule("Power",      (CmdModule *) Power );
-  task = new RealTimeTask("Power", (RTT_Interface *) Power);
+  task = new RealTimeTask("Power", (Task_Interface *) Power);
   task->SetFrequency(1);
-  task->SetMaxDuration(100);
-  TaskMan.AddTask(task);
+  task->SetMaxDuration_Ms(100);
+  TaskMan->AddTask(task);
 
   CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
   SubProt->AddModule("Camera",     (CmdModule *) CamMan );
-  task = new RealTimeTask("Camera", (RTT_Interface *) CamMan);
+  task = new RealTimeTask("Camera", (Task_Interface *) CamMan);
   task->SetFrequency(1);
-  task->SetMaxDuration(50);
-  TaskMan.AddTask(task);
+  task->SetMaxDuration_Ms(50);
+  TaskMan->AddTask(task);
 
   AlmManager = new AlarmManager();
   SubProt->AddModule("AlarmManager", (CmdModule *) AlmManager );
@@ -222,7 +233,7 @@ int main (int argc, char *argv[])
   /* --------------------------------------------- */
   while ( RunSystem ) {
 
-    long time = TaskMan.RunTasks();
+    long time = TaskMan->RunTasks();
 
     // read data from connected clients.
     if ( time > 0 ) {

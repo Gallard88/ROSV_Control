@@ -37,7 +37,7 @@
 #include "Alarm.h"
 #include "Permissions.h"
 
-class SubControl: CmdModule, RTT_Interface, NavUpdate_Interface {
+class SubControl: CmdModule, RealTime::Task_Interface, NavUpdate_Interface {
 public:
   SubControl(const char *filename);
   ~SubControl();

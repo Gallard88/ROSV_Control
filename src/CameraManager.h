@@ -30,7 +30,7 @@
 #include "parson.h"
 
 //*******************************************************************************************
-class CameraManager: CmdModule, RTT_Interface {
+class CameraManager: CmdModule, RealTime::Task_Interface {
 public:
   CameraManager(const char *filename);
   virtual ~CameraManager();

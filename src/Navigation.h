@@ -28,7 +28,7 @@ public:
 
 //  *******************************************************************************************
 
-class Navigation: CmdModule, RTT_Interface {
+class Navigation: CmdModule, RealTime::Task_Interface {
 
 public:
   Navigation(const char *filename);

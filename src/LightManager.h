@@ -46,7 +46,7 @@ typedef struct  {
 
 //*******************************************************************************************
 
-class  LightManager: CmdModule, RTT_Interface {
+class  LightManager: CmdModule, RealTime::Task_Interface {
 public:
   LightManager(const char * filename);
   ~LightManager();
