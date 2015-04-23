@@ -11,7 +11,6 @@ class EventMsg: CmdModule
 public:
   static EventMsg * Init();
 
-  void sendToSyslog(const char *name);
   void sendToTerminal(bool en);
   void setFilename(const std::string & filename);
   void setLogDepth(int log_depth);

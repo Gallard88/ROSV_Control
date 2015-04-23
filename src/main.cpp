@@ -181,9 +181,8 @@ int main (int argc, char *argv[])
 {
 
   Msg = EventMsg::Init();
-  Msg->sendToSyslog("ROSV_Control");
   Msg->setFilename("/home/pi/ROSV_Log.txt");
-  Msg->setLogDepth(20);
+  Msg->setLogDepth(5);
   Msg->Log(EventMsg::NOTICE, "Starting Program");
 
 

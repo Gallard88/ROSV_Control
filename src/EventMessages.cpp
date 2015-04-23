@@ -1,15 +1,17 @@
 
 #include <cstring>
 #include <cstdio>
-#include <syslog.h>
 #include <stdarg.h>
-
+#include <mutex>
+#include <ctime>
+#include <sys/time.h>
 
 #include "EventMessages.h"
 
 using namespace std;
 
 static EventMsg * EventPtr = NULL;
+std::mutex Mtx;
 
 EventMsg::EventMsg():
   PrintSyslog(true), PrintTerminal(true),
@@ -29,28 +31,12 @@ const char *EventText[] = {
   "Error"   //  ERROR
 };
 
-const int Syslog_Types[] = {
-  LOG_DEBUG,   //  DEBUG,
-  LOG_INFO,    //  INFO,
-  LOG_NOTICE,  //  NOTICE,
-  LOG_WARNING, //  WARN,
-  LOG_EMERG    //  ERROR
-};
-
 EventMsg *EventMsg::Init()
 {
   if ( EventPtr == NULL ) {
     EventPtr = new EventMsg();
   }
   return EventPtr;
-}
-
-void EventMsg::sendToSyslog(const char *name)
-{
-  if ( PrintSyslog != true ) {
-    PrintSyslog = true;
-    openlog(name, LOG_PID, LOG_USER);
-  }
 }
 
 void EventMsg::sendToTerminal(bool en)
@@ -71,6 +57,7 @@ void EventMsg::setLogDepth(int log_depth)
 void EventMsg::Log(EventMsg_t type, const char *fmt, ...)
 {
   char buf [512];
+  char text [512];
   va_list args;
 
   FlagReady();
@@ -79,23 +66,33 @@ void EventMsg::Log(EventMsg_t type, const char *fmt, ...)
   vsnprintf(buf, sizeof(buf), fmt, args);
   va_end(args);
 
-  if ( PrintSyslog == true ) {
-    syslog(Syslog_Types[type], buf);
-  }
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  struct tm tm = *localtime(&tv.tv_sec);
+
+  snprintf(text, sizeof(text), "%04d-%02d-%02d, %02d:%02d:%02d.%03d, %s, %s\r",
+           tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+           tm.tm_hour, tm.tm_min, tm.tm_sec, (int)(tv.tv_usec / 1000),
+           EventText[type], buf );
+
+  Mtx.lock();
   if ( PrintTerminal == true ) {
-    printf("%s, %s\n", EventText[type], buf);
+    puts(text);
   }
   if ( Messages.size() >= Num_Msgs) {
     Messages.erase(Messages.begin());
   }
-  Messages.push_back(std::string(buf));
+  Messages.push_back(std::string(text));
+
   FILE * fp = fopen(Filename.c_str(), "a" );
   if ( fp != NULL ) {
-    fprintf(fp, "%s, %s\r\n", EventText[type], buf);
+    fwrite(text, strlen(text), 1, fp);
+    fputs("\n", fp);
     fclose(fp);
   } else {
     perror("open()");
   }
+  Mtx.unlock();
 }
 
 /* ============================================ */
