@@ -52,7 +52,7 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
   }
 
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
-    Volts[i].SetName(VoltNames[i]);
+    Volts[i].SetName("Volt", VoltNames[i]);
 
     std::shared_ptr<Alarm> a(new Alarm(VoltNames[i], false, true));
     VoltAlarms[i] = a;
@@ -60,7 +60,7 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
   }
 
 
-  Temp.SetName("Pwm_Temp");
+  Temp.SetName("Temp", "Pwm_Temp");
   std::shared_ptr<Alarm> t(new Alarm("Pwm_Temp", false, true));
   TempAlarms = t;
   TempGroup.AddAlarm(std::const_pointer_cast<const Alarm>(TempAlarms));

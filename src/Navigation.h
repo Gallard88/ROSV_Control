@@ -2,11 +2,9 @@
 #ifndef __NAVIGATION__
 #define __NAVIGATION__
 //  *******************************************************************************************
-#include <string>
-
 #include <RTT_Interface.h>
 #include "CmdModule.h"
-#include "Logger.h"
+#include "Variable.h"
 
 //  *******************************************************************************************
 typedef struct {
@@ -34,7 +32,6 @@ public:
   Navigation(const char *filename);
   void Run_Task(void);
 
-  const std::string GetConfigData(void);
   void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);
 
@@ -44,11 +41,10 @@ public:
   void SetUpdateInterface(NavUpdate_Interface *iface) { Interface = iface; }
 
 private:
-  ControlVector CVec, OldVec;
+  ControlVector CVec;
   bool newVec;
   NavUpdate_Interface *Interface;
-  time_t Record;
-  Logger Log;
+  Variable Log[4];
 };
 
 #endif

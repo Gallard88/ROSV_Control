@@ -25,9 +25,7 @@
 #ifndef __VARIABLE__
 #define __VARIABLE__
 // *******************************************************************************************
-#include <ctime>
 #include <string>
-#include "Logger.h"
 
 // *******************************************************************************************
 
@@ -36,18 +34,20 @@ public:
   Variable();
   virtual ~Variable();
 
-  void SetName(const char* name);
+  void SetName(const std::string & module, const std::string & name );
+  void SetDifference(float diff);
   void Set(float v);
   float Get(void);
 
   std::string GetJSON(void);
 
 protected:
-  Logger Log;
+  std::string Module;
   std::string Name;
   float Value;
-  time_t Written;
+  float AbsDiff;
 
+  void Record(void);
 };
 
 // *******************************************************************************************

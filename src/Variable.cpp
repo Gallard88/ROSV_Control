@@ -22,14 +22,18 @@
 */
 
 //  *******************************************************************************************
-using namespace std;
-
 #include <cstdio>
+#include <ctime>
+#include <sys/time.h>
+#include <cmath>
+
 #include "Variable.h"
+
+using namespace std;
 
 //  *******************************************************************************************
 Variable::Variable():
-  Value(0.0), Written(0)
+  Value(0.0), AbsDiff(0)
 {
 }
 
@@ -42,30 +46,54 @@ string Variable::GetJSON(void)
 {
   char buf[100];
 
-  sprintf(buf, "{ \"Name\": \"%s\", \"Value\": %f }", Name.c_str(), Value );
+  snprintf(buf, sizeof(buf), "{ \"Name\": \"%s\", \"Value\": %f }", Name.c_str(), Value );
   return string(buf);
 }
 
 //  *******************************************************************************************
-void Variable::SetName(const char * name)
+void Variable::SetName(const string & module, const string & name )
 {
-  Name = string(name);
+  Module = module;
+  Name = name;
+}
+
+void Variable::SetDifference(float diff)
+{
+  AbsDiff = fabsf(diff);
 }
 
 //  *******************************************************************************************
 void Variable::Set(float v)
 {
-  time_t t = time(NULL);
-  if (( t != Written ) && ( Value != v)) {
+  if ( fabsf(Value - v) > AbsDiff ) {
     Value = v;
-    Written = t;
-    Log.RecordValue("Var", Name.c_str(), Value);
+    Record();
   }
 }
 
 float Variable::Get(void)
 {
   return Value;
+}
+
+// *******************************************************************************************
+void Variable::Record(void)
+{
+  char filename[1024];
+  snprintf(filename,  sizeof(filename), "/var/log/ROSV/%s.%s.log", Module.c_str(), Name.c_str());
+
+  FILE *fp = fopen(filename, "a+");
+  if ( fp != NULL ) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    struct tm tm = *localtime(&tv.tv_sec);
+
+    fprintf(fp, "%04d-%02d-%02d, %02d:%02d:%02d.%03d, %f\r\n",
+            tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+            tm.tm_hour, tm.tm_min, tm.tm_sec, (int)(tv.tv_usec / 1000),
+            Value);
+    fclose(fp);
+  }
 }
 
 // *******************************************************************************************

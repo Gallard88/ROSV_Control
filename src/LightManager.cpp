@@ -72,7 +72,7 @@ LightManager::LightManager(const char * filename)
       }
       const char *name = json_object_get_string (object, "Name");
       if ( name != NULL ) {
-        ch.Power.SetName(name);
+        ch.Power.SetName("Lighting", name);
       }
 
       JSON_Array *pwm_array = json_object_get_array( object, "Chanels");

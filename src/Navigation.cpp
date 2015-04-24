@@ -1,10 +1,10 @@
 //  *******************************************************************************************
 //  *******************************************************************************************
+#include <cstring>
+
+#include "Navigation.h"
 
 using namespace std;
-
-#include <cstring>
-#include "Navigation.h"
 
 //  *******************************************************************************************
 //  *******************************************************************************************
@@ -12,29 +12,16 @@ Navigation::Navigation(const char *filename):
   newVec(true)
 {
   // in time we will use this to parse a json file for system limits.
-  memset(&CVec, 0, sizeof(ControlVector));
+  CVec = { 0 };
+  Log[0].SetName("Nav", "Forward");
+  Log[1].SetName("Nav", "Strafe");
+  Log[2].SetName("Nav", "Dive");
+  Log[3].SetName("Nav", "Turn");
 }
 
 //  *******************************************************************************************
 void Navigation::Run_Task(void)
 {
-  time_t t = time(NULL);
-  if ( Record != t ) {
-    Record = t;
-    if ( OldVec.x != CVec.x ) {
-      Log.RecordValue("Nav", "Forward", CVec.x);
-    }
-    if ( OldVec.y != CVec.y ) {
-      Log.RecordValue("Nav", "Strafe",  CVec.y);
-    }
-    if ( OldVec.z != CVec.z ) {
-      Log.RecordValue("Nav", "Dive",    CVec.z);
-    }
-    if ( OldVec.yaw != CVec.yaw ) {
-      Log.RecordValue("Nav", "Turn",    CVec.yaw);
-    }
-    OldVec = CVec;
-  }
 }
 
 //  *******************************************************************************************
@@ -53,12 +40,16 @@ void Navigation::Update(const char *packet, JSON_Object *msg)
 
     if ( strcmp("Forward", ch) == 0 ) {
       CVec.x = value;
+      Log[0].Set(value);
     } else if ( strcmp("Strafe", ch) == 0 ) {
       CVec.y = value;
+      Log[1].Set(value);
     } else if ( strcmp("Dive", ch) == 0 ) {
       CVec.z = value;
+      Log[2].Set(value);
     } else if ( strcmp("Turn", ch) == 0 ) {
       CVec.yaw = value;
+      Log[3].Set(value);
     } else {
       return;
     }
