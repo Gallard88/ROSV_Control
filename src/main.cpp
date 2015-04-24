@@ -8,6 +8,8 @@
 #include <RTT_Interface.h>
 #include <RT_TaskManager.h>
 
+#include "config.h"
+
 #include "PowerManager.h"
 #include "CameraManager.h"
 #include "LightManager.h"
@@ -58,7 +60,11 @@ public:
     Msg->Log(EventMsg::NOTICE, "========================" );
     Msg->Log(EventMsg::NOTICE, "Task %s", name.c_str() );
     Msg->Log(EventMsg::NOTICE, "   Min  = %u", stats.Min );
-    Msg->Log(EventMsg::NOTICE, "   Max  = %u", stats.Max );
+    if ( stats.Max >= 1000000 ) {
+      Msg->Log(EventMsg::NOTICE, "   Max  = %u.%06u S", stats.Max / 1000000, stats.Max % 1000000 );
+    } else {
+      Msg->Log(EventMsg::NOTICE, "   Max  = %u uS", stats.Max );
+    }
 //    Msg->Log(EventMsg::NOTICE, "   Avg  = %u", stats.Avg );
     Msg->Log(EventMsg::NOTICE, "   Call = %u", stats.Called );
   }
@@ -171,6 +177,16 @@ static void Init_Modules(void)
   PManager->add(SubProt->getPermGroup());
 }
 
+static void PrintVersionInfo(void)
+{
+  char name[256];
+  gethostname(name, strlen(name));
+  Msg->Log(EventMsg::NOTICE, PACKAGE_STRING);
+  Msg->Log(EventMsg::NOTICE, PACKAGE_BUGREPORT);
+  Msg->Log(EventMsg::NOTICE, name);
+}
+
+
 /* ======================== */
 int main (int argc, char *argv[])
 {
@@ -179,6 +195,8 @@ int main (int argc, char *argv[])
   Msg->setFilename("/home/pi/ROSV_Log.txt");
   Msg->setLogDepth(5);
   Msg->Log(EventMsg::NOTICE, "Starting Program");
+
+  PrintVersionInfo();
 
 
   bool daemonise = false;
