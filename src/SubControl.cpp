@@ -21,20 +21,12 @@
  THE SOFTWARE.
 */
 // *******************************************************************************************
-#include <cstring>
-
 #include "SubControl.h"
-#include "Alarm.h"
-#include "Permissions.h"
 #include "EventMessages.h"
 
 using namespace std;
 
-const ControlVector BlankVec = { 0, 0, 0, 0, 0, 0};
-
-
-SubControl::SubControl(const char *filename):
-  Velocity(BlankVec)
+SubControl::SubControl(const char *filename)
 {
   Alarms.SetName("SubControl");
   Perm.SetName("SubControl");
@@ -75,10 +67,6 @@ SubControl::SubControl(const char *filename):
   json_value_free (val);
 }
 
-SubControl::~SubControl()
-{
-}
-
 void SubControl::Add(const AlarmGroup & group)
 {
   Alarms.add(group);
@@ -87,10 +75,6 @@ void SubControl::Add(const AlarmGroup & group)
 void SubControl::Add(const PermissionGroup & group)
 {
   Perm.add(group);
-}
-
-void SubControl::Update(const char *packet, JSON_Object *msg)
-{
 }
 
 const string SubControl::GetData(void)
@@ -109,42 +93,31 @@ const string SubControl::GetData(void)
   return msg;
 }
 
-const float MOT_SCALE = 100.0;
-#define VECTOR_X      0
-#define VECTOR_Y      1
-#define VECTOR_Z      2
-#define VECTOR_ROLL   3
-#define VECTOR_PITCH  4
-#define VECTOR_YAW    5
-
-void SubControl::UpdateControlVector(const ControlVector & vec)
+void SubControl::Update(const char *packet, JSON_Object *msg)
 {
-  FlagReady();
-  Velocity = vec;
 }
 
-void SubControl::Run_Task(void)
+const float MOT_SCALE = 100.0;
+
+void SubControl::Update(const float * update)
 {
-  float power[VECTOR_SIZE];
-  const ControlVector *v;
+  float power[vecSize];
+  size_t i;
 
   if (( Alarms.GetGroupState() == Alarm::ERROR ) ||
       ( Perm.isGroupEnabled() == false )) {
-    v = &BlankVec;
+
+    for ( i = 0; i < vecSize; i ++ ) {
+      power[i] = 0.0;
+    }
   } else {
-    v = &Velocity;
+    for ( i = 0; i < vecSize; i ++ ) {
+      power[i] = update[i] / MOT_SCALE;
+    }
   }
 
-  // run each Axes controller.
-  power[VECTOR_X]     = v->x / MOT_SCALE;
-  power[VECTOR_Y]     = v->y / MOT_SCALE;
-  power[VECTOR_Z]     = v->z / MOT_SCALE;
-  power[VECTOR_YAW]   = v->yaw   / MOT_SCALE;
-  power[VECTOR_ROLL]  = v->roll  / MOT_SCALE;
-  power[VECTOR_PITCH] = v->pitch / MOT_SCALE;
-
-  for ( size_t i = 0; i < MotorList.size(); i ++ ) {
-
+  for ( i = 0; i < MotorList.size(); i ++ ) {
     MotorList[i].Run(power);
   }
+  FlagReady();
 }

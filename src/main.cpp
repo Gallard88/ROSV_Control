@@ -118,14 +118,9 @@ static void Init_Modules(void)
 
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
-  task = new RealTimeTask("Motor", (Task_Interface *) MotorControl);
-  task->SetFrequency(10);
-  task->SetMaxDuration_Ms(50);
-  TaskMan->AddTask(task);
 
-  Nav = new Navigation("/etc/ROSV_Control/navigation.json");
+  Nav = new Navigation(MotorControl);
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
-  Nav->SetUpdateInterface((NavUpdate_Interface *) MotorControl);
   task = new RealTimeTask("Navigation", (Task_Interface *) Nav);
   task->SetFrequency(10);
   task->SetMaxDuration_Ms(50);

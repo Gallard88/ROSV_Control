@@ -8,10 +8,9 @@ using namespace std;
 
 //  *******************************************************************************************
 //  *******************************************************************************************
-Navigation::Navigation(const char *filename):
-  newVec(true)
+Navigation::Navigation(SubControl * motors):
+  Motors(motors)
 {
-  // in time we will use this to parse a json file for system limits.
   CVec = { 0 };
   Log[0].SetName("Nav", "Forward");
   Log[1].SetName("Nav", "Strafe");
@@ -22,6 +21,16 @@ Navigation::Navigation(const char *filename):
 //  *******************************************************************************************
 void Navigation::Run_Task(void)
 {
+  float update_vector[SubControl::vecSize];
+
+  update_vector[SubControl::vecX] = CVec.x;
+  update_vector[SubControl::vecY] = CVec.y;
+  update_vector[SubControl::vecZ] = CVec.z;
+  update_vector[SubControl::vecROLL]  = CVec.roll;
+  update_vector[SubControl::vecPITCH] = CVec.pitch;
+  update_vector[SubControl::vecYAW]   = CVec.yaw;
+
+  Motors->Update(update_vector);
 }
 
 //  *******************************************************************************************
@@ -50,13 +59,8 @@ void Navigation::Update(const char *packet, JSON_Object *msg)
     } else if ( strcmp("Turn", ch) == 0 ) {
       CVec.yaw = value;
       Log[3].Set(value);
-    } else {
-      return;
     }
-    if ( Interface != NULL ) {
-      Interface->UpdateControlVector(CVec);
-    }
-    newVec = true;
+    Run_Task();
   }
 }
 
@@ -82,14 +86,8 @@ const string Navigation::GetData(void)
 }
 
 //  *******************************************************************************************
-bool Navigation::NewVector(void)
-{
-  return newVec;
-}
-
 ControlVector Navigation::GetVector(void)
 {
-  newVec = false;
   return CVec;
 }
 

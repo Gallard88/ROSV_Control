@@ -5,6 +5,7 @@
 #include <RTT_Interface.h>
 #include "CmdModule.h"
 #include "Variable.h"
+#include "SubControl.h"
 
 //  *******************************************************************************************
 typedef struct {
@@ -18,18 +19,12 @@ typedef struct {
 } ControlVector;
 
 //  *******************************************************************************************
-class NavUpdate_Interface {
-
-public:
-  virtual void UpdateControlVector(const ControlVector & vec) = 0;
-};
-
 //  *******************************************************************************************
 
 class Navigation: CmdModule, RealTime::Task_Interface {
 
 public:
-  Navigation(const char *filename);
+  Navigation(SubControl * motors);
   void Run_Task(void);
 
   void Update(const char *packet, JSON_Object *msg);
@@ -38,12 +33,9 @@ public:
   bool NewVector(void);
   ControlVector GetVector(void);
 
-  void SetUpdateInterface(NavUpdate_Interface *iface) { Interface = iface; }
-
 private:
   ControlVector CVec;
-  bool newVec;
-  NavUpdate_Interface *Interface;
+  SubControl    *Motors;
   Variable Log[4];
 };
 

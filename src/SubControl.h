@@ -28,35 +28,37 @@
 //  *******************************************************************************************
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "RTT_Interface.h"
 #include "CmdModule.h"
 #include "Motor.h"
-#include "Navigation.h"
 #include "Alarm.h"
 #include "Permissions.h"
 
-class SubControl: CmdModule, RealTime::Task_Interface, NavUpdate_Interface {
+class SubControl: CmdModule {
 public:
   SubControl(const char *filename);
-  ~SubControl();
+
+  typedef enum {
+    vecX = 0,
+    vecY,
+    vecZ,
+    vecROLL,
+    vecPITCH,
+    vecYAW,
+    vecSize
+  } Control;
 
   void Add(const AlarmGroup & group);
   void Add(const PermissionGroup & group);
 
-  void Run_Task(void);
-
   void Update(const char *packet, JSON_Object *msg);
+  void Update(const float * update);
   const std::string GetData(void);
-
-  void UpdateControlVector(const ControlVector & vec);
 
 private:
   std::vector<Motor> MotorList;
   AlarmGroup      Alarms;
   PermissionGroup Perm;
-  ControlVector Velocity;
 };
 
 //*******************************************************************************************
