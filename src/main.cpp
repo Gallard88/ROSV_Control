@@ -14,7 +14,6 @@
 #include "CameraManager.h"
 #include "LightManager.h"
 #include "Navigation.h"
-#include "Motor.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
 #include "AlarmManager.h"
@@ -23,9 +22,6 @@
 
 using namespace std;
 using namespace RealTime;
-
-/* ======================== */
-/* ======================== */
 
 /* ======================== */
 /* ======================== */
@@ -117,12 +113,19 @@ static void Init_Modules(void)
 {
   RealTimeTask *task;
 
+  // connect to other external systems
+  PwmModule = PWM_Connect();
+  if ( PwmModule == NULL ) {
+    Msg->Log(EventMsg::ERROR, "PWM_Connect() failed");
+    exit(-1);
+  }
+
   TaskMan = new RT_TaskManager();
   TaskMan->AddCallback((Reporting_Interface *)&TaskCallback);
 
   SubProt = new SubProtocol();
 
-  MotorControl = new SubControl("/etc/ROSV_Control/motors.json");
+  MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
 
   Nav = new Navigation(MotorControl);
@@ -192,13 +195,8 @@ int main (int argc, char *argv[])
 {
 
   Msg = EventMsg::Init();
-  Msg->setFilename("/home/pi/ROSV_Log.txt");
+  Msg->setFilename("/var/log/ROSV/ROSV_Log");
   Msg->setLogDepth(5);
-  Msg->Log(EventMsg::NOTICE, "Starting Program");
-
-  PrintVersionInfo();
-
-
   bool daemonise = false;
   int opt;
 
@@ -211,6 +209,8 @@ int main (int argc, char *argv[])
   }
 
   Msg->sendToTerminal(!daemonise);
+  Msg->Log(EventMsg::NOTICE, "Starting Program");
+  PrintVersionInfo();
 
   if ( daemonise == true ) {
     Msg->Log(EventMsg::NOTICE, "Daemonising");
@@ -225,19 +225,8 @@ int main (int argc, char *argv[])
   atexit(System_Shutdown);
 
   /* --------------------------------------------- */
-  // connect to other external systems
-  PwmModule = PWM_Connect();
-  if ( PwmModule == NULL ) {
-    Msg->Log(EventMsg::ERROR, "PWM_Connect() failed");
-    return -1;
-  }
-  Motor_Set(PwmModule);
-  Motor::SetRamp(1.0);
-
-  /* --------------------------------------------- */
   // open sub-modules
   Msg->Log(EventMsg::NOTICE, "Starting System");
-
   RunSystem = true;
   Init_Modules();
 

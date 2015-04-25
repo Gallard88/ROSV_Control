@@ -27,12 +27,11 @@
 using namespace std;
 
 float Motor::Ramp = 100.0;
-static PWM_Con_t Pwm;
+static const float Max = 100.0;
+static const float Min = 0.0;
 
-
-//  *******************************************************************************************
 Motor::Motor(const JSON_Object *setting):
-  Target(0.0), Value(0.0)
+  Value(0.0)
 {
   const char *name = json_object_get_string(setting, "Name");
   Name = string(name);
@@ -51,18 +50,11 @@ Motor::~Motor()
 {
 }
 
-//  *******************************************************************************************
-void Motor_Set(PWM_Con_t p)
-{
-  Pwm = p;
-}
-
 void Motor::SetRamp(float ramp)
 {
   Ramp = ramp;
 }
 
-//  *******************************************************************************************
 string Motor::GetJSON(void)
 {
   char buf[100];
@@ -71,26 +63,28 @@ string Motor::GetJSON(void)
   return string(buf);
 }
 
-//  *******************************************************************************************
-static const float Max = 100.0;
-static const float Min = 0.0;
-//  *******************************************************************************************
+float Motor::GetPower(void)
+{
+  return Value;
+}
+
+int Motor::GetChanel(void)
+{
+  return Chanel;
+}
+
 void Motor::Run(const float *power)
 {
-  if ( Pwm == NULL ) {
-    return;
-  }
-
-  Target = 0.0;
+  float target = 0.0;
 
   for ( int j = 0; j < VECTOR_SIZE; j ++ ) {
-    Target = Target + ((float)mult[j] * power[j]);
+    target = target + ((float)mult[j] * power[j]);
   }
 
-  if ( Target > Max )
-    Target = Max;
-  else if ( Target < Min )
-    Target = Min;
+  if ( target > Max )
+    target = Max;
+  else if ( target < Min )
+    target = Min;
 
   /* When the motors engage at full power there is often a HUGE surge of current
    * which can cause the main rail to drop a volt or two. This glitch on the supply
@@ -103,16 +97,14 @@ void Motor::Run(const float *power)
    * of the motors, we only run this code when the motors power is LESS than the target.
    *
    */
-  if ( Value < Target ) {
-    if  (( Target - Value ) > Ramp )
+  if ( Value < target ) {
+    if  (( target - Value ) > Ramp )
       Value += Ramp;
     else
-      Value = Target;
+      Value = target;
 
   } else {
-    Value = Target;
+    Value = target;
   }
-  PWM_SetPWM(Pwm, Chanel, Value);
 }
 
-//*******************************************************************************************

@@ -25,11 +25,8 @@
 #ifndef __MOTOR__
 #define __MOTOR__
 //*******************************************************************************************
-#include "parson.h"
-
-#include <PWM_Controller.h>
+#include <parson.h>
 #include <string>
-
 
 //*******************************************************************************************
 #define VECTOR_SIZE     6
@@ -42,7 +39,10 @@ public:
   virtual ~Motor();
 
   void Run(const float *power);
+
   float GetPower(void);
+  int GetChanel(void);
+
   std::string GetJSON(void);
 
   static void SetRamp(float ramp);
@@ -50,13 +50,12 @@ public:
 private:
   int Chanel;
   int mult[VECTOR_SIZE];
-  float Target, Value;
+  float Value;
   std::string Name;
 
   static float Ramp;
 };
 
-void Motor_Set(PWM_Con_t p);
 
 //*******************************************************************************************
 //*******************************************************************************************

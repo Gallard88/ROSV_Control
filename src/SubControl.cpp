@@ -26,8 +26,10 @@
 
 using namespace std;
 
-SubControl::SubControl(const char *filename)
+SubControl::SubControl(const char *filename, PWM_Con_t p):
+  Pwm(p)
 {
+  Motor::SetRamp(1.0);
   Alarms.SetName("SubControl");
   Perm.SetName("SubControl");
 
@@ -116,8 +118,13 @@ void SubControl::Update(const float * update)
     }
   }
 
+  struct PWM_Update new_values[16];
+
   for ( i = 0; i < MotorList.size(); i ++ ) {
     MotorList[i].Run(power);
+    new_values[i].ch = MotorList[i].GetChanel();
+    new_values[i].duty = MotorList[i].GetPower();
   }
+  PWM_SetMultiplePWM(Pwm, new_values, MotorList.size());
   FlagReady();
 }

@@ -28,6 +28,7 @@
 //  *******************************************************************************************
 #include <string>
 #include <vector>
+#include <PWM_Controller.h>
 
 #include "CmdModule.h"
 #include "Motor.h"
@@ -36,7 +37,7 @@
 
 class SubControl: CmdModule {
 public:
-  SubControl(const char *filename);
+  SubControl(const char *filename, PWM_Con_t p);
 
   typedef enum {
     vecX = 0,
@@ -59,6 +60,7 @@ private:
   std::vector<Motor> MotorList;
   AlarmGroup      Alarms;
   PermissionGroup Perm;
+  PWM_Con_t Pwm;
 };
 
 //*******************************************************************************************
