@@ -180,7 +180,7 @@ static void Init_Modules(void)
 static void PrintVersionInfo(void)
 {
   char name[256];
-  gethostname(name, strlen(name));
+  gethostname(name, sizeof(name));
   Msg->Log(EventMsg::NOTICE, PACKAGE_STRING);
   Msg->Log(EventMsg::NOTICE, PACKAGE_BUGREPORT);
   Msg->Log(EventMsg::NOTICE, name);
