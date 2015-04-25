@@ -58,6 +58,7 @@ private:
   PermissionGroup              PermGroup;
   std::vector<ClientSocket::Client_Ptr> Clients;
 
+  void SendServerId(ClientSocket::Client_Ptr p);
   void ResetPacketTime(void);
   void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);

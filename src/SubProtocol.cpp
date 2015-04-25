@@ -22,8 +22,12 @@
 */
 // *******************************************************************************************
 #include <cstring>
-#include "parson.h"
+#include <sys/time.h>
+#include <cmath>
+
+#include <parson.h>
 #include "SubProtocol.h"
+#include "config.h"
 
 using namespace std;
 
@@ -95,6 +99,7 @@ void SubProtocol::Run(struct timeval timeout)
   ClientSocket::Client_Ptr p;
   p = Server->Listen(timeout);
   if ( p != NULL ) {
+    SendServerId(p);
     Clients.push_back(p);
     ResetPacketTime();
   }
@@ -112,6 +117,23 @@ void SubProtocol::Run(struct timeval timeout)
   } else {
     PermClient->Set(false);
   }
+}
+
+// *******************************************************************************************
+void SubProtocol::SendServerId(ClientSocket::Client_Ptr p)
+{
+  string msg;
+  char name[256];
+  gethostname(name, sizeof(name));
+
+  msg += "{ \"Module\":\"Server\", ";
+  msg += "\"RecordType\":\"Id\", ";
+  msg += "\"Host\":\"" + string(name) + "\", ";
+  msg += "\"Type\":\"" + string(PACKAGE_NAME) + "\", ";
+  msg += "\"Version\":\"" + string(PACKAGE_VERSION) + "\"";
+  msg += "}\r\n";
+
+  p->Send(msg);
 }
 
 // *******************************************************************************************
