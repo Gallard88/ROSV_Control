@@ -70,7 +70,7 @@ am_ROSV_Control_OBJECTS = Alarm.$(OBJEXT) AlarmManager.$(OBJEXT) \
 	Permissions.$(OBJEXT) PermissionManager.$(OBJEXT) \
 	PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
 	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
-	Variable.$(OBJEXT) main.$(OBJEXT)
+	VideoStream.$(OBJEXT) Variable.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
 ROSV_Control_DEPENDENCIES = /usr/local/lib/libPWMControl.a \
@@ -270,6 +270,8 @@ ROSV_Control_SOURCES = \
 	SubProtocol.h \
 	TcpServer.cpp \
 	TcpServer.h \
+	VideoStream.cpp \
+	VideoStream.h \
 	Variable.cpp \
 	Variable.h \
 	main.cpp
@@ -373,6 +375,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubProtocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TcpServer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VideoStream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:

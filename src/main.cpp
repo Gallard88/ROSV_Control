@@ -8,6 +8,8 @@
 #include <RTT_Interface.h>
 #include <RT_TaskManager.h>
 
+#include <thread>
+
 #include "config.h"
 
 #include "PowerManager.h"
@@ -19,6 +21,7 @@
 #include "AlarmManager.h"
 #include "PermissionManager.h"
 #include "EventMessages.h"
+#include "VideoStream.h"
 
 using namespace std;
 using namespace RealTime;
@@ -36,9 +39,17 @@ RT_TaskManager   *TaskMan;
 AlarmManager     *AlmManager;
 PermGroupManager *PManager;
 EventMsg         *Msg;
+VideoStreamer    *Video;
 
-//static thread ListenThread;
 volatile bool RunSystem;
+
+static void RunVideo(void)
+{
+  Msg->Log(EventMsg::NOTICE, "RunVideo()");
+  while ( RunSystem ) {
+    Video->RunStream();
+  }
+}
 
 /* ======================== */
 class MainCallBack: public RealTime::Reporting_Interface {
@@ -104,6 +115,7 @@ void System_Shutdown(void)
   }
   delete AlmManager;
   delete PManager;
+  delete Video;
 
   Msg->Log(EventMsg::NOTICE, "System Shutdown");
 }
@@ -119,6 +131,8 @@ static void Init_Modules(void)
     Msg->Log(EventMsg::ERROR, "PWM_Connect() failed");
     exit(-1);
   }
+
+  Video = new VideoStreamer(8091);
 
   TaskMan = new RT_TaskManager();
   TaskMan->AddCallback((Reporting_Interface *)&TaskCallback);
@@ -229,6 +243,8 @@ int main (int argc, char *argv[])
   Msg->Log(EventMsg::NOTICE, "Starting System");
   RunSystem = true;
   Init_Modules();
+
+  std::thread VideoThread (RunVideo);
 
   Msg->Log(EventMsg::NOTICE, "Main()");
   /* --------------------------------------------- */
