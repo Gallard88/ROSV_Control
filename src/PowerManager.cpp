@@ -102,12 +102,10 @@ static Alarm::Severity_t CheckVoltage(float v)
 
 void PowerManager::Run_Task(void)
 {
+  float v[NUM_VOLTAGE_CH], temp;
 
-  float v[NUM_VOLTAGE_CH];
-
-  v[0] = PWM_GetVoltage(Pwm);
-  v[1] = PMon_GetVoltage(PMon, 0);
-  v[2] = PMon_GetVoltage(PMon, 1);
+  PMon_GetVoltages(PMon, &v[1], &v[2]);
+  PWM_GetMeasurements(Pwm, &v[0], &temp, NULL);
   FlagReady();
 
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
@@ -117,9 +115,8 @@ void PowerManager::Run_Task(void)
     VoltAlarms[i]->SetState(CheckVoltage(v[i]));
   }
 
-  float t = PWM_GetTemp(Pwm);
-  TempAlarms->SetState(CheckTemp(t));
-  Temp.Set(t);
+  TempAlarms->SetState(CheckTemp(temp));
+  Temp.Set(temp);
 }
 
 //  *******************************************************************************************
