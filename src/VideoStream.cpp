@@ -16,7 +16,7 @@
 const char *VideoFileName = "/home/pi/Video.h264";
 
 VideoStreamer::VideoStreamer(int port):
-  VideoWidth(640), VideoHeight(480),
+  VideoWidth(1280), VideoHeight(960),
   VideoFrame(20), VideoDuration(1*60),
   Port(port), Recording(false)
 {
@@ -112,7 +112,6 @@ int VideoStreamer::WaitForClient(void)
   Client_Name = std::string(inet_ntoa(cli_addr.sin_addr));
   Msg->Log(EventMsg::NOTICE, "New client: %s", Client_Name.c_str());
   mtx.unlock();
-
   return fp;
 }
 
@@ -132,7 +131,7 @@ FILE *VideoStreamer::OpenPipe(void)
   char buffer[BUFFER_SIZE];
 
 //  snprintf(buffer, sizeof(buffer), "ls -l /home/pi/");
-  snprintf(buffer, sizeof(buffer), "raspivid -t %u -w %u -h %u -o -", VideoDuration*1000, (unsigned int)VideoWidth, (unsigned int)VideoHeight);
+  snprintf(buffer, sizeof(buffer), "raspivid -fps %u -t %u -w %u -h %u -o -", (unsigned int) VideoFrame, VideoDuration*1000, (unsigned int)VideoWidth, (unsigned int)VideoHeight);
   Msg->Log(EventMsg::NOTICE, "Command: %s", buffer);
   FILE * fp = popen(buffer, "r");
   if ( fp == NULL) {
@@ -146,7 +145,7 @@ int VideoStreamer::RunStream(void)
 {
   char buffer[BUFFER_SIZE];
   int client_fp = WaitForClient();
-  int written;
+  ssize_t written;
   FILE *pipe_fp = OpenPipe();
   FILE *local_file = OpenLocalFile();
 
@@ -156,7 +155,7 @@ int VideoStreamer::RunStream(void)
 
   while( !feof(pipe_fp) ) {
 
-    size_t bytes_read = fread(buffer, 1, BUFFER_SIZE, pipe_fp);
+    ssize_t bytes_read = fread(buffer, 1, BUFFER_SIZE, pipe_fp);
 
     written = fwrite(buffer, 1, bytes_read, local_file);
     if ( written != bytes_read ) {
