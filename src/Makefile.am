@@ -35,6 +35,8 @@ ROSV_Control_SOURCES = \
 	EventMessages.h \
 	LightManager.cpp \
 	LightManager.h \
+	MsgQueue.cpp \
+	MsgQueue.h \
 	Motor.cpp \
 	Motor.h \
 	Permissions.cpp \

@@ -38,12 +38,15 @@ struct Modules {
   CmdModule   *module;
 };
 
+class MsgQueue;
+
 //*******************************************************************************************
 class SubProtocol: CmdModule {
 public:
   SubProtocol();
   virtual ~SubProtocol();
 
+  void Add(MsgQueue *que);
   void AddModule(const std::string & name, CmdModule *mod);
   void Run(struct timeval timeout);
   int GetNumClients(void) const;
@@ -57,6 +60,7 @@ private:
   std::shared_ptr<Permission>  PermClient;
   PermissionGroup              PermGroup;
   std::vector<ClientSocket::Client_Ptr> Clients;
+  std::vector<MsgQueue *>      ModList;
 
   void SendServerId(ClientSocket::Client_Ptr p);
   void ResetPacketTime(void);
@@ -64,7 +68,7 @@ private:
   const std::string GetData(void);
   void SendUpdatedData(void);
   void SendMsg(const std::string & msg);
-  void ProcessLine(std::string line);
+  void ProcessLine(const std::string & line);
 };
 
 //*******************************************************************************************

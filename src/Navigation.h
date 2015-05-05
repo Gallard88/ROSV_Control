@@ -20,12 +20,15 @@ typedef struct {
 
 //  *******************************************************************************************
 //  *******************************************************************************************
+class MsgQueue;
 
 class Navigation: CmdModule, RealTime::Task_Interface {
 
 public:
   Navigation(SubControl * motors);
   void Run_Task(void);
+
+  MsgQueue *GetQueue(void);
 
   void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);
@@ -36,7 +39,10 @@ public:
 private:
   ControlVector CVec;
   SubControl    *Motors;
+  MsgQueue      *MQue;
   Variable Log[4];
+
+  void Parse(const char *msg);
 };
 
 #endif

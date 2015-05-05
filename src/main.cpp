@@ -144,6 +144,7 @@ static void Init_Modules(void)
 
   Nav = new Navigation(MotorControl);
   SubProt->AddModule("Navigation", (CmdModule *) Nav );
+  SubProt->Add(Nav->GetQueue());
   task = new RealTimeTask("Navigation", (Task_Interface *) Nav);
   task->SetFrequency(10);
   task->SetMaxDuration_Ms(50);

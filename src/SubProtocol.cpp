@@ -24,10 +24,12 @@
 #include <cstring>
 #include <sys/time.h>
 #include <cmath>
+#include <iostream>
 
 #include <parson.h>
 #include "SubProtocol.h"
 #include "config.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -67,6 +69,11 @@ SubProtocol::~SubProtocol()
 }
 
 // *******************************************************************************************
+void SubProtocol::Add(MsgQueue *que)
+{
+  ModList.push_back(que);
+}
+
 void SubProtocol::AddModule(const string & name, CmdModule *mod)
 {
   struct Modules new_module;
@@ -199,8 +206,12 @@ const string SubProtocol::GetData(void)
 }
 
 // *******************************************************************************************
-void SubProtocol::ProcessLine(string line)
+void SubProtocol::ProcessLine(const string & line)
 {
+  for ( size_t i = 0; i < ModList.size(); i ++ ) {
+    ModList[i]->Store(line);
+  }
+
   JSON_Value *data = json_parse_string(line.c_str());
 
   if ( data == NULL ) {
@@ -220,6 +231,7 @@ void SubProtocol::ProcessLine(string line)
   }
   // release the data now that we are finished.
   json_value_free(data);
+
 }
 
 // *******************************************************************************************

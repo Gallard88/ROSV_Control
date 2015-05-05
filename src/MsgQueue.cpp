@@ -10,6 +10,7 @@ using namespace std;
 MsgQueue::MsgQueue(std::string module, bool update):
   Module(module), Update(update)
 {
+  RxMsgs.reserve(100);
 }
 
 void MsgQueue::Store(const std::string & msg)
@@ -34,13 +35,21 @@ void MsgQueue::Store(const std::string & msg)
   json_value_free(data);
 }
 
+bool MsgQueue::ReceiveReady(void)
+{
+  return (RxMsgs.size () != 0)? true : false;
+}
+
+
 bool MsgQueue::Receive(std::string * type, std::string *data)
 {
   if ( RxMsgs.size() == 0 ) {
     return false;
   }
+  bool rv = false;
   string s = RxMsgs[0];
   RxMsgs.erase(RxMsgs.begin());
+
   JSON_Value *p = json_parse_string(s.c_str());
 
   if ( p == NULL ) {
@@ -52,8 +61,9 @@ bool MsgQueue::Receive(std::string * type, std::string *data)
   if ( packet != NULL ) {
     *type = string(packet);
     *data = s;
+    rv = true;
   }
   json_value_free(p);
-  cout << "Size: " << RxMsgs.size() << endl;
-  return true;
+//  cout << "Size: " << RxMsgs.size() << endl;
+  return rv;
 }

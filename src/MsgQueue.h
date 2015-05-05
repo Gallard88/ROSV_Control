@@ -13,6 +13,7 @@ public:
   void Store(const std::string & msg);
 
   //
+  bool ReceiveReady(void);
   bool Receive(std::string * type, std::string * data);
 
 private:

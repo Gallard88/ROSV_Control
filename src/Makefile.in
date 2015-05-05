@@ -66,10 +66,11 @@ am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 PROGRAMS = $(ROSV_Control_PROGRAMS)
 am_ROSV_Control_OBJECTS = Alarm.$(OBJEXT) AlarmManager.$(OBJEXT) \
 	CameraManager.$(OBJEXT) ClientSocket.$(OBJEXT) \
-	EventMessages.$(OBJEXT) LightManager.$(OBJEXT) Motor.$(OBJEXT) \
-	Permissions.$(OBJEXT) PermissionManager.$(OBJEXT) \
-	PowerManager.$(OBJEXT) Navigation.$(OBJEXT) \
-	SubControl.$(OBJEXT) SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
+	EventMessages.$(OBJEXT) LightManager.$(OBJEXT) \
+	MsgQueue.$(OBJEXT) Motor.$(OBJEXT) Permissions.$(OBJEXT) \
+	PermissionManager.$(OBJEXT) PowerManager.$(OBJEXT) \
+	Navigation.$(OBJEXT) SubControl.$(OBJEXT) \
+	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
 	VideoStream.$(OBJEXT) Variable.$(OBJEXT) main.$(OBJEXT)
 ROSV_Control_OBJECTS = $(am_ROSV_Control_OBJECTS)
 ROSV_Control_LDADD = $(LDADD)
@@ -254,6 +255,8 @@ ROSV_Control_SOURCES = \
 	EventMessages.h \
 	LightManager.cpp \
 	LightManager.h \
+	MsgQueue.cpp \
+	MsgQueue.h \
 	Motor.cpp \
 	Motor.h \
 	Permissions.cpp \
@@ -367,6 +370,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EventMessages.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LightManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Motor.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MsgQueue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Navigation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PermissionManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Permissions.Po@am__quote@
