@@ -7,6 +7,7 @@ using namespace std;
 ClientSocket::ClientSocket(std::string name, int fp):
   File(fp), Name(name)
 {
+  Buffer.reserve(1024);
   Msg = EventMsg::Init();
   Msg->Log(EventMsg::NOTICE, "New ClientSocket %s", Name.c_str());
 }
@@ -54,16 +55,13 @@ void ClientSocket::Send(const std::string & msg)
 bool ClientSocket::Read(std::string & line)
 {
   if ( isConnected() == true ) {
-    while ( Buffer.size() != 0 ) {
-      size_t found = Buffer.find_first_of("\r\n");
+    size_t found;
+    while (( found = Buffer.find_first_of("\r\n")) != string::npos ) {
+      line = Buffer.substr(0, found);
+      Buffer.erase(0, found+1);
 
-      if ( found != string::npos) {
-        line = Buffer.substr(0, found);
-        Buffer.erase(0, found+1);
-
-        if ( line.length()) {
-          return true;
-        }
+      if ( line.length()) {
+        return true;
       }
     }
   }
