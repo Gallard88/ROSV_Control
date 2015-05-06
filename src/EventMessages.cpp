@@ -7,6 +7,7 @@
 #include <sys/time.h>
 
 #include "EventMessages.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -17,10 +18,16 @@ EventMsg::EventMsg():
   PrintSyslog(true), PrintTerminal(true),
   Filename(""), Num_Msgs(10)
 {
+  MQue = new MsgQueue("Messages", false);
 }
 
 EventMsg::~EventMsg()
 {
+}
+
+MsgQueue *EventMsg::GetQueue(void)
+{
+  return MQue;
 }
 
 const char *EventText[] = {
@@ -97,10 +104,6 @@ void EventMsg::Log(EventMsg_t type, const char *fmt, ...)
 
 /* ============================================ */
 // Cmd Module
-void EventMsg::Update(const char *packet, JSON_Object *msg)
-{
-}
-
 const std::string EventMsg::GetData(void)
 {
   string msg;

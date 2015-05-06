@@ -55,6 +55,7 @@ public:
 protected:
 
 private:
+  MsgQueue *MQue;
   std::vector<struct Modules>  Modules;
   TcpServer                   *Server;
   std::shared_ptr<Permission>  PermClient;
@@ -64,7 +65,6 @@ private:
 
   void SendServerId(ClientSocket::Client_Ptr p);
   void ResetPacketTime(void);
-  void Update(const char *packet, JSON_Object *msg);
   const std::string GetData(void);
   void SendUpdatedData(void);
   void SendMsg(const std::string & msg);

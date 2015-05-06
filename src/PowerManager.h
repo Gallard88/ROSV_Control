@@ -38,6 +38,8 @@
 //*******************************************************************************************
 #define NUM_VOLTAGE_CH  3
 //*******************************************************************************************
+class MsgQueue;
+
 class  PowerManager: CmdModule, RealTime::Task_Interface {
 
 public:
@@ -46,7 +48,7 @@ public:
 
   void Run_Task(void);
 
-  void Update(const char *packet, JSON_Object *msg);
+  MsgQueue *GetQueue(void);
   const std::string GetData(void);
 
   const AlarmGroup & getVoltAlarmGroup(void);
@@ -63,6 +65,8 @@ private:
   // these need to become a shared pointer...
   std::shared_ptr<Alarm> VoltAlarms[NUM_VOLTAGE_CH];
   std::shared_ptr<Alarm> TempAlarms;
+
+  MsgQueue *MQue;
 
   PMon_t    PMon;
   PWM_Con_t Pwm;

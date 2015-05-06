@@ -28,6 +28,7 @@
 #include "LightManager.h"
 #include "parson.h"
 #include "EventMessages.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -36,6 +37,8 @@ LightManager::LightManager(const char * filename)
 {
   Alarms.SetName("Lighting");
   PermGroup.SetName("Lighting");
+
+  MQue = new MsgQueue("Lighting", true);
 
   JSON_Value *val = json_parse_file(filename);
   int rv = json_value_get_type(val);
@@ -98,6 +101,11 @@ LightManager::~LightManager()
   }
 }
 
+MsgQueue *LightManager::GetQueue(void)
+{
+  return MQue;
+}
+
 void LightManager::Add(const AlarmGroup & alarm)
 {
   Alarms.add(alarm);
@@ -128,11 +136,6 @@ void LightManager::Run_Task(void)
       PWM_SetPWM(Pwm, ch.Modules[j], pwr);
     }
   }
-}
-
-void LightManager::Update(const char *packet, JSON_Object *msg)
-{
-  FlagReady();
 }
 
 const string LightManager::GetData(void)

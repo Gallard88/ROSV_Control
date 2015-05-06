@@ -26,6 +26,7 @@
 #include "PowerManager.h"
 #include "Alarm.h"
 #include "EventMessages.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
   TempGroup.SetName("Temp");
   VoltGroup.SetName("Voltage");
   EventMsg *Msg = EventMsg::Init();
-
+  MQue = new MsgQueue("Power", false);
 
   if ( PMon == NULL ) {
     Msg->Log(EventMsg::ERROR, "PowerManager: failed to open PowerMonitor");
@@ -68,6 +69,11 @@ PowerManager::PowerManager(const char * filename, PWM_Con_t p):
 
 PowerManager::~PowerManager()
 {
+}
+
+MsgQueue *PowerManager::GetQueue(void)
+{
+  return MQue;
 }
 
 //  *******************************************************************************************
@@ -117,11 +123,6 @@ void PowerManager::Run_Task(void)
 
   TempAlarms->SetState(CheckTemp(temp));
   Temp.Set(temp);
-}
-
-//  *******************************************************************************************
-void PowerManager::Update(const char *packet, JSON_Object *msg)
-{
 }
 
 //  *******************************************************************************************

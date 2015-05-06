@@ -30,6 +30,8 @@
 #include "parson.h"
 
 //*******************************************************************************************
+class MsgQueue;
+
 class CameraManager: CmdModule, RealTime::Task_Interface {
 public:
   CameraManager(const char *filename);
@@ -39,12 +41,13 @@ public:
   void Stop(void);
   long DiveTime(void);
 
-  void Update(const char *packet, JSON_Object *msg);
+  MsgQueue *GetQueue(void);
   const std::string GetData(void);
 
   void Run_Task(void);
 
 private:
+  MsgQueue *MQue;
   char *StartSc;
   char *StopSc;
   time_t StartTime;

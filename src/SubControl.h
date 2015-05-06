@@ -35,6 +35,8 @@
 #include "Alarm.h"
 #include "Permissions.h"
 
+class MsgQueue;
+
 class SubControl: CmdModule {
 public:
   SubControl(const char *filename, PWM_Con_t p);
@@ -52,11 +54,12 @@ public:
   void Add(const AlarmGroup & group);
   void Add(const PermissionGroup & group);
 
-  void Update(const char *packet, JSON_Object *msg);
   void Update(const float * update);
+  MsgQueue *GetQueue(void);
   const std::string GetData(void);
 
 private:
+  MsgQueue *MQue;
   std::vector<Motor> MotorList;
   AlarmGroup      Alarms;
   PermissionGroup Perm;

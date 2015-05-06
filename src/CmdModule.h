@@ -26,7 +26,6 @@
 #define __CMD_MODULE__
 //*******************************************************************************************
 #include <string>
-#include <parson.h>
 
 //*******************************************************************************************
 class CmdModule {
@@ -45,7 +44,6 @@ public:
     return PacketTime;
   }
 
-  virtual void Update(const char *packet, JSON_Object *msg) = 0;
   virtual const std::string GetData(void) = 0;
 
 private:

@@ -139,7 +139,10 @@ static void Init_Modules(void)
 
   SubProt = new SubProtocol();
 
+  SubProt->Add(Msg->GetQueue());
+
   MotorControl = new SubControl("/etc/ROSV_Control/motors.json", PwmModule);
+  SubProt->Add(MotorControl->GetQueue());
   SubProt->AddModule("Motor",      (CmdModule *) MotorControl );
 
   Nav = new Navigation(MotorControl);
@@ -152,6 +155,7 @@ static void Init_Modules(void)
 
   LightMan = new LightManager("/etc/ROSV_Control/lighting.json");
   LightMan->Pwm = PwmModule;
+  SubProt->Add(LightMan->GetQueue());
   SubProt->AddModule("Light",      (CmdModule *) LightMan );
   task = new RealTimeTask("Light", (Task_Interface *) LightMan);
   task->SetFrequency(1);
@@ -159,6 +163,7 @@ static void Init_Modules(void)
   TaskMan->AddTask(task);
 
   Power = new PowerManager("/etc/ROSV_Control/power.json", PwmModule);
+  SubProt->Add(Power->GetQueue());
   SubProt->AddModule("Power",      (CmdModule *) Power );
   task = new RealTimeTask("Power", (Task_Interface *) Power);
   task->SetFrequency(1);
@@ -166,6 +171,7 @@ static void Init_Modules(void)
   TaskMan->AddTask(task);
 
   CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
+  SubProt->Add(CamMan->GetQueue());
   SubProt->AddModule("Camera",     (CmdModule *) CamMan );
   task = new RealTimeTask("Camera", (Task_Interface *) CamMan);
   task->SetFrequency(1);
@@ -173,9 +179,11 @@ static void Init_Modules(void)
   TaskMan->AddTask(task);
 
   AlmManager = new AlarmManager();
+  SubProt->Add(AlmManager->GetQueue());
   SubProt->AddModule("AlarmManager", (CmdModule *) AlmManager );
 
   PManager = new PermGroupManager();
+  SubProt->Add(PManager->GetQueue());
   SubProt->AddModule("PermissionManager", (CmdModule *) PManager );
 
   SubProt->AddModule("Messages", (CmdModule *) EventMsg::Init() );

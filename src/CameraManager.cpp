@@ -26,6 +26,7 @@
 
 #include "CameraManager.h"
 #include "EventMessages.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -37,6 +38,7 @@ static EventMsg *Msg;
 CameraManager::CameraManager(const char *filename):
   StartTime(0)
 {
+  MQue = new MsgQueue("Camera", true);
   if ( Msg == NULL ) {
     Msg = EventMsg::Init();
   }
@@ -82,6 +84,11 @@ CameraManager::~CameraManager()
     free(StopSc);
 }
 
+MsgQueue *CameraManager::GetQueue(void)
+{
+  return MQue;
+}
+
 // *******************************************************************************************
 void CameraManager::Start(const char *ip)
 {
@@ -116,22 +123,6 @@ long CameraManager::DiveTime(void)
 void CameraManager::Stop(void)
 {
   StartTime = 0;
-}
-
-// *******************************************************************************************
-void CameraManager::Update(const char *packet, JSON_Object *msg)
-{
-  Msg->Log(EventMsg::ERROR, "Msg");
-  const char *rec_type = json_object_get_string(msg, "RecordType");
-  if ( rec_type == NULL ) {
-    return;
-  }
-  if ( strcmp(rec_type, "Start") == 0 ) {
-    this->Start(json_object_get_string(msg, "IP"));
-    Msg->Log(EventMsg::ERROR,"Camera Start");
-  }  else {
-    Msg->Log(EventMsg::ERROR, "Cam record: %s", rec_type);
-  }
 }
 
 // *******************************************************************************************

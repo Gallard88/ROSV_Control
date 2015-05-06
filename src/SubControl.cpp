@@ -21,8 +21,11 @@
  THE SOFTWARE.
 */
 // *******************************************************************************************
+#include <parson.h>
+
 #include "SubControl.h"
 #include "EventMessages.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -32,6 +35,7 @@ SubControl::SubControl(const char *filename, PWM_Con_t p):
   Motor::SetRamp(1.0);
   Alarms.SetName("SubControl");
   Perm.SetName("SubControl");
+  MQue = new MsgQueue("Motor", false);
 
   EventMsg *Msg = EventMsg::Init();
 
@@ -69,6 +73,11 @@ SubControl::SubControl(const char *filename, PWM_Con_t p):
   json_value_free (val);
 }
 
+MsgQueue *SubControl::GetQueue(void)
+{
+  return MQue;
+}
+
 void SubControl::Add(const AlarmGroup & group)
 {
   Alarms.add(group);
@@ -93,10 +102,6 @@ const string SubControl::GetData(void)
   }
   msg += " ] ";
   return msg;
-}
-
-void SubControl::Update(const char *packet, JSON_Object *msg)
-{
 }
 
 const float MOT_SCALE = 100.0;

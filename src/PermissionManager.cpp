@@ -1,4 +1,5 @@
 #include "PermissionManager.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -6,10 +7,16 @@ PermGroupManager::PermGroupManager():
   LastState(false)
 {
   SetName("PermissionManager");
+  MQue = new MsgQueue("PermissionManager", false);
 }
 
 PermGroupManager::~PermGroupManager()
 {
+}
+
+MsgQueue *PermGroupManager::GetQueue(void)
+{
+  return MQue;
 }
 
 void PermGroupManager::Check(void)
@@ -19,13 +26,6 @@ void PermGroupManager::Check(void)
     FlagReady();
     LastState = s;
   }
-}
-
-
-void PermGroupManager::Update(const char *packet, JSON_Object *msg)
-{
-  // nothing to do here.
-  return;
 }
 
 const std::string PermGroupManager::GetData(void)

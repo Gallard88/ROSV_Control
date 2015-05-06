@@ -4,6 +4,8 @@
 #include "Alarm.h"
 #include "CmdModule.h"
 
+class MsgQueue;
+
 class AlarmManager: public CmdModule, public AlarmGroup
 {
 public:
@@ -13,10 +15,11 @@ public:
   void Check(void);
 
   // Cmd Module Functions.
-  void Update(const char *packet, JSON_Object *msg);
+  MsgQueue *GetQueue(void);
   const std::string GetData(void);
 
 private:
+  MsgQueue *MQue;
   Alarm::Severity_t LastState;
 };
 

@@ -1,4 +1,5 @@
 #include "AlarmManager.h"
+#include "MsgQueue.h"
 
 using namespace std;
 
@@ -6,11 +7,18 @@ AlarmManager::AlarmManager():
   LastState(Alarm::CLEAR)
 {
   SetName("AlarmManager");
+  MQue = new MsgQueue("AlarmManager", false);
   FlagReady();
 }
 
 AlarmManager::~AlarmManager()
 {
+  delete MQue;
+}
+
+MsgQueue *AlarmManager::GetQueue(void)
+{
+  return MQue;
 }
 
 void AlarmManager::Check(void)
@@ -20,12 +28,6 @@ void AlarmManager::Check(void)
     FlagReady();
     LastState = s;
   }
-}
-
-void AlarmManager::Update(const char *packet, JSON_Object *msg)
-{
-  // nothing to do here.
-  return;
 }
 
 const std::string AlarmManager::GetData(void)

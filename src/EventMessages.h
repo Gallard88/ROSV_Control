@@ -6,6 +6,8 @@
 
 #include "CmdModule.h"
 
+class MsgQueue;
+
 class EventMsg: CmdModule
 {
 public:
@@ -26,12 +28,14 @@ public:
   void Log(EventMsg_t type, const char *fmt, ...);
 
   // Cmd Module Functions.
-  void Update(const char *packet, JSON_Object *msg);
+  MsgQueue *GetQueue(void);
   const std::string GetData(void);
 
 private:
   EventMsg();
   ~EventMsg();
+
+  MsgQueue *MQue;
 
   bool PrintSyslog;
   bool PrintTerminal;

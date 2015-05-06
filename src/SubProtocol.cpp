@@ -55,11 +55,13 @@ using namespace std;
 SubProtocol::SubProtocol()
 {
   Server = new TcpServer(8090);
+  MQue = new MsgQueue("Server", false);
   AddModule("Clients", this);
   std::shared_ptr<Permission> p(new Permission("Clients"));
   PermClient = p;
   PermGroup.SetName("SubProtocol");
   PermGroup.add(std::const_pointer_cast<const Permission>(p));
+  Add(MQue);
 }
 
 // *******************************************************************************************
@@ -181,11 +183,6 @@ void SubProtocol::SendMsg(const string & msg)
 }
 
 // *******************************************************************************************
-void SubProtocol::Update(const char *packet, JSON_Object *msg)
-{
-}
-
-// *******************************************************************************************
 const string SubProtocol::GetData(void)
 {
   string msg;
@@ -211,27 +208,6 @@ void SubProtocol::ProcessLine(const string & line)
   for ( size_t i = 0; i < ModList.size(); i ++ ) {
     ModList[i]->Store(line);
   }
-
-  JSON_Value *data = json_parse_string(line.c_str());
-
-  if ( data == NULL ) {
-    return;
-  }
-
-  JSON_Object *obj = json_value_get_object(data);
-
-  const char *module = json_object_get_string(obj, "Module");
-  const char *packet = json_object_get_string(obj, "Packet");
-  if ( module != NULL ) {
-    for ( size_t j = 0; j < Modules.size(); j ++ ) {
-      if ( strcmp(module, Modules[j].Name.c_str()) == 0 ) {
-        Modules[j].module->Update(packet, obj);
-      }
-    }
-  }
-  // release the data now that we are finished.
-  json_value_free(data);
-
 }
 
 // *******************************************************************************************

@@ -45,6 +45,7 @@ typedef struct  {
 } LightChanel;
 
 //*******************************************************************************************
+class MsgQueue;
 
 class  LightManager: CmdModule, RealTime::Task_Interface {
 public:
@@ -56,12 +57,13 @@ public:
 
   void Run_Task(void);
 
-  void Update(const char *packet, JSON_Object *msg);
+  MsgQueue *GetQueue(void);
   const std::string GetData(void);
 
   PWM_Con_t Pwm;
 
 private:
+  MsgQueue *MQue;
   std::vector<LightChanel> Chanels;
   PermissionGroup PermGroup;
   AlarmGroup      Alarms;

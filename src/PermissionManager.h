@@ -4,6 +4,8 @@
 #include "Permissions.h"
 #include "CmdModule.h"
 
+class MsgQueue;
+
 class PermGroupManager: public CmdModule, public PermissionGroup
 {
 public:
@@ -13,10 +15,11 @@ public:
   void Check(void);
 
   // Cmd Module Functions.
-  void Update(const char *packet, JSON_Object *msg);
+  MsgQueue *GetQueue(void);
   const std::string GetData(void);
 
 private:
+  MsgQueue *MQue;
   bool LastState;
 };
 
