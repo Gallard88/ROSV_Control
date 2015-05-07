@@ -30,14 +30,13 @@
 #include <vector>
 #include <PWM_Controller.h>
 
-#include "CmdModule.h"
 #include "Motor.h"
 #include "Alarm.h"
 #include "Permissions.h"
 
 class MsgQueue;
 
-class SubControl: CmdModule {
+class SubControl {
 public:
   SubControl(const char *filename, PWM_Con_t p);
 
@@ -56,9 +55,10 @@ public:
 
   void Update(const float * update);
   MsgQueue *GetQueue(void);
-  const std::string GetData(void);
 
 private:
+  void SendData(void);
+
   MsgQueue *MQue;
   std::vector<Motor> MotorList;
   AlarmGroup      Alarms;

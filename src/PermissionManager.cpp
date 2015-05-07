@@ -23,17 +23,16 @@ void PermGroupManager::Check(void)
 {
   bool s = isGroupEnabled();
   if ( s != LastState ) {
-    FlagReady();
+    SendData();
     LastState = s;
   }
 }
 
-const std::string PermGroupManager::GetData(void)
+void PermGroupManager::SendData(void)
 {
   string msg;
   char vec[256];
 
-  msg = "\"RecordType\": \"ReportPermission\", ";
   msg += "\"Permissions\":[";
 
   for ( size_t i = 0; i < PermList.size(); i ++ ) {
@@ -43,6 +42,6 @@ const std::string PermGroupManager::GetData(void)
       msg += ", ";
   }
   msg += " ]";
-  return msg;
+  MQue->Send("ReportPermission", msg);
 }
 

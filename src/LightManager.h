@@ -32,7 +32,6 @@
 #include <PWM_Controller.h>
 
 #include "RTT_Interface.h"
-#include "CmdModule.h"
 #include "Variable.h"
 #include "Alarm.h"
 #include "Permissions.h"
@@ -47,7 +46,7 @@ typedef struct  {
 //*******************************************************************************************
 class MsgQueue;
 
-class  LightManager: CmdModule, RealTime::Task_Interface {
+class  LightManager:  RealTime::Task_Interface {
 public:
   LightManager(const char * filename);
   ~LightManager();
@@ -58,7 +57,6 @@ public:
   void Run_Task(void);
 
   MsgQueue *GetQueue(void);
-  const std::string GetData(void);
 
   PWM_Con_t Pwm;
 
@@ -67,6 +65,8 @@ private:
   std::vector<LightChanel> Chanels;
   PermissionGroup PermGroup;
   AlarmGroup      Alarms;
+
+  void SendData(void);
 };
 
 //*******************************************************************************************

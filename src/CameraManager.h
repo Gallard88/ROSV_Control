@@ -26,13 +26,12 @@
 #define __CAMERA_MANAGER__
 //*******************************************************************************************
 #include "RTT_Interface.h"
-#include "CmdModule.h"
 #include "parson.h"
 
 //*******************************************************************************************
 class MsgQueue;
 
-class CameraManager: CmdModule, RealTime::Task_Interface {
+class CameraManager:  RealTime::Task_Interface {
 public:
   CameraManager(const char *filename);
   virtual ~CameraManager();
@@ -42,15 +41,14 @@ public:
   long DiveTime(void);
 
   MsgQueue *GetQueue(void);
-  const std::string GetData(void);
 
   void Run_Task(void);
 
 private:
+  void SendData(void);
   MsgQueue *MQue;
   char *StartSc;
   char *StopSc;
-  time_t StartTime;
 };
 
 //*******************************************************************************************

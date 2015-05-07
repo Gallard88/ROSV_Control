@@ -56,7 +56,6 @@ SubProtocol::SubProtocol()
 {
   Server = new TcpServer(8090);
   MQue = new MsgQueue("Server", false);
-  AddModule("Clients", this);
   std::shared_ptr<Permission> p(new Permission("Clients"));
   PermClient = p;
   PermGroup.SetName("SubProtocol");
@@ -74,16 +73,6 @@ SubProtocol::~SubProtocol()
 void SubProtocol::Add(MsgQueue *que)
 {
   ModList.push_back(que);
-}
-
-void SubProtocol::AddModule(const string & name, CmdModule *mod)
-{
-  struct Modules new_module;
-
-  new_module.Name = name;
-  new_module.PTime = 0;
-  new_module.module = mod;
-  Modules.push_back(new_module);
 }
 
 const PermissionGroup &SubProtocol::getPermGroup() const
@@ -110,7 +99,9 @@ void SubProtocol::Run(struct timeval timeout)
   if ( p != NULL ) {
     SendServerId(p);
     Clients.push_back(p);
-    ResetPacketTime();
+    for ( size_t i = 0; i < ModList.size(); i ++ ) {
+      ModList[i]->SetBroadcast();
+    }
   }
 
   string l;
@@ -120,12 +111,8 @@ void SubProtocol::Run(struct timeval timeout)
     }
   }
 
-  if ( Clients.size() != 0 ) {
-    SendUpdatedData();
-    PermClient->Set(true);
-  } else {
-    PermClient->Set(false);
-  }
+  SendUpdatedData();
+  PermClient->Set((Clients.size() != 0)? true: false);
 }
 
 // *******************************************************************************************
@@ -146,29 +133,16 @@ void SubProtocol::SendServerId(ClientSocket::Client_Ptr p)
 }
 
 // *******************************************************************************************
-void SubProtocol::ResetPacketTime(void)
-{
-for ( auto& m: Modules) {
-    m.PTime = 0;
-  }
-}
-
-// *******************************************************************************************
 void SubProtocol::SendUpdatedData(void)
 {
-  /*
-   * Now, grab the data from each module,
-   * and send it to each DataSouce.
-   */
-  for ( size_t j = 0; j < Modules.size(); j ++ ) {
-    if ( Modules[j].PTime != Modules[j].module->GetPacketTime() ) {
-      Modules[j].PTime = Modules[j].module->GetPacketTime();
+  string msg;
 
-      string msg;
-      msg = "{ \"Module\":\"" + Modules[j].Name + "\", ";
-      msg += Modules[j].module->GetData();
-      msg += " }\r\n";
-      SendMsg(msg);
+  for ( size_t i = 0; i < ModList.size(); i ++ ) {
+    while ( ModList[i]->MsgWaiting() == true ) {
+      msg = ModList[i]->GetMsg();
+      for ( size_t i = 0; i < Clients.size(); i ++ ) {
+        Clients[i]->Send( msg);
+      }
     }
   }
 }
@@ -176,18 +150,16 @@ void SubProtocol::SendUpdatedData(void)
 //*******************************************************************************************
 void SubProtocol::SendMsg(const string & msg)
 {
-  size_t i;
-  for ( i = 0; i < Clients.size(); i ++ ) {
+  for ( size_t i = 0; i < Clients.size(); i ++ ) {
     Clients[i]->Send( msg);
   }
 }
 
 // *******************************************************************************************
-const string SubProtocol::GetData(void)
+void SubProtocol::SendData(void)
 {
   string msg;
 
-  msg += "\"RecordType\":\"Clients\", ";
   msg += "\"Values\":[ ";
   for ( size_t i = 0; i < Clients.size(); i ++ ) {
     msg += "{ \"ip\":\"";
@@ -199,7 +171,7 @@ const string SubProtocol::GetData(void)
     }
   }
   msg += "]";
-  return msg;
+  MQue->Send("Clients", msg);
 }
 
 // *******************************************************************************************

@@ -2,11 +2,10 @@
 #define __ALARM_MANAGER__
 
 #include "Alarm.h"
-#include "CmdModule.h"
 
 class MsgQueue;
 
-class AlarmManager: public CmdModule, public AlarmGroup
+class AlarmManager:  public AlarmGroup
 {
 public:
   AlarmManager();
@@ -16,9 +15,9 @@ public:
 
   // Cmd Module Functions.
   MsgQueue *GetQueue(void);
-  const std::string GetData(void);
 
 private:
+  void SendData(void);
   MsgQueue *MQue;
   Alarm::Severity_t LastState;
 };

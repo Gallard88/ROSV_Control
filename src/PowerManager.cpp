@@ -112,7 +112,6 @@ void PowerManager::Run_Task(void)
 
   PMon_GetVoltages(PMon, &v[1], &v[2]);
   PWM_GetMeasurements(Pwm, &v[0], &temp, NULL);
-  FlagReady();
 
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
     if ( fabsf(Volts[i].Get() - v[i]) > 0.1 ) {
@@ -123,20 +122,20 @@ void PowerManager::Run_Task(void)
 
   TempAlarms->SetState(CheckTemp(temp));
   Temp.Set(temp);
+  SendData();
 }
 
 //  *******************************************************************************************
-const string PowerManager::GetData(void)
+void PowerManager::SendData(void)
 {
-  string jVolt = "\"Volt\":[";
-  jVolt += Volts[0].GetJSON() + ", ";
-  jVolt += Volts[1].GetJSON() + ", ";
-  jVolt += Volts[2].GetJSON();
-  jVolt += "]";
+  string msg = "\"Volt\":[";
+  msg += Volts[0].GetJSON() + ", ";
+  msg += Volts[1].GetJSON() + ", ";
+  msg += Volts[2].GetJSON();
+  msg += "], ";
 
-  string jTemp = "\"Temp\":[" + Temp.GetJSON() + "]";
-
-  return "\"RecordType\": \"PowerData\", " + jVolt + ", " + jTemp;
+  msg += "\"Temp\":[" + Temp.GetJSON() + "]";
+  MQue->Send("PowerData", msg);
 }
 
 //*******************************************************************************************

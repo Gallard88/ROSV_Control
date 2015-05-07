@@ -35,8 +35,7 @@ using namespace std;
 static EventMsg *Msg;
 
 // *******************************************************************************************
-CameraManager::CameraManager(const char *filename):
-  StartTime(0)
+CameraManager::CameraManager(const char *filename)
 {
   MQue = new MsgQueue("Camera", true);
   if ( Msg == NULL ) {
@@ -106,44 +105,32 @@ void CameraManager::Start(const char *ip)
 //  } else  if ( pid < 0 ) {
 //    exit(-1);
 //  }
-  StartTime = time(NULL);
 }
 
 // *******************************************************************************************
 long CameraManager::DiveTime(void)
 {
-  if ( StartTime ) {
-    return time(NULL) - StartTime;
-  } else {
-    return 0;
-  }
+  return 0;
 }
 
 // *******************************************************************************************
 void CameraManager::Stop(void)
 {
-  StartTime = 0;
 }
 
 // *******************************************************************************************
-const string CameraManager::GetData(void)
+void CameraManager::SendData(void)
 {
   char power[10];
-  string msg("\"RecordType\": \"Update\", ");
+  string msg;
   int diff = 0;
 
-  if ( StartTime != 0 ) {
-    diff = time(NULL) - StartTime;
-  }
-
-
-  msg += "\"Chanels\":[ ";
+  msg += "\"Channels\":[ ";
   msg += " {\"Name\": \"Primary\",\"Max\":100, \"Min\":0, \"Value\": ";
   sprintf(power, "%d", diff );
   msg += string(power);
-  msg += "}";
-  msg += " ] ";
-  return msg;
+  msg += "}]";
+  MQue->Send("Update", msg);
 
 }
 

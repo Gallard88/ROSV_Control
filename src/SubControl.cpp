@@ -88,10 +88,10 @@ void SubControl::Add(const PermissionGroup & group)
   Perm.add(group);
 }
 
-const string SubControl::GetData(void)
+void SubControl::SendData(void)
 {
-  string msg("\"RecordType\": \"MotorData\", ");
-  msg += "\"Chanels\":[ ";
+  string msg;
+  msg += "\"Channels\":[ ";
   for ( size_t i = 0; i < MotorList.size(); i ++ ) {
 
     msg += MotorList[i].GetJSON();
@@ -101,7 +101,7 @@ const string SubControl::GetData(void)
     }
   }
   msg += " ] ";
-  return msg;
+  MQue->Send("MotorData", msg);
 }
 
 const float MOT_SCALE = 100.0;
@@ -131,5 +131,5 @@ void SubControl::Update(const float * update)
     new_values[i].duty = MotorList[i].GetPower();
   }
   PWM_SetMultiplePWM(Pwm, new_values, MotorList.size());
-  FlagReady();
+  SendData();
 }

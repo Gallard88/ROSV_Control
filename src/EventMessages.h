@@ -4,11 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "CmdModule.h"
-
 class MsgQueue;
 
-class EventMsg: CmdModule
+class EventMsg
 {
 public:
   static EventMsg * Init();
@@ -29,12 +27,12 @@ public:
 
   // Cmd Module Functions.
   MsgQueue *GetQueue(void);
-  const std::string GetData(void);
 
 private:
   EventMsg();
   ~EventMsg();
 
+  void SendData(void);
   MsgQueue *MQue;
 
   bool PrintSyslog;

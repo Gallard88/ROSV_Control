@@ -1,7 +1,7 @@
 //  *******************************************************************************************
 //  *******************************************************************************************
 #include <cstring>
-#include <iostream>
+#include <parson.h>
 
 #include "Navigation.h"
 #include "MsgQueue.h"
@@ -46,25 +46,24 @@ void Navigation::Run_Task(void)
   update_vector[SubControl::vecYAW]   = CVec.yaw;
 
   Motors->Update(update_vector);
+  if ( MQue->IsBroadcast() ) {
+    SendData();
+  }
 }
 
 //  *******************************************************************************************
-void Navigation::Update(const char *packet, JSON_Object *msg)
-{
-}
-
 void Navigation::Parse(const char *msg)
 {
   JSON_Value *data = json_parse_string(msg);
   if ( data == NULL ) {
-    cout << "Null Ptr" << endl;
+//    cout << "Null Ptr" << endl;
     return;
   }
   JSON_Object *obj = json_value_get_object(data);
 
   const char *packet = json_object_get_string(obj, "Packet");
   if ( strcmp("SetVector", packet) != 0 ) {
-    cout << "Wierd Packet: " << msg << endl;
+//    cout << "Wierd Packet: " << msg << endl;
     json_value_free(data);
     return;
   }
@@ -72,7 +71,7 @@ void Navigation::Parse(const char *msg)
   const char *mode = json_object_get_string(obj, "Mode");
   if ( strcmp("Raw", mode) != 0 ) {
     // unknown mode, ignore this packet for the moment.
-    cout << "Not Raw: " << msg << endl;
+//    cout << "Not Raw: " << msg << endl;
     json_value_free(data);
     return;
   }
@@ -92,15 +91,16 @@ void Navigation::Parse(const char *msg)
     CVec.yaw = value;
     Log[3].Set(value);
   }
-  FlagReady();
+  MQue->SetBroadcast();
   json_value_free(data);
 }
 
-//  *******************************************************************************************
-const string Navigation::GetData(void)
+void Navigation::SendData(void)
 {
   string msg;
   char vec[256];
+
+  MQue->Send("ReportVectors", msg);
 
   msg = "\"RecordType\": \"ReportVectors\", ";
   msg += "\"Vectors\":[";
@@ -114,7 +114,7 @@ const string Navigation::GetData(void)
   msg += string(vec);
 
   msg += " ]";
-  return msg;
+  MQue->Send("ReportVectors", msg);
 }
 
 //  *******************************************************************************************

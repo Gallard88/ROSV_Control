@@ -2,11 +2,10 @@
 #define __PERMISSION_MANAGER__
 
 #include "Permissions.h"
-#include "CmdModule.h"
 
 class MsgQueue;
 
-class PermGroupManager: public CmdModule, public PermissionGroup
+class PermGroupManager:  public PermissionGroup
 {
 public:
   PermGroupManager();
@@ -16,9 +15,9 @@ public:
 
   // Cmd Module Functions.
   MsgQueue *GetQueue(void);
-  const std::string GetData(void);
 
 private:
+  void SendData(void);
   MsgQueue *MQue;
   bool LastState;
 };

@@ -8,7 +8,6 @@ AlarmManager::AlarmManager():
 {
   SetName("AlarmManager");
   MQue = new MsgQueue("AlarmManager", false);
-  FlagReady();
 }
 
 AlarmManager::~AlarmManager()
@@ -25,18 +24,17 @@ void AlarmManager::Check(void)
 {
   Alarm::Severity_t s = GetGroupState();
   if ( s != LastState ) {
-    FlagReady();
+    SendData();
     LastState = s;
   }
 }
 
-const std::string AlarmManager::GetData(void)
+void AlarmManager::SendData(void)
 {
   string msg;
   char vec[256];
 
-  msg = "\"RecordType\": \"ReportAlarms\", ";
-  msg += "\"Alarms\":[";
+  msg = "\"Alarms\":[";
 
   for ( size_t i = 0; i < AlarmList.size(); i ++ ) {
     sprintf(vec, "{ \"Alm\":\"%s\", \"State\": \"%s\" }", AlarmList[i]->GetName().c_str(), AlarmList[i]->GetState_Text().c_str());
@@ -45,6 +43,6 @@ const std::string AlarmManager::GetData(void)
       msg += ", ";
   }
   msg += " ]";
-  return msg;
+  MQue->Send("ReportAlarms", msg);
 }
 

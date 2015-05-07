@@ -28,26 +28,18 @@
 #include <memory>
 
 #include "Permissions.h"
-#include "CmdModule.h"
 #include "TcpServer.h"
 #include "ClientSocket.h"
-
-struct Modules {
-  std::string  Name;
-  unsigned int PTime;
-  CmdModule   *module;
-};
 
 class MsgQueue;
 
 //*******************************************************************************************
-class SubProtocol: CmdModule {
+class SubProtocol {
 public:
   SubProtocol();
   virtual ~SubProtocol();
 
   void Add(MsgQueue *que);
-  void AddModule(const std::string & name, CmdModule *mod);
   void Run(struct timeval timeout);
   int GetNumClients(void) const;
   const PermissionGroup &getPermGroup() const;
@@ -56,7 +48,6 @@ protected:
 
 private:
   MsgQueue *MQue;
-  std::vector<struct Modules>  Modules;
   TcpServer                   *Server;
   std::shared_ptr<Permission>  PermClient;
   PermissionGroup              PermGroup;
@@ -64,8 +55,7 @@ private:
   std::vector<MsgQueue *>      ModList;
 
   void SendServerId(ClientSocket::Client_Ptr p);
-  void ResetPacketTime(void);
-  const std::string GetData(void);
+  void SendData(void);
   void SendUpdatedData(void);
   void SendMsg(const std::string & msg);
   void ProcessLine(const std::string & line);

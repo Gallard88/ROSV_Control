@@ -30,7 +30,6 @@
 #include <PWM_Controller.h>
 #include <PowerMonitor.h>
 
-#include "CmdModule.h"
 #include "RTT_Interface.h"
 #include "Variable.h"
 #include "Alarm.h"
@@ -40,7 +39,7 @@
 //*******************************************************************************************
 class MsgQueue;
 
-class  PowerManager: CmdModule, RealTime::Task_Interface {
+class  PowerManager:  RealTime::Task_Interface {
 
 public:
   PowerManager(const char * filename, PWM_Con_t p);
@@ -49,12 +48,13 @@ public:
   void Run_Task(void);
 
   MsgQueue *GetQueue(void);
-  const std::string GetData(void);
 
   const AlarmGroup & getVoltAlarmGroup(void);
   const AlarmGroup & getTempAlarmGroup(void);
 
 private:
+
+  void SendData(void);
 
   AlarmGroup VoltGroup;
   AlarmGroup TempGroup;

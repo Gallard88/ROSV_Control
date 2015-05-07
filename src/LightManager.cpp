@@ -134,15 +134,16 @@ void LightManager::Run_Task(void)
 //      pwr = ( en == true )? ch.Power.Get(): 0;
       pwr = ( en == true )? 1: 0;
       PWM_SetPWM(Pwm, ch.Modules[j], pwr);
+      SendData();
     }
   }
 }
 
-const string LightManager::GetData(void)
+void LightManager::SendData(void)
 {
   string msg;
 
-  msg = "\"RecordType\":\"LightChanels\", \"Chanels\":[ ";
+  msg = "\"Channels\":[ ";
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
 
     msg += Chanels[i].Power.GetJSON();
@@ -151,7 +152,7 @@ const string LightManager::GetData(void)
     }
   }
   msg += " ] ";
-  return msg;
+  MQue->Send("LightChannels", msg);
 }
 
 

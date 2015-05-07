@@ -67,8 +67,6 @@ void EventMsg::Log(EventMsg_t type, const char *fmt, ...)
   char text [512];
   va_list args;
 
-  FlagReady();
-
   va_start(args,fmt);
   vsnprintf(buf, sizeof(buf), fmt, args);
   va_end(args);
@@ -100,16 +98,16 @@ void EventMsg::Log(EventMsg_t type, const char *fmt, ...)
     perror("open()");
   }
   Mtx.unlock();
+//  SendData();
 }
 
 /* ============================================ */
 // Cmd Module
-const std::string EventMsg::GetData(void)
+void EventMsg::SendData(void)
 {
   string msg;
   size_t size = Messages.size();
 
-  msg = "\"RecordType\": \"SystemMessages\", ";
   msg += "\"Messages\":[ ";
 
   for ( size_t i = 0; i < size; i ++ ) {
@@ -121,6 +119,6 @@ const std::string EventMsg::GetData(void)
     }
   }
   msg += " ]";
-  return msg;
+  MQue->Send("SystemMessages", msg);
 }
 
