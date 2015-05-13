@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <atomic>
 
 /*	Permission Class
  *	An object to control system wide modules.
@@ -23,8 +24,7 @@ public:
 
 private:
   std::string Name;
-  bool Value;
-  unsigned int Max_Value;
+  std::atomic_bool Value;
 
   // Disable copying.
   Permission(const Permission &);
@@ -46,7 +46,7 @@ public:
 protected:
   std::vector<std::shared_ptr<const Permission >> PermList;
   std::string Name;
-  bool GroupState;
+  std::atomic_bool GroupState;
 
   // Disable copying
   PermissionGroup & operator=(const PermissionGroup&);

@@ -19,7 +19,7 @@ public:
 private:
   void SendData(void);
   MsgQueue *MQue;
-  bool LastState;
+  std::atomic_bool LastState;
 };
 
 #endif
