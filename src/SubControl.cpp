@@ -111,6 +111,15 @@ void SubControl::Update(const float * update)
   float power[vecSize];
   size_t i;
 
+  bool send_alm = false;
+  bool send_perm = false;
+
+  if ( MQue->IsBroadcast() ) {
+    send_alm = true;
+    send_perm = true;
+  }
+
+
   if (( Alarms.GetGroupState() == Alarm::ERROR ) ||
       ( Perm.isGroupEnabled() == false )) {
 
@@ -131,5 +140,13 @@ void SubControl::Update(const float * update)
     new_values[i].duty = MotorList[i].GetPower();
   }
   PWM_SetMultiplePWM(Pwm, new_values, MotorList.size());
+
+
+  if ( send_alm == true ) {
+    MQue->Send("Alarm", Alarms.GetJSON());
+  }
+  if ( send_perm == true ) {
+    MQue->Send("Permissions", Perm.GetJSON());
+  }
   SendData();
 }

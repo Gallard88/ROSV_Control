@@ -79,6 +79,8 @@ public:
   //	This functions scans the group of errors and reports the highest severity found.
   Alarm::Severity_t GetGroupState(void);
 
+  std::string GetJSON();
+
 protected:
   std::vector<std::shared_ptr<const Alarm >> AlarmList;
   std::string Name;

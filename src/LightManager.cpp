@@ -135,6 +135,8 @@ void LightManager::Run_Task(void)
       pwr = ( en == true )? 1: 0;
       PWM_SetPWM(Pwm, ch.Modules[j], pwr);
       SendData();
+      MQue->Send("Alarms", Alarms.GetJSON() );
+      MQue->Send("Permission", PermGroup.GetJSON() );
     }
   }
 }
@@ -154,6 +156,7 @@ void LightManager::SendData(void)
   msg += " ] ";
   MQue->Send("LightChannels", msg);
 }
+
 
 
 

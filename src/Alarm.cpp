@@ -182,3 +182,18 @@ Alarm::Severity_t AlarmGroup::GetGroupState(void)
   }
   return global;
 }
+
+std::string AlarmGroup::GetJSON(void)
+{
+  string msg = "\"" + Name + "\":[ ";
+  for ( size_t i = 0; i < AlarmList.size(); i ++ ) {
+    msg += "{ \"Name\":\"" + AlarmList[i]->GetName() + "\", ";
+    msg += "\"State\":\"" +  AlarmList[i]->GetState_Text() + "\"}";
+    if (( AlarmList.size() > 1 ) && ( i < (AlarmList.size() -1) )) {
+      msg += ", ";
+    }
+  }
+  msg += "] ";
+  return msg;
+}
+

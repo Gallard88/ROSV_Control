@@ -2,6 +2,8 @@
 #include "Permissions.h"
 #include "EventMessages.h"
 
+using namespace std;
+
 static EventMsg *Msg;
 
 Permission::Permission(std::string name ):
@@ -89,4 +91,19 @@ bool PermissionGroup::isGroupEnabled()
   return global;
 }
 
+std::string PermissionGroup::GetJSON(void)
+{
+  std::string msg = "\"" + Name + "\":[ ";
+  for ( size_t i = 0; i < PermList.size(); i ++ ) {
+    msg += "{ \"Name\":\"" + PermList[i]->GetName() + "\", ";
+    msg += "\"Enabled\":\"";
+    msg += PermList[i]->isEnabled() ? string("True"):string("False");
+    msg += "\"}";
+    if (( PermList.size() > 1 ) && ( i < (PermList.size() -1) )) {
+      msg += ", ";
+    }
+    msg += "] ";
+  }
+  return msg;
+}
 

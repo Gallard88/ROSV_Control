@@ -18,8 +18,6 @@
 #include "Navigation.h"
 #include "SubControl.h"
 #include "SubProtocol.h"
-#include "AlarmManager.h"
-#include "PermissionManager.h"
 #include "EventMessages.h"
 #include "VideoStream.h"
 
@@ -36,8 +34,6 @@ CameraManager    *CamMan;
 PowerManager     *Power;
 Navigation       *Nav;
 RT_TaskManager   *TaskMan;
-AlarmManager     *AlmManager;
-PermGroupManager *PManager;
 EventMsg         *Msg;
 VideoStreamer    *Video;
 
@@ -113,8 +109,6 @@ void System_Shutdown(void)
   if ( SubProt != NULL ) {
     delete SubProt;
   }
-  delete AlmManager;
-  delete PManager;
   delete Video;
 
   Msg->Log(EventMsg::NOTICE, "System Shutdown");
@@ -173,25 +167,15 @@ static void Init_Modules(void)
   task->SetMaxDuration_Ms(50);
   TaskMan->AddTask(task);
 
-  AlmManager = new AlarmManager();
-  SubProt->Add(AlmManager->GetQueue());
-
-  PManager = new PermGroupManager();
-  SubProt->Add(PManager->GetQueue());
-
   // Wire up alarms
   MotorControl->Add(Power->getVoltAlarmGroup());
   MotorControl->Add(Power->getTempAlarmGroup());
-
-  AlmManager->add(Power->getVoltAlarmGroup());
-  AlmManager->add(Power->getTempAlarmGroup());
 
   LightMan->Add(Power->getVoltAlarmGroup());
   LightMan->Add(Power->getTempAlarmGroup());
 
   MotorControl->Add(SubProt->getPermGroup());
   LightMan->Add(SubProt->getPermGroup());
-  PManager->add(SubProt->getPermGroup());
 }
 
 static void PrintVersionInfo(void)
@@ -259,8 +243,6 @@ int main (int argc, char *argv[])
       system_time.tv_usec =  10000;
       SubProt->Run(system_time);
     }
-    PManager->Check();
-    AlmManager->Check();
   }
   return 0;
 }

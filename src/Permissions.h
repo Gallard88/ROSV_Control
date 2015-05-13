@@ -43,6 +43,8 @@ public:
 
   bool isGroupEnabled();  // returns true if all member Permissions are enabled.
 
+  std::string GetJSON();
+
 protected:
   std::vector<std::shared_ptr<const Permission >> PermList;
   std::string Name;

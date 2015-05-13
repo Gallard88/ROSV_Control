@@ -64,11 +64,10 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(ROSV_Controldir)" \
 	"$(DESTDIR)$(ROSV_Control_Filesdir)"
 PROGRAMS = $(ROSV_Control_PROGRAMS)
-am_ROSV_Control_OBJECTS = Alarm.$(OBJEXT) AlarmManager.$(OBJEXT) \
-	CameraManager.$(OBJEXT) ClientSocket.$(OBJEXT) \
-	EventMessages.$(OBJEXT) LightManager.$(OBJEXT) \
-	MsgQueue.$(OBJEXT) Motor.$(OBJEXT) Permissions.$(OBJEXT) \
-	PermissionManager.$(OBJEXT) PowerManager.$(OBJEXT) \
+am_ROSV_Control_OBJECTS = Alarm.$(OBJEXT) CameraManager.$(OBJEXT) \
+	ClientSocket.$(OBJEXT) EventMessages.$(OBJEXT) \
+	LightManager.$(OBJEXT) MsgQueue.$(OBJEXT) Motor.$(OBJEXT) \
+	Permissions.$(OBJEXT) PowerManager.$(OBJEXT) \
 	Navigation.$(OBJEXT) SubControl.$(OBJEXT) \
 	SubProtocol.$(OBJEXT) TcpServer.$(OBJEXT) \
 	VideoStream.$(OBJEXT) Variable.$(OBJEXT) main.$(OBJEXT)
@@ -244,8 +243,6 @@ LDADD = \
 ROSV_Control_SOURCES = \
 	Alarm.cpp \
 	Alarm.h \
-	AlarmManager.cpp \
-	AlarmManager.h \
 	CameraManager.cpp \
 	CameraManager.h \
 	ClientSocket.cpp \
@@ -261,8 +258,6 @@ ROSV_Control_SOURCES = \
 	Motor.h \
 	Permissions.cpp \
 	Permissions.h \
-	PermissionManager.cpp \
-	PermissionManager.h \
 	PowerManager.cpp \
 	PowerManager.h \
 	Navigation.cpp \
@@ -364,7 +359,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Alarm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AlarmManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CameraManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ClientSocket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EventMessages.Po@am__quote@
@@ -372,7 +366,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Motor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MsgQueue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Navigation.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PermissionManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Permissions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PowerManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubControl.Po@am__quote@

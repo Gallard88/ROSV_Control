@@ -24,8 +24,6 @@ LDADD = \
 ROSV_Control_SOURCES = \
 	Alarm.cpp \
 	Alarm.h \
-	AlarmManager.cpp \
-	AlarmManager.h \
 	CameraManager.cpp \
 	CameraManager.h \
 	ClientSocket.cpp \
@@ -41,8 +39,6 @@ ROSV_Control_SOURCES = \
 	Motor.h \
 	Permissions.cpp \
 	Permissions.h \
-	PermissionManager.cpp \
-	PermissionManager.h \
 	PowerManager.cpp \
 	PowerManager.h \
 	Navigation.cpp \

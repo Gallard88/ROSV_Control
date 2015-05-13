@@ -123,6 +123,8 @@ void PowerManager::Run_Task(void)
   TempAlarms->SetState(CheckTemp(temp));
   Temp.Set(temp);
   SendData();
+  MQue->Send("VoltAlarm", VoltGroup.GetJSON());
+  MQue->Send("TempAlarm", TempGroup.GetJSON());
 }
 
 //  *******************************************************************************************
