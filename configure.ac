@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.50])
-AC_INIT(ROSV_Control, 1.0, thomasburns88@gmail.com)
+AC_INIT(ROSV_Control, 2.0, thomasburns88@gmail.com)
 AC_CONFIG_SRCDIR([src/main.cpp])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER([config.h])
