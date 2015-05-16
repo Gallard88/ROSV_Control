@@ -26,19 +26,15 @@
 #define __CAMERA_MANAGER__
 //*******************************************************************************************
 #include "RTT_Interface.h"
-#include "parson.h"
 
 //*******************************************************************************************
 class MsgQueue;
+class VideoStreamer;
 
 class CameraManager:  RealTime::Task_Interface {
 public:
-  CameraManager(const char *filename);
+  CameraManager(VideoStreamer *video);
   virtual ~CameraManager();
-
-  void Start(const char *ip);
-  void Stop(void);
-  long DiveTime(void);
 
   MsgQueue *GetQueue(void);
 
@@ -46,9 +42,9 @@ public:
 
 private:
   void SendData(void);
+
+  VideoStreamer *Video;
   MsgQueue *MQue;
-  char *StartSc;
-  char *StopSc;
 };
 
 //*******************************************************************************************

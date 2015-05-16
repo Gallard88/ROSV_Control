@@ -16,8 +16,8 @@
 const char *VideoFileName = "/home/pi/Video.h264";
 
 VideoStreamer::VideoStreamer(int port):
-  VideoWidth(1280), VideoHeight(960),
-  VideoFrame(20), VideoDuration(1*60),
+  VideoWidth(1024), VideoHeight(768),
+  VideoFrame(20), VideoDuration(60*60),
   Port(port), Recording(false)
 {
   struct sockaddr_in serv_addr;
@@ -110,8 +110,8 @@ int VideoStreamer::WaitForClient(void)
     return -1;
   mtx.lock();
   Client_Name = std::string(inet_ntoa(cli_addr.sin_addr));
-  Msg->Log(EventMsg::NOTICE, "New client: %s", Client_Name.c_str());
   mtx.unlock();
+  Msg->Log(EventMsg::NOTICE, "New client: %s", Client_Name.c_str());
   return fp;
 }
 

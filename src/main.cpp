@@ -160,7 +160,7 @@ static void Init_Modules(void)
   task->SetMaxDuration_Ms(100);
   TaskMan->AddTask(task);
 
-  CamMan = new CameraManager("/etc/ROSV_Control/camera.json");
+  CamMan = new CameraManager(Video);
   SubProt->Add(CamMan->GetQueue());
   task = new RealTimeTask("Camera", (Task_Interface *) CamMan);
   task->SetFrequency(1);
