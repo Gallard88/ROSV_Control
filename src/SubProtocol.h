@@ -54,8 +54,8 @@ private:
   std::vector<ClientSocket::Client_Ptr> Clients;
   std::vector<MsgQueue *>      ModList;
 
-  void SendServerId(ClientSocket::Client_Ptr p);
-  void SendData(void);
+  void SendServerId(void);
+  void SendClientData(void);
   void SendUpdatedData(void);
   void SendMsg(const std::string & msg);
   void ProcessLine(const std::string & line);

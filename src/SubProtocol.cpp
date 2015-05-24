@@ -97,7 +97,6 @@ void SubProtocol::Run(struct timeval timeout)
   ClientSocket::Client_Ptr p;
   p = Server->Listen(timeout);
   if ( p != NULL ) {
-    SendServerId(p);
     Clients.push_back(p);
     for ( size_t i = 0; i < ModList.size(); i ++ ) {
       ModList[i]->SetBroadcast();
@@ -113,23 +112,26 @@ void SubProtocol::Run(struct timeval timeout)
 
   SendUpdatedData();
   PermClient->Set((Clients.size() != 0)? true: false);
+  if ( MQue->IsBroadcast() ) {
+    SendServerId();
+    SendClientData();
+  }
 }
 
 // *******************************************************************************************
-void SubProtocol::SendServerId(ClientSocket::Client_Ptr p)
+void SubProtocol::SendServerId(void)
 {
   string msg;
   char name[256];
   gethostname(name, sizeof(name));
 
-  msg += "{ \"Module\":\"Server\", ";
-  msg += "\"RecordType\":\"Id\", ";
+  msg += "\"Version\":[ ";
   msg += "\"Host\":\"" + string(name) + "\", ";
   msg += "\"Type\":\"" + string(PACKAGE_NAME) + "\", ";
   msg += "\"Version\":\"" + string(PACKAGE_VERSION) + "\"";
-  msg += "}\r\n";
+  msg += "] ";
 
-  p->Send(msg);
+  MQue->Send("Version", msg);
 }
 
 // *******************************************************************************************
@@ -156,7 +158,7 @@ void SubProtocol::SendMsg(const string & msg)
 }
 
 // *******************************************************************************************
-void SubProtocol::SendData(void)
+void SubProtocol::SendClientData(void)
 {
   string msg;
 
