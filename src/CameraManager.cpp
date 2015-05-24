@@ -82,7 +82,9 @@ void CameraManager::SendData(void)
 // *******************************************************************************************
 void CameraManager::Run_Task(void)
 {
-  SendData();
+  if ( Video->isRecording() || MQue->IsBroadcast() ) {
+    SendData();
+  }
 }
 
 // *******************************************************************************************

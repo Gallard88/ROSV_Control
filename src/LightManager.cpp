@@ -68,6 +68,7 @@ LightManager::LightManager(const char * filename)
     for ( size_t i = 0; i < number; i ++) {
       LightChanel ch;
       ch.Modules.clear();
+      ch.last_value = -1.0;
 
       JSON_Object *object = json_array_get_object (ch_array, i);
       if ( object == NULL ) {
@@ -121,24 +122,48 @@ void LightManager::Run_Task(void)
   bool en = true;
   int  pwr;
 
-  if (( Alarms.GetGroupState() == Alarm::ERROR ) ||
-      ( PermGroup.isGroupEnabled() == false )) {
+  bool send_alm  = false;
+  bool send_perm = false;
 
+  if ( MQue->IsBroadcast() == true ) {
+    send_alm  = true;
+    send_perm = true;
+  }
+
+  Alarm::Severity_t severity = Alarms.GetGroupState();
+  if ( LastAlm != severity ) {
+    LastAlm = severity;
+    send_alm = true;
+  }
+  bool perm = PermGroup.isGroupEnabled();
+  if ( perm != LastPermission ) {
+    LastPermission = perm;
+    send_perm = true;
+  }
+
+  if (( severity == Alarm::ERROR ) ||
+      ( perm == false )) {
     en = false;
   }
 
   for ( size_t i = 0; i < Chanels.size(); i ++ ) {
     LightChanel ch = Chanels[i];
-    for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
-
-//      pwr = ( en == true )? ch.Power.Get(): 0;
-      pwr = ( en == true )? 1: 0;
-      PWM_SetPWM(Pwm, ch.Modules[j], pwr);
+    pwr = ( en == true )? 1.0: 0.0;
+    if ( pwr != ch.last_value ) {
+      Chanels[i].last_value = pwr;
       SendData();
-      MQue->Send("Alarms", Alarms.GetJSON() );
-      MQue->Send("Permission", PermGroup.GetJSON() );
+    }
+    for ( size_t j = 0; j < ch.Modules.size(); j ++ ) {
+      PWM_SetPWM(Pwm, ch.Modules[j], pwr);
     }
   }
+  if ( send_alm  == true ) {
+    MQue->Send("Alarms", Alarms.GetJSON() );
+  }
+  if ( send_perm == true) {
+    MQue->Send("Permission", PermGroup.GetJSON() );
+  }
+
 }
 
 void LightManager::SendData(void)

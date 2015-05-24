@@ -38,7 +38,7 @@ public:
   Motor(const JSON_Object *setting);
   virtual ~Motor();
 
-  void Run(const float *power);
+  bool Run(const float *power);
 
   float GetPower(void);
   int GetChanel(void);
@@ -51,6 +51,7 @@ private:
   int Chanel;
   int mult[VECTOR_SIZE];
   float Value;
+  float LastValue;
   std::string Name;
 
   static float Ramp;

@@ -62,7 +62,8 @@ private:
   Variable Volts[NUM_VOLTAGE_CH];
   Variable Temp;
 
-  // these need to become a shared pointer...
+  Alarm::Severity_t LastAlm[NUM_VOLTAGE_CH];
+  Alarm::Severity_t LastTemp;
   std::shared_ptr<Alarm> VoltAlarms[NUM_VOLTAGE_CH];
   std::shared_ptr<Alarm> TempAlarms;
 

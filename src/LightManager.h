@@ -40,6 +40,7 @@
 //*******************************************************************************************
 typedef struct  {
   Variable Power;
+  float last_value;
   std::vector<int> Modules;
 } LightChanel;
 
@@ -65,6 +66,8 @@ private:
   std::vector<LightChanel> Chanels;
   PermissionGroup PermGroup;
   AlarmGroup      Alarms;
+  Alarm::Severity_t LastAlm;
+  bool LastPermission;
 
   void SendData(void);
 };

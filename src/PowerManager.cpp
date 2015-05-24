@@ -24,7 +24,6 @@
 //  *******************************************************************************************
 #include <math.h>
 #include "PowerManager.h"
-#include "Alarm.h"
 #include "EventMessages.h"
 #include "MsgQueue.h"
 
@@ -109,6 +108,16 @@ static Alarm::Severity_t CheckVoltage(float v)
 void PowerManager::Run_Task(void)
 {
   float v[NUM_VOLTAGE_CH], temp;
+  bool send_data = false;
+  bool send_temp = false;
+  bool send_volt = false;
+  Alarm::Severity_t alm;
+
+  if ( MQue->IsBroadcast() ) {
+    send_data = true;
+    send_temp = true;
+    send_volt = true;
+  }
 
   PMon_GetVoltages(PMon, &v[1], &v[2]);
   PWM_GetMeasurements(Pwm, &v[0], &temp, NULL);
@@ -116,15 +125,32 @@ void PowerManager::Run_Task(void)
   for ( int i = 0; i < NUM_VOLTAGE_CH; i ++ ) {
     if ( fabsf(Volts[i].Get() - v[i]) > 0.1 ) {
       Volts[i].Set(v[i]);
+      send_data = true;
     }
-    VoltAlarms[i]->SetState(CheckVoltage(v[i]));
+    alm = CheckVoltage(v[i]);
+    if ( alm != LastAlm[i] ) {
+      LastAlm[i] = alm;
+      send_volt = true;
+    }
+    VoltAlarms[i]->SetState(alm);
   }
 
-  TempAlarms->SetState(CheckTemp(temp));
+  alm = CheckTemp(temp);
+  if ( alm != LastTemp ) {
+    LastTemp = alm;
+    send_temp = true;
+  }
+  TempAlarms->SetState(alm);
   Temp.Set(temp);
-  SendData();
-  MQue->Send("VoltAlarm", VoltGroup.GetJSON());
-  MQue->Send("TempAlarm", TempGroup.GetJSON());
+  if ( send_data == true ) {
+    SendData();
+  }
+  if ( send_volt == true ) {
+    MQue->Send("VoltAlarm", VoltGroup.GetJSON());
+  }
+  if ( send_temp == true ) {
+    MQue->Send("TempAlarm", TempGroup.GetJSON());
+  }
 }
 
 //  *******************************************************************************************

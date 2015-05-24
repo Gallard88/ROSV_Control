@@ -111,17 +111,30 @@ void SubControl::Update(const float * update)
   float power[vecSize];
   size_t i;
 
+  bool send_motor = false;
   bool send_alm = false;
   bool send_perm = false;
 
   if ( MQue->IsBroadcast() ) {
+    send_motor = true;
     send_alm = true;
     send_perm = true;
   }
 
+  Alarm::Severity_t severity = Alarms.GetGroupState();
+  if ( severity != LastAlm ) {
+    send_alm = true;
+    LastAlm = severity;
+  }
+  bool perm = Perm.isGroupEnabled();
+  if ( perm != LastPermission ) {
+    LastPermission = perm;
+    send_perm = true;
+  }
 
-  if (( Alarms.GetGroupState() == Alarm::ERROR ) ||
-      ( Perm.isGroupEnabled() == false )) {
+
+  if (( severity  == Alarm::ERROR ) ||
+      ( perm == false )) {
 
     for ( i = 0; i < vecSize; i ++ ) {
       power[i] = 0.0;
@@ -135,18 +148,22 @@ void SubControl::Update(const float * update)
   struct PWM_Update new_values[16];
 
   for ( i = 0; i < MotorList.size(); i ++ ) {
-    MotorList[i].Run(power);
+    if ( MotorList[i].Run(power) == true ) {
+      send_motor = true;
+    }
     new_values[i].ch = MotorList[i].GetChanel();
     new_values[i].duty = MotorList[i].GetPower();
   }
   PWM_SetMultiplePWM(Pwm, new_values, MotorList.size());
 
 
+  if ( send_motor == true ) {
+    SendData();
+  }
   if ( send_alm == true ) {
     MQue->Send("Alarm", Alarms.GetJSON());
   }
   if ( send_perm == true ) {
     MQue->Send("Permissions", Perm.GetJSON());
   }
-  SendData();
 }

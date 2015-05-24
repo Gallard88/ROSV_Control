@@ -59,6 +59,9 @@ public:
 private:
   void SendData(void);
 
+  Alarm::Severity_t LastAlm;
+  bool LastPermission;
+
   MsgQueue *MQue;
   std::vector<Motor> MotorList;
   AlarmGroup      Alarms;

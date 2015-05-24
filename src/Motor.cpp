@@ -31,7 +31,7 @@ static const float Max = 100.0;
 static const float Min = 0.0;
 
 Motor::Motor(const JSON_Object *setting):
-  Value(0.0)
+  Value(0.0), LastValue(-1.0)
 {
   const char *name = json_object_get_string(setting, "Name");
   Name = string(name);
@@ -73,7 +73,7 @@ int Motor::GetChanel(void)
   return Chanel;
 }
 
-void Motor::Run(const float *power)
+bool Motor::Run(const float *power)
 {
   float target = 0.0;
 
@@ -106,5 +106,10 @@ void Motor::Run(const float *power)
   } else {
     Value = target;
   }
+  if ( LastValue != Value ) {
+    LastValue = Value;
+    return true;
+  }
+  return false;
 }
 

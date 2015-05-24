@@ -100,9 +100,6 @@ void Navigation::SendData(void)
   string msg;
   char vec[256];
 
-  MQue->Send("ReportVectors", msg);
-
-  msg = "\"RecordType\": \"ReportVectors\", ";
   msg += "\"Vectors\":[";
   sprintf(vec, "{ \"Ch\":\"Forward\", \"Mode\":\"Raw\", \"Target\": %2.2f }, ", CVec.x );
   msg += string(vec);
