@@ -1,4 +1,0 @@
-#!/bin/bash
-
-update-rc.d -f ROSV_Control_Init remove
-rm -rf /etc/init.d/ROSV_Control_Init
