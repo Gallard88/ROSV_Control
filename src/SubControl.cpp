@@ -133,8 +133,7 @@ void SubControl::Update(const float * update)
   }
 
 
-  if (( severity  == Alarm::ERROR ) ||
-      ( perm == false )) {
+  if ( perm == false ) {
 
     for ( i = 0; i < vecSize; i ++ ) {
       power[i] = 0.0;
