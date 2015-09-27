@@ -1,5 +1,5 @@
 
-
+#include <ctime>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -117,7 +117,15 @@ int VideoStreamer::WaitForClient(void)
 
 FILE *VideoStreamer::OpenLocalFile(void)
 {
-  FILE * file = fopen(VideoFileName, "w");
+  time_t rawtime;
+  time ( &rawtime );
+  struct tm * t = localtime ( &rawtime );
+  char file_name[1024];
+  snprintf(file_name, sizeof(file_name), "/home/pi/Video_%04u%02u%02u_%02u%02u%02u.h264",
+           t->tm_year+1900,t->tm_mon+1, t->tm_mday,
+           t->tm_hour, t->tm_min, t->tm_sec);
+
+  FILE * file = fopen(file_name, "w");
   if ( file == NULL ) {
     perror("fopen");
     Msg->Log(EventMsg::ERROR,"fopen");
